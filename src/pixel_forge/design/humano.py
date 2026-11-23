@@ -3,14 +3,12 @@ pelos clipes que o corpo faz. O que é assimétrico nunca é espelhado: cada dir
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
 from ..contracts.composicao import Clipe, Composicao
 from ..core.direcoes import DIRECOES
 from ..core.recusa import Recusa
 from ..core.rng import Stream
-from ..views.camera import PROFUNDIDADE_PERMILLE
 from .composicao import medidas, semente_do_no
 from .construtor import AssetBuilder
 from .expressao import compilar, variaveis
@@ -21,6 +19,7 @@ from .kit.pecas_humano import corpo_dos_args
 from .kit.pilha import Pilha
 from .kit.registro import PECAS
 from .kit.roupa import Vista
+from .vistas import sombra_no_obliquo
 
 CORPO = "corpo_humano"
 CLIPES = {"idle": "parado", "walk": "andar_poses"}  # o clipe e a receita que o gera
@@ -96,11 +95,7 @@ def ir_do_humano(comp: Composicao) -> dict[str, Any]:
         ctx = Ctx(b, Stream(semente_do_no(comp.semente, no.id)), no.id, no.grupo or no.id, Pilha(), 0, no=no.id,
                   humano=humano)
         PECAS[no.peca].desenha(ctx, args)
-    sen = math.sin(math.radians(45))
-    for p in b.parts:
-        if p["id"] == "ground_shadow":
-            p["geometry"]["radii_q8"][1] = max(1, round(p["geometry"]["radii_q8"][1] * sen / (PROFUNDIDADE_PERMILLE
-                                                                                                / 1000)))
+    sombra_no_obliquo(b.parts)
     c = humano["medidas"]
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": landmarks(c),
             "canvas": canvas_de(c["estatura"]), "views": _vistas(b, humano["vista"]), "modelo": "humano"}

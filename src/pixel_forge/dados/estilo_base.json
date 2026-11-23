@@ -954,11 +954,6 @@
   }
  ],
  "shading": {
-  "light_dir": [
-   -1,
-   -1,
-   1
-  ],
   "shadow_band_px": 1,
   "highlight_band_px": 1,
   "highlight_min_area_px": 10,

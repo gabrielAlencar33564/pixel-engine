@@ -12,6 +12,7 @@ from .pecas_formas import PECAS_FORMAS
 from .pecas_humano import PECAS_HUMANO
 from .pecas_madeira import PECAS_MADEIRA
 from .pecas_pedra import PECAS_PEDRA
+from .pecas_quadrupede import PECAS_QUADRUPEDE
 from .pecas_telhado import PECAS_TELHADO
 from .pecas_tronco import PECAS_TRONCO
 from .pecas_vaos import PECAS_VAOS
@@ -28,4 +29,5 @@ def conferida(p: Peca) -> Peca:
 
 PECAS: dict[str, Peca] = {p.id: conferida(p) for p in (*PECAS_MADEIRA, *PECAS_PEDRA, *PECAS_TELHADO,
                                                         *PECAS_CARPINTARIA, *PECAS_VAOS, *PECAS_FORMAS, *PECAS_TRONCO,
-                                                        *PECAS_COPA, *PECAS_HUMANO)}
+                                                        *PECAS_COPA, *PECAS_HUMANO,
+                                                        *PECAS_QUADRUPEDE)}

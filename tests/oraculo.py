@@ -7,6 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
+from pixel_forge.application.estilo import estilo_base
 from pixel_forge.application.quadros import quadro_de_repouso
 from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.estilo import StyleDoc
@@ -14,6 +17,24 @@ from pixel_forge.contracts.ir import AssetIR
 from pixel_forge.raster.estilo import estilo_render
 
 CASOS = Path(__file__).parent / "fixtures" / "oraculo"
+
+
+def no_canvas_antigo(rgba: np.ndarray[Any, np.dtype[np.uint8]], tamanho: list[int]) -> dict[str, Any]:
+    """O quadro no canvas do antigo, como o oráculo grava (o tamanho, o hash e o hash sem a sombra no chão): o canvas
+    novo inclui a sombra que o asset projeta no chão (à direita e embaixo; o pivô não muda), então o antigo é o
+    recorte de cima e da esquerda, e fora dele só há a sombra no chão."""
+    w, h = tamanho
+    chao = np.array(next(p.rgba for p in estilo_base().palette if p.id == "sombra_chao"), dtype=np.uint8)
+    if rgba.shape[0] >= h and rgba.shape[1] >= w:
+        fora = rgba.copy()
+        fora[:h, :w] = 0
+        assert np.all(np.all(fora[fora[..., 3] == 255] == chao, axis=-1)), "fora do canvas antigo: não é sombra"
+        rgba = np.ascontiguousarray(rgba[:h, :w])
+    sem = rgba.copy()
+    sem[np.all(rgba == chao, axis=-1) | (rgba[..., 3] == 0)] = 0  # a sombra no chão e o fundo
+    return {"tamanho": [int(rgba.shape[1]), int(rgba.shape[0])],
+            "rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest(),
+            "sem_chao_sha256": hashlib.sha256(sem.tobytes()).hexdigest()}
 
 
 def caso(nome: str) -> dict[str, Any]:

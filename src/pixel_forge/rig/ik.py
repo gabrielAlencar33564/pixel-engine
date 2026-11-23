@@ -79,3 +79,23 @@ def solve_two_bone(skel: Skeleton, local: Local, world: dict[str, BoneWorld], en
     w2 = skel.solve(out)[e.id].pos
     diff = (w2[0] - target_body_pos[0], w2[1] - target_body_pos[1], w2[2] - target_body_pos[2])
     return out, isqrt(diff[0] ** 2 + diff[1] ** 2 + diff[2] ** 2)
+
+
+def _x_acima(skel: Skeleton, local: Local, bone: str | None) -> int:
+    """A inclinação em x acumulada (o ângulo local de cada osso de eixo x) do ``bone`` até a raiz, inclusive."""
+    total = 0
+    while bone is not None:
+        b = skel.bones[bone]
+        if b.rotation_axis == "x":
+            total += local[bone].rotation_mdeg
+        bone = b.parent_id
+    return total
+
+
+def orienta_no_mundo(skel: Skeleton, local: Local, ossos: tuple[str, ...], angulos: tuple[int, ...]) -> Local:
+    """Os segmentos distais da cadeia na inclinação de mundo pedida (mdeg, um por osso, na ordem): cada um desconta a
+    cadeia acima dele. É a metade de cima do IK de N segmentos: a pata plana no apoio, o punho que dobra no balanço."""
+    out = dict(local)
+    for bone, ang in zip(ossos, angulos, strict=True):
+        out[bone] = LocalPose(ang - _x_acima(skel, out, skel.bones[bone].parent_id), out[bone].translation_q8)
+    return out

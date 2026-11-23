@@ -1,0 +1,313 @@
+{
+ "id": "canino",
+ "descricao": "O rig canino: pernas em Z de quatro segmentos (úmero ou fêmur, antebraço ou tíbia, metacarpo ou metatarso, pata), o pescoço que gira, a cabeça, a crista e a cauda. Posições e comprimentos em px nas medidas do corpo; o repouso em miligraus. A cadeia de IK de cada perna: os dois segmentos de cima pelo triângulo até o alvo, os distais orientados no mundo.",
+ "ossos": [
+  {
+   "id": "root",
+   "pai": [],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "z",
+   "limites": [
+    -180,
+    180
+   ]
+  },
+  {
+   "id": "body",
+   "pai": [
+    "root"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "$corpo_z"
+   ],
+   "eixo": "x",
+   "comp": "$corpo_comp",
+   "limites": [
+    -60,
+    60
+   ]
+  },
+  {
+   "id": "neck_yaw",
+   "pai": [
+    "body"
+   ],
+   "pos": [
+    "0",
+    "$pescoco_y",
+    "$pescoco_z"
+   ],
+   "eixo": "z",
+   "comp": "1",
+   "limites": [
+    -55,
+    55
+   ]
+  },
+  {
+   "id": "head",
+   "pai": [
+    "neck_yaw"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "x",
+   "comp": "$cabeca",
+   "limites": [
+    -60,
+    60
+   ]
+  },
+  {
+   "id": "crest",
+   "pai": [
+    "body"
+   ],
+   "pos": [
+    "$crista_x",
+    "$crista_y",
+    "$crista_z"
+   ],
+   "eixo": "x",
+   "comp": "$crista",
+   "limites": [
+    -20,
+    20
+   ]
+  },
+  {
+   "id": "tail",
+   "pai": [
+    "body"
+   ],
+   "pos": [
+    "0",
+    "$cauda_y",
+    "$cauda_z"
+   ],
+   "eixo": "x",
+   "comp": "$cauda",
+   "limites": [
+    -80,
+    60
+   ]
+  },
+  {
+   "lados": [
+    {
+     "id": "upper_f{lado}",
+     "pai": [
+      "body"
+     ],
+     "pos": [
+      "$lado*$ombro_x",
+      "$ombro_y",
+      "$perna_z"
+     ],
+     "eixo": "x",
+     "comp": "$umero",
+     "limites": [
+      -110,
+      70
+     ],
+     "repouso": "$umero_mdeg"
+    },
+    {
+     "id": "lower_f{lado}",
+     "pai": [
+      "upper_f{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$umero"
+     ],
+     "eixo": "x",
+     "comp": "$antebraco",
+     "limites": [
+      5,
+      150
+     ],
+     "repouso": "$antebraco_mdeg"
+    },
+    {
+     "id": "cannon_f{lado}",
+     "pai": [
+      "lower_f{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$antebraco"
+     ],
+     "eixo": "x",
+     "comp": "$metacarpo",
+     "limites": [
+      -150,
+      60
+     ],
+     "repouso": "$metacarpo_mdeg"
+    },
+    {
+     "id": "foot_f{lado}",
+     "pai": [
+      "cannon_f{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$metacarpo"
+     ],
+     "eixo": "x",
+     "comp": "$pata",
+     "limites": [
+      -120,
+      120
+     ],
+     "repouso": "$pata_f_mdeg"
+    }
+   ]
+  },
+  {
+   "lados": [
+    {
+     "id": "upper_b{lado}",
+     "pai": [
+      "body"
+     ],
+     "pos": [
+      "$lado*$ombro_x",
+      "-$ombro_y",
+      "$perna_z"
+     ],
+     "eixo": "x",
+     "comp": "$femur",
+     "limites": [
+      -70,
+      110
+     ],
+     "repouso": "$femur_mdeg"
+    },
+    {
+     "id": "lower_b{lado}",
+     "pai": [
+      "upper_b{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$femur"
+     ],
+     "eixo": "x",
+     "comp": "$tibia",
+     "limites": [
+      -160,
+      -5
+     ],
+     "repouso": "$tibia_mdeg"
+    },
+    {
+     "id": "cannon_b{lado}",
+     "pai": [
+      "lower_b{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$tibia"
+     ],
+     "eixo": "x",
+     "comp": "$metatarso",
+     "limites": [
+      -20,
+      160
+     ],
+     "repouso": "$metatarso_mdeg"
+    },
+    {
+     "id": "foot_b{lado}",
+     "pai": [
+      "cannon_b{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$metatarso"
+     ],
+     "eixo": "x",
+     "comp": "$pata",
+     "limites": [
+      -120,
+      120
+     ],
+     "repouso": "$pata_b_mdeg"
+    }
+   ]
+  }
+ ],
+ "papeis": {
+  "raiz": {
+   "giro": "root"
+  },
+  "corpo": {
+   "frente": "body"
+  },
+  "pescoco": {
+   "giro": "neck_yaw"
+  },
+  "cabeca": {
+   "frente": "head"
+  },
+  "crista": {
+   "base": "crest"
+  },
+  "cauda": {
+   "base": "tail"
+  },
+  "perna_f{lado}": {
+   "frente": "upper_f{lado}",
+   "joelho": "lower_f{lado}",
+   "canela": "cannon_f{lado}",
+   "pe": "foot_f{lado}"
+  },
+  "perna_b{lado}": {
+   "frente": "upper_b{lado}",
+   "joelho": "lower_b{lado}",
+   "canela": "cannon_b{lado}",
+   "pe": "foot_b{lado}"
+  }
+ },
+ "ik": [
+  {
+   "papel": "perna_f{lado}",
+   "de": "frente",
+   "ate": "pe",
+   "segmentos": 4,
+   "alvo": "canela",
+   "orienta": [
+    "canela",
+    "pe"
+   ]
+  },
+  {
+   "papel": "perna_b{lado}",
+   "de": "frente",
+   "ate": "pe",
+   "segmentos": 4,
+   "alvo": "canela",
+   "orienta": [
+    "canela",
+    "pe"
+   ]
+  }
+ ]
+}

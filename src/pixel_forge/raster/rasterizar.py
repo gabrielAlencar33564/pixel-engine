@@ -9,13 +9,22 @@ from ..views.primitivas import (
     CapsulePrim,
     EllipsePrim,
     FanPrim,
+    OrientedEllipsePrim,
     PolygonPrim,
     Prim,
     RevolutionPrim,
     StipplePrim,
     TaperedPrim,
 )
-from .formas import Pontos, raster_bresenham, raster_capsule, raster_ellipse, raster_polygon, raster_tapered
+from .formas import (
+    Pontos,
+    raster_bresenham,
+    raster_capsule,
+    raster_ellipse,
+    raster_oriented_ellipse,
+    raster_polygon,
+    raster_tapered,
+)
 from .grade import MARGIN, Mascara
 from .revolucao import surface
 
@@ -78,6 +87,8 @@ def _pontilhado(prim: StipplePrim, w: int, h: int) -> Mascara:
 def rasterize(prim: Prim, w: int, h: int) -> Mascara:
     if isinstance(prim, EllipsePrim):
         return raster_ellipse(w, h, MARGIN, (prim.cu, prim.cv), (prim.hu, prim.hv))
+    if isinstance(prim, OrientedEllipsePrim):
+        return raster_oriented_ellipse(w, h, MARGIN, (prim.cu, prim.cv), (prim.muu, prim.muv, prim.mvv))
     if isinstance(prim, RevolutionPrim):
         return surface(prim.stations, prim.sd, prim.ce, w, h).mask.copy()
     if isinstance(prim, CapsulePrim):
@@ -92,7 +103,7 @@ def rasterize(prim: Prim, w: int, h: int) -> Mascara:
 
 
 def prim_center(prim: Prim) -> tuple[int, int]:
-    if isinstance(prim, EllipsePrim):
+    if isinstance(prim, EllipsePrim | OrientedEllipsePrim):
         return prim.cu, prim.cv
     pts = prim.points
     return sum(p[0] for p in pts) // len(pts), sum(p[1] for p in pts) // len(pts)

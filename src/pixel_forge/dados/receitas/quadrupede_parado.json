@@ -1,0 +1,79 @@
+{
+ "id": "quadrupede_parado",
+ "clip": "idle",
+ "tipo": "parado",
+ "descricao": "Quadrúpede em pé, respirando: o corpo desce e volta, a cabeça acompanha, a cauda e a crista atrasam 120 ms; as quatro patas plantadas por IK, os distais no repouso (a pata plana).",
+ "duracao_ms": 1200,
+ "chaves_ms": [
+  0,
+  300,
+  600,
+  900,
+  1200
+ ],
+ "suave": "smoothstep",
+ "amostras_ms": [
+  0,
+  200,
+  400,
+  600,
+  800,
+  1000
+ ],
+ "pes": [
+  "perna_fl",
+  "perna_fr",
+  "perna_bl",
+  "perna_br"
+ ],
+ "canais": {
+  "corpo.frente": {
+   "tr": [
+    0,
+    0,
+    {
+     "termos": [
+      {
+       "amp": 1,
+       "par": "idle_bob_q8",
+       "onda": "vale"
+      }
+     ]
+    }
+   ],
+   "rot": 0
+  },
+  "cabeca.frente": {
+   "rot": {
+    "termos": [
+     {
+      "amp": 4000,
+      "onda": "vale"
+     }
+    ]
+   }
+  },
+  "cauda.base": {
+   "rot": {
+    "termos": [
+     {
+      "amp": -8000,
+      "onda": "vale",
+      "atraso_ms": 120
+     }
+    ]
+   }
+  },
+  "crista.base": {
+   "rot": {
+    "termos": [
+     {
+      "amp": 3000,
+      "onda": "vale",
+      "atraso_ms": 120
+     }
+    ]
+   }
+  }
+ }
+}

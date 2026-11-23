@@ -1,0 +1,109 @@
+{
+ "id": "quadrupede_passo",
+ "clip": "walk",
+ "tipo": "passada_apoio",
+ "descricao": "Passo em sequência lateral: traseira esquerda, dianteira esquerda, traseira direita, dianteira direita, cada pata apoiada 'duty_permille' do ciclo; o corpo sobe e desce duas vezes por ciclo e rola de leve, a cabeça compensa, a cauda e a crista atrasam. No balanço, o punho e o jarrete dobram.",
+ "duracao_ms": 800,
+ "passo_ms": 50,
+ "amostras_ms": [
+  0,
+  100,
+  200,
+  300,
+  400,
+  500,
+  600,
+  700
+ ],
+ "pernas_pm": [
+  [
+   "perna_bl",
+   0
+  ],
+  [
+   "perna_fl",
+   250
+  ],
+  [
+   "perna_br",
+   500
+  ],
+  [
+   "perna_fr",
+   750
+  ]
+ ],
+ "apoio": {
+  "par": "duty_permille"
+ },
+ "passada": {
+  "par": "stride_q8"
+ },
+ "altura": {
+  "par": "lift_q8"
+ },
+ "sobe_desce": {
+  "par": "bob_q8"
+ },
+ "canais": {
+  "corpo.frente": {
+   "tr": [
+    0,
+    0,
+    {
+     "termos": [
+      {
+       "amp": -1,
+       "par": "bob_q8",
+       "onda": "sin",
+       "freq": 2
+      }
+     ]
+    }
+   ],
+   "rot": {
+    "termos": [
+     {
+      "amp": 1500,
+      "onda": "sin"
+     }
+    ]
+   }
+  },
+  "cabeca.frente": {
+   "rot": {
+    "termos": [
+     {
+      "amp": -2500,
+      "onda": "sin",
+      "freq": 2,
+      "atraso_ms": 60
+     }
+    ]
+   }
+  },
+  "cauda.base": {
+   "rot": {
+    "termos": [
+     {
+      "amp": 9000,
+      "onda": "sin",
+      "atraso_ms": 120
+     }
+    ]
+   }
+  },
+  "crista.base": {
+   "rot": {
+    "termos": [
+     {
+      "amp": -3000,
+      "onda": "sin",
+      "freq": 2,
+      "atraso_ms": 100
+     }
+    ]
+   }
+  }
+ }
+}

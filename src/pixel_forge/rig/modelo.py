@@ -6,6 +6,8 @@
 - **Papéis:** cada papel (pelve, coluna, pescoço, cabeça, braço e perna de cada lado) diz o osso de cada junta dele.
   Os geradores de movimento citam ``(papel, junta)``, nunca o nome do osso. Os anexos são os papéis dos ossos que a
   roupa acrescenta (a saia).
+- **IK de N segmentos:** a cadeia de cada perna diz o alvo do triângulo (os dois segmentos de cima) e os distais, que
+  se orientam no mundo depois (a pata plana no apoio, o punho que dobra no balanço). Sem cadeia, o alvo é o pé.
 """
 
 from __future__ import annotations
@@ -35,10 +37,19 @@ class OssoModelo:
 
 
 @dataclass(frozen=True)
+class Cadeia:
+    papel: str
+    ate: str  # a junta da ponta (o pé)
+    alvo: str  # a junta que o triângulo põe no alvo
+    orienta: tuple[str, ...]  # as juntas distais, orientadas no mundo
+
+
+@dataclass(frozen=True)
 class RigModelo:
     id: str
     ossos: tuple[OssoModelo, ...]
     papeis: dict[str, dict[str, str]]
+    ik: tuple[Cadeia, ...]
 
 
 def _por_lado(texto: str, lado: str) -> str:
@@ -69,14 +80,22 @@ def modelo(nome: str) -> RigModelo:
     ossos: list[OssoModelo] = []
     for item in raw["ossos"]:
         ossos += [_osso(o, lado) for lado in LADOS for o in item["lados"]] if "lados" in item else [_osso(item, None)]
-    return RigModelo(raw["id"], tuple(ossos), {**_papeis(raw["papeis"]), **_papeis(raw.get("anexos", {}))})
+    ik = tuple(Cadeia(_por_lado(c["papel"], lado), c["ate"], c["alvo"], tuple(c["orienta"]))
+               for c in raw.get("ik", []) for lado in ([ln for ln, _ in LADOS] if "{lado}" in c["papel"] else [""]))
+    return RigModelo(raw["id"], tuple(ossos), {**_papeis(raw["papeis"]), **_papeis(raw.get("anexos", {}))}, ik)
 
 
 @dataclass(frozen=True)
 class Papeis:
-    """Os papéis de um asset: ``osso(papel, junta)`` é o osso que o asset tem naquela junta (ou ``None``)."""
+    """Os papéis de um asset: ``osso(papel, junta)`` é o osso que o asset tem naquela junta (ou ``None``); as cadeias
+    de IK, do osso do pé ao alvo do triângulo e aos distais."""
 
     mapa: dict[str, dict[str, str]]
+    cadeias: dict[str, tuple[str, tuple[str, ...]]]
+
+    def alvo(self, pe: str) -> str:
+        """O osso que o IK do triângulo põe no alvo da perna que termina em ``pe`` (sem cadeia, o próprio pé)."""
+        return self.cadeias.get(pe, (pe, ()))[0]
 
     def osso(self, papel: str, junta: str) -> str | None:
         return self.mapa.get(papel, {}).get(junta)
@@ -90,5 +109,9 @@ class Papeis:
 
 
 def papeis_do_asset(nome: str, ossos: set[str]) -> Papeis:
-    """Os papéis do modelo, só com os ossos que o asset tem."""
-    return Papeis({p: {j: b for j, b in juntas.items() if b in ossos} for p, juntas in modelo(nome).papeis.items()})
+    """Os papéis do modelo, só com os ossos que o asset tem, e as cadeias de IK dele."""
+    m = modelo(nome)
+    mapa = {p: {j: b for j, b in juntas.items() if b in ossos} for p, juntas in m.papeis.items()}
+    cadeias = {mapa[c.papel][c.ate]: (mapa[c.papel][c.alvo], tuple(mapa[c.papel][x] for x in c.orienta))
+               for c in m.ik if c.ate in mapa[c.papel]}
+    return Papeis(mapa, cadeias)

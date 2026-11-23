@@ -32,6 +32,12 @@ def de_uma_peca(peca: str, args: dict[str, Any]) -> Composicao:
                         "reference": "o catálogo do kit", "tipo": "humanoide", "categoria": "humano", "semente": 11,
                         "nos": nos, "vistas": dict.fromkeys(DIRECOES, {}), "movimento": ["idle"], "tracos": []},
                        Composicao, f"variação de {peca}")
+    if PECAS[peca].tipo == "quadrupede":
+        return validar({"id": "kit_peca", "revision": 1, "description": f"O corpo {peca}",
+                        "reference": "o catálogo do kit", "tipo": "quadrupede", "categoria": "quadrupede",
+                        "semente": 11,
+                        "nos": [{"id": "corpo", "peca": peca, "args": args}], "vistas": dict.fromkeys(DIRECOES, {}),
+                        "movimento": ["idle"], "tracos": []}, Composicao, f"variação de {peca}")
     return validar({"id": "kit_peca", "revision": 1, "description": f"A peça {peca} sozinha",
                     "reference": "o catálogo do kit", "tipo": "prop", "categoria": "objeto", "semente": 11,
                     "nos": [{"id": "n", "peca": peca, "args": args}], "vistas": {"S": {}}, "movimento": ["static"],

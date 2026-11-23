@@ -10,7 +10,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from .base import Id, PosInt, Strict, Vec3
+from .base import Id, PosInt, Strict
 
 Indice = Annotated[int, Field(ge=1, le=255, strict=True)]
 
@@ -48,10 +48,9 @@ class MaterialDef(Strict):
 
 
 class ShadingDef(Strict):
-    """``light_dir`` em eixos de câmera (direita, baixo, para a câmera); as faixas de luz e sombra da peça lisa; e até
-    onde a sombra projetada entre peças anda na tela."""
+    """As faixas de luz e sombra da peça lisa e até onde a sombra projetada entre peças anda na tela (a luz é da
+    câmera: ``views.camera.LUZ``)."""
 
-    light_dir: Vec3
     shadow_band_px: Annotated[int, Field(ge=0, le=4, strict=True)]
     highlight_band_px: Annotated[int, Field(ge=0, le=4, strict=True)]
     highlight_min_area_px: Annotated[int, Field(ge=0, le=4096, strict=True)]

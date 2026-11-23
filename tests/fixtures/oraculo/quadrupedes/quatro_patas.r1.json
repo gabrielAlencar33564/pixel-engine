@@ -1,0 +1,12 @@
+{
+ "id": "quatro_patas", "revision": 1,
+ "description": "Fixture sintética: o corpo canino de manta e meias, parado e no passo",
+ "reference": "fixture sintética mínima", "tipo": "quadrupede", "categoria": "quadrupede", "semente": 5,
+ "nos": [
+  {"id": "corpo", "peca": "corpo_canino", "args": {"altura": "0.60m", "comprimento": "0.66m", "cabeca": "0.28m",
+   "cauda": "0.26m", "pelagem": "pelo_castanho", "meias": "olho_claro", "dorso": "pano_cinza"}}
+ ],
+ "vistas": {"S": {}, "SW": {}, "W": {}, "NW": {}, "N": {}, "NE": {}, "E": {}, "SE": {}},
+ "movimento": ["idle", "walk"],
+ "tracos": []
+}

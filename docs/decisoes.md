@@ -66,3 +66,18 @@ substituído). O porquê longo vai no commit.
 - O capuz com máscara, a ombreira e as molas de cabelo não vêm: eram treino de personagem e de combate (seção 4).
 - O porte é a altura no mundo (o ponto mais alto no repouso, sem a sombra) contra a faixa da categoria, em humanos de
   1,65 m; o build recusa com o porte típico na dica. O catálogo de peças não confere: a peça sozinha não tem categoria.
+- O quadrúpede é o corpo canino como peça (`corpo_canino`) no rig `canino` de pernas em Z; o modelo de rig declara a
+  cadeia de IK de N segmentos de cada perna (o triângulo até o jarrete, os distais orientados no mundo). Vêm o parado
+  e o passo lateral; a corrida, o galope e a bateria canina (sentar, deitar, latir, uivar) não vêm (treino de cena).
+- A elipse orientada (girada com o osso) entra no núcleo: o ombro e a anca do quadrúpede a usam (I1, pelo oráculo).
+- A luz é da câmera, como ela (`views.camera.LUZ`, de cima e da esquerda), e sai do estilo: um grau de liberdade a
+  menos, e o canvas pode medir a sombra no chão sem ler o estilo (objetivo; I10).
+- O canvas inclui a sombra que o asset projeta no chão: no antigo ela passava do canvas e era cortada calada (o abrigo,
+  o marco e o quadrúpede sairiam recusados por `QUADRO_CORTADO`). O canvas só cresce à direita e para baixo; o pivô
+  fica; o oráculo compara o recorte do tamanho antigo e confere que fora dele só há sombra (mudança intencional).
+- A sombra de contato do quadrúpede é a pegada dele (não é reescalada para o oblíquo): ela gira com o corpo, e a
+  reescalada ficava 2× mais longa que ele de lado. A do humano fica como estava (arte aprovada, cabe no canvas).
+- O oráculo grava também o hash sem a sombra no chão; o kit do quadrúpede compara esse, e o movimento dele compara o
+  quadro inteiro com o antigo animando a mesma IR nova (o passo antigo pede `gait` 1, o único que a engine faz).
+- As receitas são dados do motor conferidos por teste: o `exige` do passo (o `gait`) e a recusa do balanço curto não
+  vêm (nenhum pedido muda a receita).

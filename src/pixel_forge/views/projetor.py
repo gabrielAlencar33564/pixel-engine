@@ -30,6 +30,7 @@ from .primitivas import (
     DrawCommand,
     EllipsePrim,
     FanPrim,
+    OrientedEllipsePrim,
     PolygonPrim,
     Prim,
     RevolutionPrim,
@@ -85,10 +86,13 @@ def ellipsoid_inverse(m: tuple[float, float, float, float, float, float]
     return (c11 / det, c12 / det, c13 / det, c22 / det, c23 / det, c33 / det)
 
 
-def _elipse(g: EllipseGeom, pc: _Peca) -> _Projetada:
+def _elipse(g: EllipseGeom, pc: _Peca, orientada: bool) -> _Projetada:
+    """A elipse alinhada à tela (a caixa da projeção) ou, com ``oriented``, girada com o osso (a forma exata)."""
     u, v, depth = pc.tela(g.center_q8)
     cam, rot = pc.cam, pc.bw.rot
-    prim = EllipsePrim(u, v, cam.extent_q8(rot, g.radii_q8, cam.eu), cam.extent_q8(rot, g.radii_q8, cam.ev))
+    prim: EllipsePrim | OrientedEllipsePrim = (
+        OrientedEllipsePrim(u, v, *cam.shape_q8(rot, g.radii_q8)) if orientada
+        else EllipsePrim(u, v, cam.extent_q8(rot, g.radii_q8, cam.eu), cam.extent_q8(rot, g.radii_q8, cam.ev)))
     w = [mat_t_vec(rot, ax) for ax in (cam.eu, cam.ev, cam.ed)]
     rv = [[r * x for r, x in zip(g.radii_q8, wi, strict=True)] for wi in w]
 
@@ -161,7 +165,7 @@ def _leque(g: BoundPolygonGeom, pc: _Peca, chapada: bool) -> _Projetada:
 
 def _projetar(g: Geometry, part: PartDef, pc: _Peca) -> _Projetada:
     if isinstance(g, EllipseGeom):
-        return _elipse(g, pc)
+        return _elipse(g, pc, "oriented" in part.tags)
     if isinstance(g, RevolutionGeom):
         return _revolucao(g, pc)
     if isinstance(g, PolylineGeom):

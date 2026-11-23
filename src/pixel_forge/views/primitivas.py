@@ -18,6 +18,17 @@ class EllipsePrim:
 
 
 @dataclass(frozen=True)
+class OrientedEllipsePrim:
+    """A elipse projetada exata, girada com o osso: a matriz de forma 2×2 em q8² (muu, muv, mvv)."""
+
+    cu: int
+    cv: int
+    muu: int
+    muv: int
+    mvv: int
+
+
+@dataclass(frozen=True)
 class CapsulePrim:
     points: tuple[Ponto, ...]
     radius: int
@@ -67,7 +78,8 @@ class RevolutionPrim:
         return tuple((round(s[0] * 256), round(s[1] * 256)) for s in self.stations)
 
 
-Prim = EllipsePrim | CapsulePrim | TaperedPrim | PolygonPrim | StipplePrim | FanPrim | RevolutionPrim
+Prim = (EllipsePrim | OrientedEllipsePrim | CapsulePrim | TaperedPrim | PolygonPrim | StipplePrim | FanPrim
+        | RevolutionPrim)
 
 
 @dataclass(frozen=True)

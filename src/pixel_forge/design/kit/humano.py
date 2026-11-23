@@ -8,10 +8,9 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
-from ...rig.modelo import modelo
-from ..construtor import AssetBuilder, Junta, Parte, ellipse, q, qv
+from ..construtor import AssetBuilder, Parte, ellipse, q, qv
 from ..escala import PX_POR_M
-from ..expressao import valor
+from .esqueleto import monta
 
 PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.186, 0.146, 0.108, 0.039, 0.152
 OMBRO_X, QUADRIL_X, TORNOZELO_X = 0.105, 0.050, 0.080
@@ -71,15 +70,8 @@ def esqueleto(b: AssetBuilder, c: dict[str, float]) -> None:
     """Os ossos do modelo ``humano`` nas medidas do corpo: os pés na largura do quadril, os braços afastados ~15° e os
     cotovelos dobrados ~12° no repouso."""
     abre = round(math.degrees(math.atan2(c["tornozelo_x"] - c["quadril_x"], c["quadril_z"] - c["tornozelo_z"])) * 1000)
-    env0 = {**c, "abre_perna_mdeg": float(abre), "abre_braco_mdeg": 15_000.0, "dobra_cotovelo_mdeg": 12_000.0}
-    presentes: set[str] = set()
-    for o in modelo("humano").ossos:
-        env = {**env0, "lado": float(o.lado)}
-        pai = next((p for p in o.pai if p in presentes), None)
-        pos = qv(*(valor(t, env) for t in o.pos))
-        b.bone(o.id, pai, pos, Junta(o.eixo, q(valor(o.comp, env)), (o.limites[0] * 1000, o.limites[1] * 1000),
-                                     round(valor(o.repouso, env))))
-        presentes.add(o.id)
+    monta(b, "humano", {**c, "abre_perna_mdeg": float(abre), "abre_braco_mdeg": 15_000.0,
+                        "dobra_cotovelo_mdeg": 12_000.0})
 
 
 def _tronco(b: AssetBuilder, c: dict[str, float], pele: str) -> None:

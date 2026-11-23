@@ -4,7 +4,6 @@ das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo, ela f
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 from typing import Any, cast
@@ -20,7 +19,7 @@ from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.design.asset import ir_da_composicao
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS
+from .oraculo import CASOS, no_canvas_antigo
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "composicoes.esperado.json").read_text(encoding="utf-8"))["casos"]
 SOMBRA_GIRADA = {("marco", "E"), ("marco", "N"), ("marco", "W")}
@@ -36,10 +35,9 @@ def rgba(nome: str, vista: str) -> np.ndarray[Any, np.dtype[np.uint8]]:
 
 @pytest.mark.parametrize(("nome", "vista"), VISTAS, ids=[f"{c}/{v}" for c, v in VISTAS])
 def test_igual_ao_oraculo(nome: str, vista: str) -> None:
-    img = rgba(nome, vista)
     quer = ESPERADO[nome][vista]
-    assert [[img.shape[1], img.shape[0]], hashlib.sha256(img.tobytes()).hexdigest()] == [quer["tamanho"],
-                                                                                        quer["rgba_sha256"]]
+    feito = no_canvas_antigo(rgba(nome, vista), quer["tamanho"])
+    assert [feito["tamanho"], feito["rgba_sha256"]] == [quer["tamanho"], quer["rgba_sha256"]]
 
 
 def _altura_da_sombra(img: np.ndarray[Any, np.dtype[np.uint8]]) -> int:
@@ -54,7 +52,8 @@ def test_a_sombra_de_contato_tem_a_mesma_altura_em_toda_vista() -> None:
 
 
 def test_controle_o_oraculo_acusa_a_sombra_girada_de_antes() -> None:
-    feitos = {v: hashlib.sha256(rgba("marco", v).tobytes()).hexdigest() for v in ("E", "N", "W")}
+    feitos = {v: no_canvas_antigo(rgba("marco", v), ESPERADO["marco"][v]["tamanho"])["rgba_sha256"]
+              for v in ("E", "N", "W")}
     assert all(feitos[v] != ESPERADO["marco"][v]["rgba_sha256"] for v in feitos)
 
 
@@ -72,3 +71,20 @@ def test_controle_a_ancora_citada_antes_de_ser_deixada_e_recusada(tmp_path: Path
     with pytest.raises(Recusa) as e:
         ir_da_composicao(ler(arq, Composicao))
     assert e.value.codigo == "ANCORA" and "acima" in e.value.dica
+
+
+TODAS = sorted((CASOS.parent).rglob("*.r1.json"))
+
+
+@pytest.mark.parametrize("arq", TODAS, ids=[a.stem for a in TODAS])
+def test_nenhuma_vista_sai_do_canvas(arq: Path) -> None:
+    """O canvas inclui a sombra que o asset projeta no chão (no antigo, ela saía do canvas e era cortada)."""
+    ir = ir_da_composicao(ler(arq, Composicao))
+    est = estilo_render(estilo_base())
+    assert {d: quadro_de_repouso(ir, est, d).clipping_px for d in ir.views} == dict.fromkeys(ir.views, 0)
+
+
+def test_controle_sem_a_sombra_no_canvas_o_abrigo_sai_dele() -> None:
+    ir = ir_da_composicao(ler(CASOS / "composicoes" / "abrigo.r1.json", Composicao))
+    estreito = ir.model_copy(update={"canvas": ir.canvas.model_copy(update={"width": ir.canvas.width - 40})})
+    assert quadro_de_repouso(estreito, estilo_render(estilo_base()), "S").clipping_px > 0

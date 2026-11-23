@@ -15,6 +15,7 @@ import math
 from collections.abc import Sequence
 from typing import Any
 
+from ..views.camera import PROFUNDIDADE_PERMILLE
 from .construtor import Vec, q
 from .kit.movimento import Elo, bone_for
 
@@ -129,3 +130,15 @@ def no_mundo(parts: Sequence[dict[str, Any]], bones: Sequence[dict[str, Any]]) -
             _desloca(p2["geometry"], origem(p["bone_id"]), "root")
         out.append(p2)
     return out
+
+
+SEN45 = math.sin(math.radians(45))
+
+
+def sombra_no_obliquo(parts: Sequence[dict[str, Any]]) -> None:
+    """A profundidade da sombra de contato reescalada da câmera física de 45° (a do canvas) para o 0,35 do oblíquo:
+    ela continua com a proporção da tela (≈ 3:1) no jogo."""
+    for p in parts:
+        if p["id"] == "ground_shadow":
+            r = p["geometry"]["radii_q8"]
+            r[1] = max(1, round(r[1] * SEN45 / (PROFUNDIDADE_PERMILLE / 1000)))

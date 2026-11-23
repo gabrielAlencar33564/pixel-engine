@@ -21,7 +21,7 @@ from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS
+from .oraculo import CASOS, no_canvas_antigo
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "humanos.esperado.json").read_text(encoding="utf-8"))["casos"]
 VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if p.tipo == "humanoide"
@@ -32,7 +32,8 @@ def _comp(nome: str) -> Composicao:
     return ler(CASOS / "humanos" / f"{nome}.r1.json", Composicao)
 
 
-def _hashes(comp: Composicao) -> dict[str, Any]:
+def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
+    """O tamanho e o hash de cada quadro de cada clipe e vista, no canvas do antigo."""
     ir, style = ir_da_composicao(comp), estilo_base()
     est = estilo_render(style)
     pal = {p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in style.palette}
@@ -42,16 +43,18 @@ def _hashes(comp: Composicao) -> dict[str, Any]:
         its, _ = instantes(ir, clip, receita, mp)
         for d in ir.views:
             for it in its:
-                rgba = quadro_da_pose(ir, est, it.pose, d).to_rgba(pal)
-                out[f"{clip}/{d}/{it.index}"] = {"tamanho": [int(rgba.shape[1]), int(rgba.shape[0])],
-                                                 "rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest()}
+                k = f"{clip}/{d}/{it.index}"
+                feito = no_canvas_antigo(quadro_da_pose(ir, est, it.pose, d).to_rgba(pal),
+                                         quer.get(k, {}).get("tamanho", [0, 0]))
+                out[k] = [feito["tamanho"], feito["rgba_sha256"]]
     return out
 
 
 @pytest.mark.slow
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo() -> None:
-    feito, quer = _hashes(_comp("vestido")), ESPERADO["vestido"]
-    diferentes = sorted(k for k in quer if feito.get(k) != quer[k])
+    quer = ESPERADO["vestido"]
+    feito = _hashes(_comp("vestido"), quer)
+    diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["rgba_sha256"]])
     assert feito.keys() == quer.keys() and not diferentes, diferentes[:8]
 
 

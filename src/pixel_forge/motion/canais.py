@@ -7,9 +7,10 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from ..core.q8 import atan2_mdeg, pos_to_q8, q8_to_pos
+from ..core.q8 import atan2_mdeg, normalize_mdeg, pos_to_q8, q8_to_pos
 from ..rig.fk import BoneWorld, LocalPose, Skeleton, Vec3i, mat_t_vec
-from ..rig.ik import solve_two_bone
+from ..rig.ik import orienta_no_mundo, solve_two_bone
+from ..rig.modelo import Papeis
 
 Channels = dict[str, tuple[list[int], int]]
 Local = dict[str, LocalPose]
@@ -148,3 +149,22 @@ def bend_guess(skel: Skeleton, feet: list[str]) -> Channels:
             lo, hi = skel.bones[knee].angle_limits_mdeg
             ch[knee] = ([0, 0, 0], -10_000 if -lo >= hi else 10_000)
     return ch
+
+
+def inclinacoes_de_repouso(skel: Skeleton, r: Papeis) -> dict[str, tuple[int, ...]]:
+    """As inclinações de mundo dos distais de cada cadeia no repouso (a pata plana), pelo osso do pé."""
+    return {pe: tuple(chain_world_mdeg(skel, {}, b) for b in distais) for pe, (_, distais) in r.cadeias.items()
+            if distais}
+
+
+def orienta_distais(skel: Skeleton, ch: Channels, r: Papeis, angulos: dict[str, tuple[int, ...]]) -> Channels:
+    """Os distais de cada cadeia na inclinação de mundo pedida (``angulos[pé]``, mdeg; 0 = vertical, + = a ponta para
+    a frente), depois do IK do triângulo."""
+    local = {b: LocalPose(normalize_mdeg(lp.rotation_mdeg), lp.translation_q8) for b, lp in _locais(skel, ch).items()}
+    out = dict(ch)
+    for pe, angs in angulos.items():
+        distais = r.cadeias[pe][1]
+        local = orienta_no_mundo(skel, local, distais, angs)
+        for bid in distais:
+            out[bid] = (out.get(bid, ([0, 0, 0], 0))[0], local[bid].rotation_mdeg - skel.bones[bid].rest_rotation_mdeg)
+    return out

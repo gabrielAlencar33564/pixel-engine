@@ -29,7 +29,11 @@ from pathlib import Path
 from typing import Any
 
 from pixel_forge.application.catalogo import de_uma_peca
+from pixel_forge.contracts.carregar import validar
+from pixel_forge.contracts.composicao import Composicao
+from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.kit.registro import PECAS
+from pixel_forge.views.camera import LUZ
 
 REPO = Path(os.environ.get("PFE_ORACULO_REPO", r"D:\gabri\Projetos\Gabriel\pixel-engine"))
 CACHE = Path(tempfile.gettempdir()) / "pfe-oraculo"
@@ -86,7 +90,8 @@ def estilo_antigo(e: dict[str, Any]) -> dict[str, Any]:
             "palette": e["palette"], "materials": e["materials"], "max_opaque_colors": e["max_opaque_colors"],
             "outline": {"thickness_px": 1, "external": True, "internal": "group_change", "default_index": 1},
             "clusters": {"min_cluster_px": 2, "whitelist_tags": ["detail", "pixel_detail", "eye", "accent", "spark"]},
-            "shading": {"space": "camera", **{k: v for k, v in sh.items() if k != "cast_shadow_px"}},
+            "shading": {"space": "camera", "light_dir": list(LUZ),
+                        **{k: v for k, v in sh.items() if k != "cast_shadow_px"}},
             "quantization": {"rounding": "floor_half_up", "tie_break": "part_id_ascending", "temporal": "stateless"},
             "stylize": {"selective_outline": "light_side", "isolated_cleanup": True, "outline_placement": "inside",
                         "crease_lines": True, "pixel_perfect": True, "cast_shadow_px": sh["cast_shadow_px"],
@@ -139,7 +144,7 @@ def antigo(destino: Path, casos: list[dict[str, Any]], estilo: dict[str, Any] | 
     entrada = {"casos": casos, "style": estilo}
     saida: dict[str, Any] = json.loads(rodar(destino, Path(__file__).with_name("oraculo_antigo.py"),
                                              json.dumps(entrada).encode()))
-    return {nome: {v: {"tamanho": q["tamanho"], "rgba_sha256": q["rgba_sha256"]} for v, q in vistas.items()}
+    return {nome: {v: {k: q[k] for k in ("tamanho", "rgba_sha256", "sem_chao_sha256")} for v, q in vistas.items()}
             for nome, vistas in saida.items()}
 
 
@@ -150,16 +155,45 @@ def humano_antigo(comp: dict[str, Any]) -> dict[str, Any]:
     return {**velho, "rig": "humanoid_v2", "movimento": mov}
 
 
-def gravar_humanos(destino: Path, sha: str) -> None:
-    """Os humanos sintéticos de ``humanos/``: o parado e o andar em cada vista, quadro a quadro."""
-    casos = []
-    for arq in sorted((FIXTURES / "humanos").glob("*.json")):
-        comp = json.loads(arq.read_text(encoding="utf-8"))
-        casos.append({"nome": arq.name.removesuffix(".r1.json"), "composicao": humano_antigo(comp),
-                      "vistas": list(comp["vistas"]), "clipes": {"idle": "parado", "walk": "andar_poses"}})
-    saida = antigo(destino, casos, estilo_base_antigo())
-    _salvar(FIXTURES / "humanos.esperado.json", {"pixel_engine": sha, "casos": saida})
-    print(f"humanos: {sum(len(v) for v in saida.values())} quadros gravados")
+def quadrupede_antigo(comp: dict[str, Any]) -> dict[str, Any]:
+    """O quadrúpede no formato antigo: o rig canino do template."""
+    return {**composicao_antiga(comp), "rig": "quadruped_canine_v1"}
+
+
+def _caso_humano(nome: str, comp: dict[str, Any]) -> dict[str, Any]:
+    return {"nome": nome, "composicao": humano_antigo(comp), "vistas": list(comp["vistas"]),
+            "clipes": {"idle": "parado", "walk": "andar_poses"}}
+
+
+def _caso_quadrupede(nome: str, comp: dict[str, Any]) -> dict[str, Any]:
+    """A IR nova do quadrúpede convertida, animada pelas receitas antigas com os parâmetros novos: o movimento e o
+    render na mesma IR (a pegada no chão mudou de propósito; o corpo é provado pelo kit)."""
+    doc = validar(comp, Composicao, nome)
+    ir = ir_da_composicao(doc).model_dump(mode="json")
+    mapa = json.loads((FIXTURES / "materiais.json").read_text(encoding="utf-8"))
+    estilo = estilo_base_antigo()
+    velho = asset_antigo({**ir, "parts": [{**p, "material": mapa.get(p["material"], p["material"])}
+                                          for p in ir["parts"]]}, estilo)
+    velho["rig"]["template_id"] = "quadruped_canine_v1"
+    velho["category"] = "quadruped"
+    velho["capabilities"] = {"entity_role": "creature", "motion_class": "locomoting", "directions": list(ir["views"]),
+                             "clip_presets": ["idle", "walk"], "rig_kind": "quadruped"}
+    # o passo antigo exige ``gait`` 1 (o passo lateral), o único que a engine nova faz: ela não tem o parâmetro
+    return {"nome": nome, "asset": velho, "mp": {**movimento(doc)[1], "gait": 1}, "vistas": list(ir["views"]),
+            "clipes": {"idle": "quadrupede_parado", "walk": "quadrupede_passo"}}
+
+
+ANIMADOS = {"humanos": _caso_humano, "quadrupedes": _caso_quadrupede}
+
+
+def gravar_animados(destino: Path, sha: str) -> None:
+    """Os humanos e os quadrúpedes sintéticos: o parado e o andar em cada vista, quadro a quadro."""
+    for pasta, caso in ANIMADOS.items():
+        casos = [caso(arq.name.removesuffix(".r1.json"), json.loads(arq.read_text(encoding="utf-8")))
+                 for arq in sorted((FIXTURES / pasta).glob("*.json"))]
+        saida = antigo(destino, casos, estilo_base_antigo())
+        _salvar(FIXTURES / f"{pasta}.esperado.json", {"pixel_engine": sha, "casos": saida})
+        print(f"{pasta}: {sum(len(v) for v in saida.values())} quadros gravados")
 
 
 def _salvar(alvo: Path, dado: dict[str, Any]) -> None:
@@ -189,7 +223,8 @@ def estilo_base_antigo() -> dict[str, Any]:
 
 def _antiga_da_peca(pid: str, args: dict[str, Any]) -> dict[str, Any]:
     comp = de_uma_peca(pid, args).model_dump(mode="json")
-    return humano_antigo(comp) if comp["tipo"] == "humanoide" else composicao_antiga(comp)
+    conversao = {"humanoide": humano_antigo, "quadrupede": quadrupede_antigo}.get(comp["tipo"], composicao_antiga)
+    return conversao(comp)
 
 
 def gravar_kit(destino: Path, sha: str) -> None:
@@ -217,7 +252,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--versao", action="store_true", help="exporta e mostra o commit e a versão do motor antigo")
     ap.add_argument("--kit", action="store_true", help="grava o esperado das variações do kit")
     ap.add_argument("--composicoes", action="store_true", help="grava o esperado das composições sintéticas")
-    ap.add_argument("--humanos", action="store_true", help="grava o esperado dos humanos sintéticos (parado e andar)")
+    ap.add_argument("--animados", action="store_true",
+                    help="grava o esperado dos humanos e quadrúpedes sintéticos (parado e andar)")
     ap.add_argument("casos", nargs="*", type=Path, help="os casos de IR para gravar o esperado")
     args = ap.parse_args(argv)
     sha = commit()
@@ -232,8 +268,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         gravar_kit(destino, sha)
     if args.composicoes:
         gravar_composicoes(destino, sha)
-    if args.humanos:
-        gravar_humanos(destino, sha)
+    if args.animados:
+        gravar_animados(destino, sha)
     return 0
 
 

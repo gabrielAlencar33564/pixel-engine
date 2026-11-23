@@ -13,6 +13,7 @@ from functools import partial
 import numpy as np
 import numpy.typing as npt
 
+from ..views.camera import LUZ
 from ..views.primitivas import Scene2D
 from .contorno import contorno_externo, contorno_interno
 from .estilo import EstiloRender
@@ -68,7 +69,7 @@ def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D, bufs: tuple[Buf16,
 
 def render(scene: Scene2D, est: EstiloRender, width: int, height: int) -> Quadro:
     scene = replace(scene, commands=pela_normal(scene.commands, est.doc.materials,
-                                                partial(lambert_permille, est.doc.shading.light_dir)))
+                                                partial(lambert_permille, LUZ)))
     cam = compor(scene, est.materials, width, height)
     t = tabelas(cam, est.materials)
     index = np.zeros(cam.part.shape, dtype=np.uint16)

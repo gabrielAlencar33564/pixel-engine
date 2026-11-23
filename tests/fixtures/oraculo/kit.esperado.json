@@ -7,7 +7,8 @@
      18,
      15
     ],
-    "rgba_sha256": "39a2e5326344a3b2872e58097036a621f0b362125569a6d7ed6adc55fc4ce3d4"
+    "rgba_sha256": "39a2e5326344a3b2872e58097036a621f0b362125569a6d7ed6adc55fc4ce3d4",
+    "sem_chao_sha256": "39a2e5326344a3b2872e58097036a621f0b362125569a6d7ed6adc55fc4ce3d4"
    }
   },
   "aduelas/tonel": {
@@ -16,7 +17,8 @@
      28,
      40
     ],
-    "rgba_sha256": "f07778c277ba735e2280dda5ba0a3069b23fd6fc220003dc9178c4489b1de320"
+    "rgba_sha256": "f07778c277ba735e2280dda5ba0a3069b23fd6fc220003dc9178c4489b1de320",
+    "sem_chao_sha256": "f07778c277ba735e2280dda5ba0a3069b23fd6fc220003dc9178c4489b1de320"
    }
   },
   "aduelas/tina": {
@@ -25,7 +27,8 @@
      38,
      27
     ],
-    "rgba_sha256": "f04358e5387ffe857eda73def05755ad7af040ed0fa03253d50c855e3776b890"
+    "rgba_sha256": "f04358e5387ffe857eda73def05755ad7af040ed0fa03253d50c855e3776b890",
+    "sem_chao_sha256": "f04358e5387ffe857eda73def05755ad7af040ed0fa03253d50c855e3776b890"
    }
   },
   "aro/reto": {
@@ -34,7 +37,8 @@
      28,
      15
     ],
-    "rgba_sha256": "483eb9caef5c245bfaf1e10873418678e3a7bf4a5b2f0c9724da77ef46ac2e0b"
+    "rgba_sha256": "483eb9caef5c245bfaf1e10873418678e3a7bf4a5b2f0c9724da77ef46ac2e0b",
+    "sem_chao_sha256": "483eb9caef5c245bfaf1e10873418678e3a7bf4a5b2f0c9724da77ef46ac2e0b"
    }
   },
   "aro/curvo": {
@@ -43,7 +47,8 @@
      28,
      15
     ],
-    "rgba_sha256": "ba1527c7a7f5d29dabfb3a2fa865735b83755b759348c99f2fa221c345cb48d8"
+    "rgba_sha256": "ba1527c7a7f5d29dabfb3a2fa865735b83755b759348c99f2fa221c345cb48d8",
+    "sem_chao_sha256": "ba1527c7a7f5d29dabfb3a2fa865735b83755b759348c99f2fa221c345cb48d8"
    }
   },
   "aro/alça": {
@@ -52,7 +57,8 @@
      18,
      11
     ],
-    "rgba_sha256": "d846c66b535a9657449b75e696d2850b1f05d4ebd96e1935214184e3af098301"
+    "rgba_sha256": "d846c66b535a9657449b75e696d2850b1f05d4ebd96e1935214184e3af098301",
+    "sem_chao_sha256": "d846c66b535a9657449b75e696d2850b1f05d4ebd96e1935214184e3af098301"
    }
   },
   "bocal/baixo": {
@@ -61,7 +67,8 @@
      56,
      55
     ],
-    "rgba_sha256": "98110ac2b7d55427ff0e579d5056aad804b69949a18ef8cbe2e312ccc31db1bd"
+    "rgba_sha256": "98110ac2b7d55427ff0e579d5056aad804b69949a18ef8cbe2e312ccc31db1bd",
+    "sem_chao_sha256": "98110ac2b7d55427ff0e579d5056aad804b69949a18ef8cbe2e312ccc31db1bd"
    }
   },
   "bocal/médio": {
@@ -70,7 +77,8 @@
      56,
      61
     ],
-    "rgba_sha256": "1e87250443513bcd66ed02347c996e9aab8323058a76247f0a3ed87bdfc17ae2"
+    "rgba_sha256": "1e87250443513bcd66ed02347c996e9aab8323058a76247f0a3ed87bdfc17ae2",
+    "sem_chao_sha256": "1e87250443513bcd66ed02347c996e9aab8323058a76247f0a3ed87bdfc17ae2"
    }
   },
   "bocal/largo": {
@@ -79,7 +87,8 @@
      76,
      73
     ],
-    "rgba_sha256": "7042596ec554f58e05f6462f7f8d77d0bc57fe8a5ebb64635fa17cbee80251e6"
+    "rgba_sha256": "7042596ec554f58e05f6462f7f8d77d0bc57fe8a5ebb64635fa17cbee80251e6",
+    "sem_chao_sha256": "7042596ec554f58e05f6462f7f8d77d0bc57fe8a5ebb64635fa17cbee80251e6"
    }
   },
   "bolsa/de pano": {
@@ -88,7 +97,8 @@
      96,
      96
     ],
-    "rgba_sha256": "739ef41dac3960336a911fae74fd6524ee67738bed02d242a20fe5c1301afef0"
+    "rgba_sha256": "739ef41dac3960336a911fae74fd6524ee67738bed02d242a20fe5c1301afef0",
+    "sem_chao_sha256": "ba34061cbb32fc0193a2dc4acaa3fa88817d87aede1320377d82fa4be424d662"
    }
   },
   "bolsa/de couro": {
@@ -97,7 +107,8 @@
      96,
      96
     ],
-    "rgba_sha256": "316c262af357c1d6778e265e56341c198f1fbe0eb16ead312df3d3a261e01a61"
+    "rgba_sha256": "316c262af357c1d6778e265e56341c198f1fbe0eb16ead312df3d3a261e01a61",
+    "sem_chao_sha256": "046a24a79456a43b2ca50948198e1fc2b3b479fe879a6843ba978223169497ad"
    }
   },
   "bolsa/escura": {
@@ -106,7 +117,8 @@
      96,
      96
     ],
-    "rgba_sha256": "7278bb9c05945fc204921d117c72c23186cbd2955edf989772f71fcc9e33cd93"
+    "rgba_sha256": "7278bb9c05945fc204921d117c72c23186cbd2955edf989772f71fcc9e33cd93",
+    "sem_chao_sha256": "7e827c0377f30a0627711c5153ef85f48279ae3bf5ebe73c0a43bf5b5b0c8b21"
    }
   },
   "cabelo_preso/escuro": {
@@ -115,7 +127,8 @@
      96,
      96
     ],
-    "rgba_sha256": "0881dafbb04c41e1a21deba2aaa0fc3afb08146cd4c831f9834676e785f7cee5"
+    "rgba_sha256": "0881dafbb04c41e1a21deba2aaa0fc3afb08146cd4c831f9834676e785f7cee5",
+    "sem_chao_sha256": "f20a0991265ab503047609dc2f814782c221a2c4369c5a5455b527604fce7c93"
    }
   },
   "cabelo_preso/pano": {
@@ -124,7 +137,8 @@
      96,
      96
     ],
-    "rgba_sha256": "e86b972c1b7bdf1ab0748b54297a815808da781db93046a42f81d9d3c2e64a0b"
+    "rgba_sha256": "e86b972c1b7bdf1ab0748b54297a815808da781db93046a42f81d9d3c2e64a0b",
+    "sem_chao_sha256": "ee78c94831e7a37344da15ddab2274bca709eb51e07114a78c964f65b5311562"
    }
   },
   "cabelo_preso/palha": {
@@ -133,7 +147,8 @@
      96,
      96
     ],
-    "rgba_sha256": "321c9ae54d18bbb6bfbc29011b96a33fbcaf19538399f5ff1d19301ddb6dd369"
+    "rgba_sha256": "321c9ae54d18bbb6bfbc29011b96a33fbcaf19538399f5ff1d19301ddb6dd369",
+    "sem_chao_sha256": "6f75ca9978440cbeba0d1d0b779bf9b61899a6fcd64c4c1fad4b2173172d9dcc"
    }
   },
   "calca/folgada": {
@@ -142,7 +157,8 @@
      96,
      96
     ],
-    "rgba_sha256": "d88628705405ecdf2f4c99413b91bbfc7e75a4384a62a4449d65b01903df8f0c"
+    "rgba_sha256": "d88628705405ecdf2f4c99413b91bbfc7e75a4384a62a4449d65b01903df8f0c",
+    "sem_chao_sha256": "f689c2ae29eeb54ec0abd0fcc4d138e19529319cdddb20e0ed0e75e84fbafe19"
    }
   },
   "calca/larga": {
@@ -151,7 +167,8 @@
      96,
      96
     ],
-    "rgba_sha256": "88297b5747181d3f601120f08311d43635a271e4f06d2a6147cd523c83a10083"
+    "rgba_sha256": "88297b5747181d3f601120f08311d43635a271e4f06d2a6147cd523c83a10083",
+    "sem_chao_sha256": "4711d341590684287c4b01e9d0f24957c9a73cb73d5983bb044cc06fa05d458c"
    }
   },
   "calca/presa": {
@@ -160,7 +177,8 @@
      96,
      96
     ],
-    "rgba_sha256": "599fd8c49bb06801ec1efd9fdb1a1b6ddedc43cc23d96e8c6bab31418376edb2"
+    "rgba_sha256": "599fd8c49bb06801ec1efd9fdb1a1b6ddedc43cc23d96e8c6bab31418376edb2",
+    "sem_chao_sha256": "fda04644b9e90ba2390149b2e20bc93c5d58673e175b30fe81ee2ef869bb8686"
    }
   },
   "cercado/curto": {
@@ -169,7 +187,8 @@
      50,
      24
     ],
-    "rgba_sha256": "30a64ad4fc0169cadfbc1f5fb5558087e81a6fade12a4d38915e571c21d918fe"
+    "rgba_sha256": "30a64ad4fc0169cadfbc1f5fb5558087e81a6fade12a4d38915e571c21d918fe",
+    "sem_chao_sha256": "2d2e06ed3af7dab15a6f90030c093ce4aa9c4f78ac08999424b07e127718bfb1"
    }
   },
   "cercado/médio": {
@@ -178,7 +197,8 @@
      70,
      27
     ],
-    "rgba_sha256": "13abe688a716d81f01d40d1d9af4e5f66a1622d1937a3dba50eb6bd26afb9f23"
+    "rgba_sha256": "13abe688a716d81f01d40d1d9af4e5f66a1622d1937a3dba50eb6bd26afb9f23",
+    "sem_chao_sha256": "ee664a08e1d99e3778c308838b86c8e84d7cb6f0deaeb6240bcf777eb84a1f33"
    }
   },
   "cercado/alto": {
@@ -187,7 +207,8 @@
      70,
      34
     ],
-    "rgba_sha256": "b20ab39e63e29e5912dd0da2c3de5e590ed4e4bcd55cdf684b490430e7c6aed7"
+    "rgba_sha256": "b20ab39e63e29e5912dd0da2c3de5e590ed4e4bcd55cdf684b490430e7c6aed7",
+    "sem_chao_sha256": "1e5f367daf9cdca36c24ac6d3dccef09428f0c76e26ba15cb5281d8f048bb277"
    }
   },
   "chapeu/de feltro": {
@@ -196,7 +217,8 @@
      96,
      96
     ],
-    "rgba_sha256": "12d960942efe7fbc51d2bfbcfd874eeef8e2e00a94d1f76d082a6e784cbb71df"
+    "rgba_sha256": "12d960942efe7fbc51d2bfbcfd874eeef8e2e00a94d1f76d082a6e784cbb71df",
+    "sem_chao_sha256": "d6d973cea70bcf15f2a169182271bc4723d4c6e39784285c45aca8d3e3086e2e"
    }
   },
   "chapeu/aba curta": {
@@ -205,7 +227,8 @@
      96,
      96
     ],
-    "rgba_sha256": "0edf19724df724a15a25e51d090b6d1739323363178f207f8dec22cdf3e0b872"
+    "rgba_sha256": "0edf19724df724a15a25e51d090b6d1739323363178f207f8dec22cdf3e0b872",
+    "sem_chao_sha256": "f3af0fa4d9cc10a82c08ce26a41f85a900eac8e01b189e7000f5b80afa7a44b2"
    }
   },
   "chapeu/de palha": {
@@ -214,7 +237,8 @@
      96,
      96
     ],
-    "rgba_sha256": "e18b6dd51e70b6bf89b357fb5e137a2b68bff109e2c6ad2e7e6f922a200c27cd"
+    "rgba_sha256": "e18b6dd51e70b6bf89b357fb5e137a2b68bff109e2c6ad2e7e6f922a200c27cd",
+    "sem_chao_sha256": "a0b8391f85ffdb3a2b4cfa25ee91bbfe3e2fb13c97f485017038f10b0e592c4c"
    }
   },
   "corda/esticada": {
@@ -223,7 +247,8 @@
      40,
      20
     ],
-    "rgba_sha256": "c54a6385f2e3e8a2039778b44da38463ffad20a883687b00cb0e9716daa09445"
+    "rgba_sha256": "c54a6385f2e3e8a2039778b44da38463ffad20a883687b00cb0e9716daa09445",
+    "sem_chao_sha256": "c54a6385f2e3e8a2039778b44da38463ffad20a883687b00cb0e9716daa09445"
    }
   },
   "corda/frouxa": {
@@ -232,7 +257,8 @@
      40,
      20
     ],
-    "rgba_sha256": "da6191706986de9f638c5afe45aeea124be0e69dc44b9fd38b2ee5042347ff52"
+    "rgba_sha256": "da6191706986de9f638c5afe45aeea124be0e69dc44b9fd38b2ee5042347ff52",
+    "sem_chao_sha256": "da6191706986de9f638c5afe45aeea124be0e69dc44b9fd38b2ee5042347ff52"
    }
   },
   "corda/vertical": {
@@ -241,7 +267,38 @@
      8,
      31
     ],
-    "rgba_sha256": "a33d3d3cc8eee20e1ac7c058fdfa0c628f2ee5a2eec2e1558a911efee963dc27"
+    "rgba_sha256": "a33d3d3cc8eee20e1ac7c058fdfa0c628f2ee5a2eec2e1558a911efee963dc27",
+    "sem_chao_sha256": "a33d3d3cc8eee20e1ac7c058fdfa0c628f2ee5a2eec2e1558a911efee963dc27"
+   }
+  },
+  "corpo_canino/esguio, de orelha em pé e manta": {
+   "S": {
+    "tamanho": [
+     46,
+     53
+    ],
+    "rgba_sha256": "4c189d32f78cf6b3e743228feb14dbd6201d010c0caa18323b1b634f4760803d",
+    "sem_chao_sha256": "f4a669399586dd4a16255e0f700aaf82b5dffbfed8bbe96ca1ea0cae661183b9"
+   }
+  },
+  "corpo_canino/pequeno, de orelha caída e cauda enrolada": {
+   "S": {
+    "tamanho": [
+     40,
+     46
+    ],
+    "rgba_sha256": "3a4d3148a3450b0229e7abbf0353f1e0fefb10adf343a36f3ddebfcb988022a2",
+    "sem_chao_sha256": "017a254735d0e42cd63bdf4b494c2d3bfe713b36e178f87ee0fa01e4976cdb73"
+   }
+  },
+  "corpo_canino/alto, de orelha caída": {
+   "S": {
+    "tamanho": [
+     50,
+     57
+    ],
+    "rgba_sha256": "67c08f2a2090462ace1fddaefce4177d931e7aa56e685b512c88732e3c998828",
+    "sem_chao_sha256": "0236cef196fcebac0f88b1e55eb298fb432197bb74468601a70700a15be17cd9"
    }
   },
   "corpo_humano/adulto de madeira": {
@@ -250,7 +307,8 @@
      96,
      96
     ],
-    "rgba_sha256": "24847fc3c1f2bec8cdbc3183ec3e5ea9293295f110be67b17dc3e7f55d4a1ace"
+    "rgba_sha256": "24847fc3c1f2bec8cdbc3183ec3e5ea9293295f110be67b17dc3e7f55d4a1ace",
+    "sem_chao_sha256": "0ebb97faa7aaf12685dee57eb2436fcc3e33a10a9c6e7112617d0a36b3927edf"
    }
   },
   "corpo_humano/criança": {
@@ -259,7 +317,8 @@
      96,
      96
     ],
-    "rgba_sha256": "6dba2e36cba04c40c251b68f51d1c68683b8abda371b69bdd274521e0e025ec4"
+    "rgba_sha256": "6dba2e36cba04c40c251b68f51d1c68683b8abda371b69bdd274521e0e025ec4",
+    "sem_chao_sha256": "d5f64f25625c0461eb97ca9217eb37178cdb3bd3d6022432c165363c81f4b2d9"
    }
   },
   "corpo_humano/forte, de pele": {
@@ -268,7 +327,8 @@
      96,
      112
     ],
-    "rgba_sha256": "dc57f46fea1370154ae6481882ea1c9e5b75b2b7c8508f71f123e6585dfdbad9"
+    "rgba_sha256": "dc57f46fea1370154ae6481882ea1c9e5b75b2b7c8508f71f123e6585dfdbad9",
+    "sem_chao_sha256": "e385a1b6d43efdce380778739c63e21597157cae319941b7458956bdd67949d0"
    }
   },
   "cortinas/cheias": {
@@ -277,7 +337,8 @@
      83,
      53
     ],
-    "rgba_sha256": "65c3ca5c6605f58007edda9243f5f8ac7bc6b11c0cd2bb614b99e1441c96644b"
+    "rgba_sha256": "65c3ca5c6605f58007edda9243f5f8ac7bc6b11c0cd2bb614b99e1441c96644b",
+    "sem_chao_sha256": "6201e8036c4c9bbac71dabeee33c05c19f7dbb12f8abd46d2898b280ca4c9411"
    }
   },
   "cortinas/poucas": {
@@ -286,7 +347,8 @@
      74,
      51
     ],
-    "rgba_sha256": "0f49bac64e8024ece1d3da3abccacdd81cfc5a476f7408e2f7e158a473715766"
+    "rgba_sha256": "0f49bac64e8024ece1d3da3abccacdd81cfc5a476f7408e2f7e158a473715766",
+    "sem_chao_sha256": "0f49bac64e8024ece1d3da3abccacdd81cfc5a476f7408e2f7e158a473715766"
    }
   },
   "cortinas/curtas": {
@@ -295,7 +357,8 @@
      69,
      47
     ],
-    "rgba_sha256": "e82c5cdb821195850c5009906d264fb9b4fab6412d7239b7fd73b3ec587f2c18"
+    "rgba_sha256": "e82c5cdb821195850c5009906d264fb9b4fab6412d7239b7fd73b3ec587f2c18",
+    "sem_chao_sha256": "cf0b9c94335b00509c87ce53778cfc4f218fca3a9b4ef27322ee2e4fe0143c3a"
    }
   },
   "elipsoide/domo": {
@@ -304,7 +367,8 @@
      40,
      40
     ],
-    "rgba_sha256": "f89b27564d3bef95f8ce41ba001e941408f0d7006502d923822f363c07c42304"
+    "rgba_sha256": "f89b27564d3bef95f8ce41ba001e941408f0d7006502d923822f363c07c42304",
+    "sem_chao_sha256": "f89b27564d3bef95f8ce41ba001e941408f0d7006502d923822f363c07c42304"
    }
   },
   "elipsoide/bola": {
@@ -313,7 +377,8 @@
      20,
      25
     ],
-    "rgba_sha256": "08cf87e83e079470c64895a1142213e427fe7f3e0c3d0dec7281d403c9f084b7"
+    "rgba_sha256": "08cf87e83e079470c64895a1142213e427fe7f3e0c3d0dec7281d403c9f084b7",
+    "sem_chao_sha256": "08cf87e83e079470c64895a1142213e427fe7f3e0c3d0dec7281d403c9f084b7"
    }
   },
   "elipsoide/chapado": {
@@ -322,7 +387,8 @@
      26,
      21
     ],
-    "rgba_sha256": "38f958053c30a315cc8b7f359b11f31dd13781b6d1f6580f0667ec9ef2a7f41a"
+    "rgba_sha256": "38f958053c30a315cc8b7f359b11f31dd13781b6d1f6580f0667ec9ef2a7f41a",
+    "sem_chao_sha256": "38f958053c30a315cc8b7f359b11f31dd13781b6d1f6580f0667ec9ef2a7f41a"
    }
   },
   "faixa/palha": {
@@ -331,7 +397,8 @@
      96,
      96
     ],
-    "rgba_sha256": "6fec3a6e1def52a15e3f8f4ca54270ac5d6d820f6d91de55a6804f50804f07ce"
+    "rgba_sha256": "6fec3a6e1def52a15e3f8f4ca54270ac5d6d820f6d91de55a6804f50804f07ce",
+    "sem_chao_sha256": "10d17ac39bbb0f00f06f79e172933b8638812b8c35546bd94e039df6b834281e"
    }
   },
   "faixa/couro": {
@@ -340,7 +407,8 @@
      96,
      96
     ],
-    "rgba_sha256": "28589a9ce2e8e2416d7e5a2234d73e259c88619c2811283ab60b0320eba6d117"
+    "rgba_sha256": "28589a9ce2e8e2416d7e5a2234d73e259c88619c2811283ab60b0320eba6d117",
+    "sem_chao_sha256": "eeee306ae5e97a4fa2f97ae11407f617ea3e41ed25f08063604693da611f19bd"
    }
   },
   "faixa/ponta de outra cor": {
@@ -349,7 +417,8 @@
      96,
      96
     ],
-    "rgba_sha256": "d510037922014e223b058a8193049829c58996e82bda1a76b549af0c32f8f30e"
+    "rgba_sha256": "d510037922014e223b058a8193049829c58996e82bda1a76b549af0c32f8f30e",
+    "sem_chao_sha256": "85be14d042afb7b0e80d84da89a710d87296a58b62f29b93d1ad920988111d14"
    }
   },
   "fios/monte": {
@@ -358,7 +427,8 @@
      36,
      22
     ],
-    "rgba_sha256": "279a0f8a97c667bfb5d5d7cefb4ca09608481529a70da4e57c4dfa89967c32e0"
+    "rgba_sha256": "279a0f8a97c667bfb5d5d7cefb4ca09608481529a70da4e57c4dfa89967c32e0",
+    "sem_chao_sha256": "279a0f8a97c667bfb5d5d7cefb4ca09608481529a70da4e57c4dfa89967c32e0"
    }
   },
   "fios/ralo": {
@@ -367,7 +437,8 @@
      35,
      22
     ],
-    "rgba_sha256": "469a6c57b1143201d96ebbdaf8d81b2db7d4b9f992938b6baef4985926d4bb2f"
+    "rgba_sha256": "469a6c57b1143201d96ebbdaf8d81b2db7d4b9f992938b6baef4985926d4bb2f",
+    "sem_chao_sha256": "469a6c57b1143201d96ebbdaf8d81b2db7d4b9f992938b6baef4985926d4bb2f"
    }
   },
   "fios/alto": {
@@ -376,7 +447,8 @@
      31,
      27
     ],
-    "rgba_sha256": "d1097827f0d9f2f045ae2b3f7c9f904691db100d4f22ee8c9c3bab2ac7c5c877"
+    "rgba_sha256": "d1097827f0d9f2f045ae2b3f7c9f904691db100d4f22ee8c9c3bab2ac7c5c877",
+    "sem_chao_sha256": "d1097827f0d9f2f045ae2b3f7c9f904691db100d4f22ee8c9c3bab2ac7c5c877"
    }
   },
   "galhos_em_pena/alta": {
@@ -385,7 +457,8 @@
      65,
      107
     ],
-    "rgba_sha256": "e2a337b7ca82b401053b21d7ca779b6e78441da12dfd4b469b46a4e5557fad71"
+    "rgba_sha256": "e2a337b7ca82b401053b21d7ca779b6e78441da12dfd4b469b46a4e5557fad71",
+    "sem_chao_sha256": "9824008993f079a365e23e12d9ac07e3a89acc790d0e626a343ba477aa4ce342"
    }
   },
   "galhos_em_pena/jovem": {
@@ -394,7 +467,8 @@
      48,
      66
     ],
-    "rgba_sha256": "ad09845a382ad2b0c25039ad3b2b9afaadb87488447a8b2ee6f59b0722204c00"
+    "rgba_sha256": "ad09845a382ad2b0c25039ad3b2b9afaadb87488447a8b2ee6f59b0722204c00",
+    "sem_chao_sha256": "ad09845a382ad2b0c25039ad3b2b9afaadb87488447a8b2ee6f59b0722204c00"
    }
   },
   "galhos_em_pena/rala": {
@@ -403,7 +477,8 @@
      57,
      86
     ],
-    "rgba_sha256": "55253786b52cb123b21fac488782c5f65ff385c4207a550c090d40d56488ef5f"
+    "rgba_sha256": "55253786b52cb123b21fac488782c5f65ff385c4207a550c090d40d56488ef5f",
+    "sem_chao_sha256": "55253786b52cb123b21fac488782c5f65ff385c4207a550c090d40d56488ef5f"
    }
   },
   "galhos_finos/três": {
@@ -412,7 +487,8 @@
      23,
      55
     ],
-    "rgba_sha256": "bf149599b9cb46c3973de518b1259b07b0a3c7bd2d21edcf09b7bddfadb8c1b6"
+    "rgba_sha256": "bf149599b9cb46c3973de518b1259b07b0a3c7bd2d21edcf09b7bddfadb8c1b6",
+    "sem_chao_sha256": "bf149599b9cb46c3973de518b1259b07b0a3c7bd2d21edcf09b7bddfadb8c1b6"
    }
   },
   "galhos_finos/dois": {
@@ -421,7 +497,8 @@
      17,
      36
     ],
-    "rgba_sha256": "ac2ebb1517532749a9836845e994752d16e653cd14a3daac270e04b8615f79e2"
+    "rgba_sha256": "ac2ebb1517532749a9836845e994752d16e653cd14a3daac270e04b8615f79e2",
+    "sem_chao_sha256": "ac2ebb1517532749a9836845e994752d16e653cd14a3daac270e04b8615f79e2"
    }
   },
   "galhos_finos/abertos": {
@@ -430,7 +507,8 @@
      36,
      45
     ],
-    "rgba_sha256": "e6118a2ffacf0f74c5f61ff624ee1c3bce19a7153618b76f67c54bbf1f46f661"
+    "rgba_sha256": "e6118a2ffacf0f74c5f61ff624ee1c3bce19a7153618b76f67c54bbf1f46f661",
+    "sem_chao_sha256": "e6118a2ffacf0f74c5f61ff624ee1c3bce19a7153618b76f67c54bbf1f46f661"
    }
   },
   "galhos_grossos/em leque": {
@@ -439,7 +517,8 @@
      61,
      91
     ],
-    "rgba_sha256": "7aadbb68b3648bd704011ea037aac76d7b5e752179f356f474f847db317cc2bc"
+    "rgba_sha256": "7aadbb68b3648bd704011ea037aac76d7b5e752179f356f474f847db317cc2bc",
+    "sem_chao_sha256": "7aadbb68b3648bd704011ea037aac76d7b5e752179f356f474f847db317cc2bc"
    }
   },
   "galhos_grossos/andares": {
@@ -448,7 +527,8 @@
      57,
      89
     ],
-    "rgba_sha256": "2ead5597be81ca0813ed917fb2609b2b021f4a0d1b012f10d67bf7967069290d"
+    "rgba_sha256": "2ead5597be81ca0813ed917fb2609b2b021f4a0d1b012f10d67bf7967069290d",
+    "sem_chao_sha256": "2ead5597be81ca0813ed917fb2609b2b021f4a0d1b012f10d67bf7967069290d"
    }
   },
   "galhos_grossos/aberto": {
@@ -457,7 +537,8 @@
      68,
      89
     ],
-    "rgba_sha256": "69fd4a16a154a569817de9092188cd1c3d567bc12817ebb08c7041f7556f5c8a"
+    "rgba_sha256": "69fd4a16a154a569817de9092188cd1c3d567bc12817ebb08c7041f7556f5c8a",
+    "sem_chao_sha256": "69fd4a16a154a569817de9092188cd1c3d567bc12817ebb08c7041f7556f5c8a"
    }
   },
   "janela/quadrada": {
@@ -466,7 +547,8 @@
      26,
      22
     ],
-    "rgba_sha256": "fa117424d506d18b02487f34d990b2eebae1f36067c2fe7f1b6f986df277aee3"
+    "rgba_sha256": "fa117424d506d18b02487f34d990b2eebae1f36067c2fe7f1b6f986df277aee3",
+    "sem_chao_sha256": "fa117424d506d18b02487f34d990b2eebae1f36067c2fe7f1b6f986df277aee3"
    }
   },
   "janela/alta": {
@@ -475,7 +557,8 @@
      24,
      26
     ],
-    "rgba_sha256": "11f38c902da5506749ea4eed5b5bccbd482ef24e0272391a02c31d8a2a1fb392"
+    "rgba_sha256": "11f38c902da5506749ea4eed5b5bccbd482ef24e0272391a02c31d8a2a1fb392",
+    "sem_chao_sha256": "11f38c902da5506749ea4eed5b5bccbd482ef24e0272391a02c31d8a2a1fb392"
    }
   },
   "janela/larga": {
@@ -484,7 +567,8 @@
      36,
      20
     ],
-    "rgba_sha256": "b06b3c31047144515e0f6007cd8b1e4e20d5ae1f6b1efd128e3307ae212d84b4"
+    "rgba_sha256": "b06b3c31047144515e0f6007cd8b1e4e20d5ae1f6b1efd128e3307ae212d84b4",
+    "sem_chao_sha256": "b06b3c31047144515e0f6007cd8b1e4e20d5ae1f6b1efd128e3307ae212d84b4"
    }
   },
   "jaqueta/curta": {
@@ -493,7 +577,8 @@
      96,
      96
     ],
-    "rgba_sha256": "6e7358abe1393863d9f5234445616881b0d73fd8481aabf530c258e21e12417d"
+    "rgba_sha256": "6e7358abe1393863d9f5234445616881b0d73fd8481aabf530c258e21e12417d",
+    "sem_chao_sha256": "2b0c7d16d828dfd3945440cfb65f6ef48d76c31f3097fea149a15cb017d3c8fa"
    }
   },
   "jaqueta/larga": {
@@ -502,7 +587,8 @@
      96,
      96
     ],
-    "rgba_sha256": "787ae8ae42afae0c5879892a961b00f2517c6bef43d87a02b3aabaf284c70395"
+    "rgba_sha256": "787ae8ae42afae0c5879892a961b00f2517c6bef43d87a02b3aabaf284c70395",
+    "sem_chao_sha256": "053315e4590c3bc82048daf53d49254be558d609ab9530a0f8d645f9d9e8f0ed"
    }
   },
   "jaqueta/ao punho": {
@@ -511,7 +597,8 @@
      96,
      96
     ],
-    "rgba_sha256": "06af2c38ad96c17e6f1b80a5ae9ab3ed9b155985c8e3bb1e68da8e712c069245"
+    "rgba_sha256": "06af2c38ad96c17e6f1b80a5ae9ab3ed9b155985c8e3bb1e68da8e712c069245",
+    "sem_chao_sha256": "5e8e1b9973ebc40222437fbea3ae7de0c4fd4290a7974bc5220873ae0ff3eb85"
    }
   },
   "muro_fiadas/baixo": {
@@ -520,7 +607,8 @@
      72,
      24
     ],
-    "rgba_sha256": "18e4849a0445fe7c61b783bfb9e6a08d0f9017f29823051cb0a53055bee0cc8c"
+    "rgba_sha256": "18e4849a0445fe7c61b783bfb9e6a08d0f9017f29823051cb0a53055bee0cc8c",
+    "sem_chao_sha256": "18e4849a0445fe7c61b783bfb9e6a08d0f9017f29823051cb0a53055bee0cc8c"
    }
   },
   "muro_fiadas/com vão": {
@@ -529,7 +617,8 @@
      72,
      40
     ],
-    "rgba_sha256": "66ee6403588e3a450c0af04c0f02cc7abab32dd7409d59347d8f5aeb4ac8113a"
+    "rgba_sha256": "66ee6403588e3a450c0af04c0f02cc7abab32dd7409d59347d8f5aeb4ac8113a",
+    "sem_chao_sha256": "66ee6403588e3a450c0af04c0f02cc7abab32dd7409d59347d8f5aeb4ac8113a"
    }
   },
   "muro_fiadas/empena": {
@@ -538,7 +627,8 @@
      72,
      45
     ],
-    "rgba_sha256": "7727fd50884b65c1d9d332af41b223114588ad16563b271323c2267d26bf12be"
+    "rgba_sha256": "7727fd50884b65c1d9d332af41b223114588ad16563b271323c2267d26bf12be",
+    "sem_chao_sha256": "7727fd50884b65c1d9d332af41b223114588ad16563b271323c2267d26bf12be"
    }
   },
   "olhos/escuros": {
@@ -547,7 +637,8 @@
      96,
      96
     ],
-    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993"
+    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993",
+    "sem_chao_sha256": "ffe2b231621f5dcaedeaa030eb82fe58fc25bd99a97345032078060e0f403c28"
    }
   },
   "olhos/couro": {
@@ -556,7 +647,8 @@
      96,
      96
     ],
-    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993"
+    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993",
+    "sem_chao_sha256": "ffe2b231621f5dcaedeaa030eb82fe58fc25bd99a97345032078060e0f403c28"
    }
   },
   "olhos/claros": {
@@ -565,7 +657,8 @@
      96,
      96
     ],
-    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993"
+    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993",
+    "sem_chao_sha256": "ffe2b231621f5dcaedeaa030eb82fe58fc25bd99a97345032078060e0f403c28"
    }
   },
   "parede_tabuas/parede": {
@@ -574,7 +667,8 @@
      72,
      45
     ],
-    "rgba_sha256": "d2eabd991826a003dec97304998f5b016c6387c26c0890051030e8d0a0bcf6fe"
+    "rgba_sha256": "d2eabd991826a003dec97304998f5b016c6387c26c0890051030e8d0a0bcf6fe",
+    "sem_chao_sha256": "d2eabd991826a003dec97304998f5b016c6387c26c0890051030e8d0a0bcf6fe"
    }
   },
   "parede_tabuas/empena": {
@@ -583,7 +677,8 @@
      72,
      71
     ],
-    "rgba_sha256": "4fa547d16ed721c0deb5e6ff2cc2c3044764ed062e02b926ef6467cb9b0206eb"
+    "rgba_sha256": "4fa547d16ed721c0deb5e6ff2cc2c3044764ed062e02b926ef6467cb9b0206eb",
+    "sem_chao_sha256": "4fa547d16ed721c0deb5e6ff2cc2c3044764ed062e02b926ef6467cb9b0206eb"
    }
   },
   "parede_tabuas/tábua larga": {
@@ -592,7 +687,8 @@
      46,
      36
     ],
-    "rgba_sha256": "ea94856912ff2fbf36d87d9a549421cac4e77ac96c848c87fefcefeea78bee9f"
+    "rgba_sha256": "ea94856912ff2fbf36d87d9a549421cac4e77ac96c848c87fefcefeea78bee9f",
+    "sem_chao_sha256": "ea94856912ff2fbf36d87d9a549421cac4e77ac96c848c87fefcefeea78bee9f"
    }
   },
   "poligono/de frente": {
@@ -601,7 +697,8 @@
      26,
      17
     ],
-    "rgba_sha256": "c2d396bcf109ee9c0670bb42bc62d5213524d339c0523a14bcc924cf5bcf9a0b"
+    "rgba_sha256": "c2d396bcf109ee9c0670bb42bc62d5213524d339c0523a14bcc924cf5bcf9a0b",
+    "sem_chao_sha256": "c2d396bcf109ee9c0670bb42bc62d5213524d339c0523a14bcc924cf5bcf9a0b"
    }
   },
   "poligono/deitado": {
@@ -610,7 +707,8 @@
      26,
      17
     ],
-    "rgba_sha256": "a91f9ebb4a8fda8bf28e4b444d9448414450359566c31f063623b79e758f2340"
+    "rgba_sha256": "a91f9ebb4a8fda8bf28e4b444d9448414450359566c31f063623b79e758f2340",
+    "sem_chao_sha256": "a91f9ebb4a8fda8bf28e4b444d9448414450359566c31f063623b79e758f2340"
    }
   },
   "poligono/sombra": {
@@ -619,7 +717,8 @@
      26,
      17
     ],
-    "rgba_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956"
+    "rgba_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956",
+    "sem_chao_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956"
    }
   },
   "pontilhado/copa de folha": {
@@ -628,7 +727,8 @@
      86,
      94
     ],
-    "rgba_sha256": "4371727ff5f119bd926f2beed8d4909ba08b97d3b18cb12d8b15add005e4152c"
+    "rgba_sha256": "4371727ff5f119bd926f2beed8d4909ba08b97d3b18cb12d8b15add005e4152c",
+    "sem_chao_sha256": "4371727ff5f119bd926f2beed8d4909ba08b97d3b18cb12d8b15add005e4152c"
    }
   },
   "pontilhado/almofada": {
@@ -637,7 +737,8 @@
      79,
      97
     ],
-    "rgba_sha256": "87285b63d9eef896a9191f553859462551450e1da84b6c3585cdb93fa44459e5"
+    "rgba_sha256": "87285b63d9eef896a9191f553859462551450e1da84b6c3585cdb93fa44459e5",
+    "sem_chao_sha256": "87285b63d9eef896a9191f553859462551450e1da84b6c3585cdb93fa44459e5"
    }
   },
   "pontilhado/rala": {
@@ -646,7 +747,8 @@
      65,
      91
     ],
-    "rgba_sha256": "1b7bb18a5cc756e08d6d5d62de6f5f25289c55f57e01e76521d467bb900f76fc"
+    "rgba_sha256": "1b7bb18a5cc756e08d6d5d62de6f5f25289c55f57e01e76521d467bb900f76fc",
+    "sem_chao_sha256": "1b7bb18a5cc756e08d6d5d62de6f5f25289c55f57e01e76521d467bb900f76fc"
    }
   },
   "porta/estreita": {
@@ -655,7 +757,8 @@
      32,
      46
     ],
-    "rgba_sha256": "bb4503a59c18dc9406f81b52c84328f6e9eac3b990c29dcc23ded361950f6f44"
+    "rgba_sha256": "bb4503a59c18dc9406f81b52c84328f6e9eac3b990c29dcc23ded361950f6f44",
+    "sem_chao_sha256": "bb4503a59c18dc9406f81b52c84328f6e9eac3b990c29dcc23ded361950f6f44"
    }
   },
   "porta/larga": {
@@ -664,7 +767,8 @@
      42,
      49
     ],
-    "rgba_sha256": "2f97684da46c8278d2bb969080bcf973efce68a9e24eb25fa643b8fd46f5cb86"
+    "rgba_sha256": "2f97684da46c8278d2bb969080bcf973efce68a9e24eb25fa643b8fd46f5cb86",
+    "sem_chao_sha256": "2f97684da46c8278d2bb969080bcf973efce68a9e24eb25fa643b8fd46f5cb86"
    }
   },
   "porta/baixa": {
@@ -673,7 +777,8 @@
      30,
      37
     ],
-    "rgba_sha256": "ef0d61d74b8e133aaaae90e6885d08de0a8cbde72567bdb3ec872beb068f84a0"
+    "rgba_sha256": "ef0d61d74b8e133aaaae90e6885d08de0a8cbde72567bdb3ec872beb068f84a0",
+    "sem_chao_sha256": "ef0d61d74b8e133aaaae90e6885d08de0a8cbde72567bdb3ec872beb068f84a0"
    }
   },
   "poste/fino": {
@@ -682,7 +787,8 @@
      10,
      33
     ],
-    "rgba_sha256": "d3dd41b8a82adfa1eff03820910a97d84168374e753cdb142774b675fb076f36"
+    "rgba_sha256": "d3dd41b8a82adfa1eff03820910a97d84168374e753cdb142774b675fb076f36",
+    "sem_chao_sha256": "d3dd41b8a82adfa1eff03820910a97d84168374e753cdb142774b675fb076f36"
    }
   },
   "poste/grosso": {
@@ -691,7 +797,8 @@
      14,
      40
     ],
-    "rgba_sha256": "6b291d5820df994f6ac79cbe06e359641d1313dbbea385b11dcfcdb8a3954c40"
+    "rgba_sha256": "6b291d5820df994f6ac79cbe06e359641d1313dbbea385b11dcfcdb8a3954c40",
+    "sem_chao_sha256": "6b291d5820df994f6ac79cbe06e359641d1313dbbea385b11dcfcdb8a3954c40"
    }
   },
   "poste/sem topo": {
@@ -700,7 +807,8 @@
      10,
      53
     ],
-    "rgba_sha256": "2792335b789da4b350ff6a1a3635a8a085f5862e6e74b120dc57f9c37ab410a1"
+    "rgba_sha256": "2792335b789da4b350ff6a1a3635a8a085f5862e6e74b120dc57f9c37ab410a1",
+    "sem_chao_sha256": "2792335b789da4b350ff6a1a3635a8a085f5862e6e74b120dc57f9c37ab410a1"
    }
   },
   "sandalia/palha": {
@@ -709,7 +817,8 @@
      96,
      96
     ],
-    "rgba_sha256": "1474bcd05870473155dc3422e27af8c6c4ce81ff2e043c2d27fe1547107ad589"
+    "rgba_sha256": "1474bcd05870473155dc3422e27af8c6c4ce81ff2e043c2d27fe1547107ad589",
+    "sem_chao_sha256": "099f4a7a0cafada77f6cf08cea410e9a472de7ad87e1c19d7316ec326f46df36"
    }
   },
   "sandalia/tira de couro": {
@@ -718,7 +827,8 @@
      96,
      96
     ],
-    "rgba_sha256": "ccbe4e75e9365683aca6338e939fdebac7fd684cf2a0aa81907b869e788fcd29"
+    "rgba_sha256": "ccbe4e75e9365683aca6338e939fdebac7fd684cf2a0aa81907b869e788fcd29",
+    "sem_chao_sha256": "98b3aaefc6dea795145160dd7dc9b1e95106e97624532a75c0ca84f4aa7e25d0"
    }
   },
   "sandalia/couro": {
@@ -727,7 +837,8 @@
      96,
      96
     ],
-    "rgba_sha256": "d5faed91f40cb666e4fb9a241e98bf99c73a7fb773ad8c489c154a9c485af0d8"
+    "rgba_sha256": "d5faed91f40cb666e4fb9a241e98bf99c73a7fb773ad8c489c154a9c485af0d8",
+    "sem_chao_sha256": "36195f577625e89b651ec73f358b54dbe631ceefd8de347af7ce896687b4650e"
    }
   },
   "tabi/linho": {
@@ -736,7 +847,8 @@
      96,
      96
     ],
-    "rgba_sha256": "4476cfbdda78c4bbecc7f55f9af774741543ad0adb918b84b76c833b8abea314"
+    "rgba_sha256": "4476cfbdda78c4bbecc7f55f9af774741543ad0adb918b84b76c833b8abea314",
+    "sem_chao_sha256": "0569da959a16e6b2449992f824ffa94acf0c2da1d86de2522647186a1d15a979"
    }
   },
   "tabi/escuro": {
@@ -745,7 +857,8 @@
      96,
      96
     ],
-    "rgba_sha256": "4c14de4bd0339152cc182f4b1dafc0ba1d55a7379b02afa13a56fc75d2ddde42"
+    "rgba_sha256": "4c14de4bd0339152cc182f4b1dafc0ba1d55a7379b02afa13a56fc75d2ddde42",
+    "sem_chao_sha256": "31c4a6259ddafa43d99c21e7b9452e21f63963ea3957124ff6714c6bb12e3459"
    }
   },
   "tabi/couro": {
@@ -754,7 +867,8 @@
      96,
      96
     ],
-    "rgba_sha256": "e4d2dca4e827dd75b98c80f7229c6d6694e998b37b205d3a60619aa7b2f00d35"
+    "rgba_sha256": "e4d2dca4e827dd75b98c80f7229c6d6694e998b37b205d3a60619aa7b2f00d35",
+    "sem_chao_sha256": "5a482a4efef718f02327c59b7c0eb631a3e7f4f187db7381c27ad08665640b77"
    }
   },
   "tabuado/piso": {
@@ -763,7 +877,8 @@
      46,
      26
     ],
-    "rgba_sha256": "fa8a1ae468b3c2054b6f47b932570829490bf59c53093d61e32a37bd3b2a2ef9"
+    "rgba_sha256": "fa8a1ae468b3c2054b6f47b932570829490bf59c53093d61e32a37bd3b2a2ef9",
+    "sem_chao_sha256": "fa8a1ae468b3c2054b6f47b932570829490bf59c53093d61e32a37bd3b2a2ef9"
    }
   },
   "tabuado/frente de caixa": {
@@ -772,7 +887,8 @@
      20,
      16
     ],
-    "rgba_sha256": "caafc491cec7f6ca23b20b46a17054c8e2c24cd2eaba69018c3a9cedb8fde105"
+    "rgba_sha256": "caafc491cec7f6ca23b20b46a17054c8e2c24cd2eaba69018c3a9cedb8fde105",
+    "sem_chao_sha256": "caafc491cec7f6ca23b20b46a17054c8e2c24cd2eaba69018c3a9cedb8fde105"
    }
   },
   "tabuado/gasto e claro": {
@@ -781,7 +897,8 @@
      46,
      26
     ],
-    "rgba_sha256": "1074348f65e7a9f4385963299f83bdf97eab9e79670c3a7c6f8a50f33301489c"
+    "rgba_sha256": "1074348f65e7a9f4385963299f83bdf97eab9e79670c3a7c6f8a50f33301489c",
+    "sem_chao_sha256": "1074348f65e7a9f4385963299f83bdf97eab9e79670c3a7c6f8a50f33301489c"
    }
   },
   "telhado_palha/água da frente": {
@@ -790,7 +907,8 @@
      72,
      33
     ],
-    "rgba_sha256": "3c5682498b7d3e8de23ac7e798df28032d50731013f5f016f721723ed4bcb041"
+    "rgba_sha256": "3c5682498b7d3e8de23ac7e798df28032d50731013f5f016f721723ed4bcb041",
+    "sem_chao_sha256": "3c5682498b7d3e8de23ac7e798df28032d50731013f5f016f721723ed4bcb041"
    }
   },
   "telhado_palha/quadril": {
@@ -799,7 +917,8 @@
      40,
      32
     ],
-    "rgba_sha256": "a76261bbdb5043e46ad54f6d9b7a0387fc868830d637afb7890948ed2d7b261d"
+    "rgba_sha256": "a76261bbdb5043e46ad54f6d9b7a0387fc868830d637afb7890948ed2d7b261d",
+    "sem_chao_sha256": "a76261bbdb5043e46ad54f6d9b7a0387fc868830d637afb7890948ed2d7b261d"
    }
   },
   "telhado_palha/sem fio claro": {
@@ -808,7 +927,8 @@
      72,
      33
     ],
-    "rgba_sha256": "c309fce279a487bc17dbdd30b9e9738286d3de8b3c2957cc0d10d76ef138d7b9"
+    "rgba_sha256": "c309fce279a487bc17dbdd30b9e9738286d3de8b3c2957cc0d10d76ef138d7b9",
+    "sem_chao_sha256": "c309fce279a487bc17dbdd30b9e9738286d3de8b3c2957cc0d10d76ef138d7b9"
    }
   },
   "telhado_tabuinhas/alto": {
@@ -817,7 +937,8 @@
      76,
      76
     ],
-    "rgba_sha256": "f4e447b2011425e7c98bcb0fa230196e6defe6520fc4c82b802c187d7609ff8b"
+    "rgba_sha256": "f4e447b2011425e7c98bcb0fa230196e6defe6520fc4c82b802c187d7609ff8b",
+    "sem_chao_sha256": "f4e447b2011425e7c98bcb0fa230196e6defe6520fc4c82b802c187d7609ff8b"
    }
   },
   "telhado_tabuinhas/raso": {
@@ -826,7 +947,8 @@
      76,
      46
     ],
-    "rgba_sha256": "be00527b5c6f067e03e8d2627cfea85210f6c3dcd912d573d57a98663c69b030"
+    "rgba_sha256": "be00527b5c6f067e03e8d2627cfea85210f6c3dcd912d573d57a98663c69b030",
+    "sem_chao_sha256": "be00527b5c6f067e03e8d2627cfea85210f6c3dcd912d573d57a98663c69b030"
    }
   },
   "telhado_tabuinhas/sem empena": {
@@ -835,7 +957,8 @@
      60,
      57
     ],
-    "rgba_sha256": "a2252eeac4264fdfb2496003b217f5eca475cc555e8817911dcdfee3bf02981b"
+    "rgba_sha256": "a2252eeac4264fdfb2496003b217f5eca475cc555e8817911dcdfee3bf02981b",
+    "sem_chao_sha256": "a2252eeac4264fdfb2496003b217f5eca475cc555e8817911dcdfee3bf02981b"
    }
   },
   "traco/fino": {
@@ -844,7 +967,8 @@
      28,
      13
     ],
-    "rgba_sha256": "baa35f7ed9a34e516f54fe56f082296305467f1dd7d57e561b38f05a755b8ef1"
+    "rgba_sha256": "baa35f7ed9a34e516f54fe56f082296305467f1dd7d57e561b38f05a755b8ef1",
+    "sem_chao_sha256": "baa35f7ed9a34e516f54fe56f082296305467f1dd7d57e561b38f05a755b8ef1"
    }
   },
   "traco/largo": {
@@ -853,7 +977,8 @@
      8,
      18
     ],
-    "rgba_sha256": "87450854f790dbc5168950217a659a98552301137eb224192cdd9822da9e355a"
+    "rgba_sha256": "87450854f790dbc5168950217a659a98552301137eb224192cdd9822da9e355a",
+    "sem_chao_sha256": "87450854f790dbc5168950217a659a98552301137eb224192cdd9822da9e355a"
    }
   },
   "traco/roliço": {
@@ -862,7 +987,8 @@
      34,
      13
     ],
-    "rgba_sha256": "eea14ad00c0496ab9408a23bbb0b1ddab3f0e977577840934b1d8442b26c4621"
+    "rgba_sha256": "eea14ad00c0496ab9408a23bbb0b1ddab3f0e977577840934b1d8442b26c4621",
+    "sem_chao_sha256": "eea14ad00c0496ab9408a23bbb0b1ddab3f0e977577840934b1d8442b26c4621"
    }
   },
   "tronco_em_pe/fino": {
@@ -871,7 +997,8 @@
      12,
      66
     ],
-    "rgba_sha256": "a8c6e17d3c896e130a12d29ef703102c3c20423951c6542138f84f175aaa5b31"
+    "rgba_sha256": "a8c6e17d3c896e130a12d29ef703102c3c20423951c6542138f84f175aaa5b31",
+    "sem_chao_sha256": "a8c6e17d3c896e130a12d29ef703102c3c20423951c6542138f84f175aaa5b31"
    }
   },
   "tronco_em_pe/grosso": {
@@ -880,7 +1007,8 @@
      16,
      52
     ],
-    "rgba_sha256": "a9b25fd85316071e8216d4b9b2d766b7206e242459bb06c89e26d2e9bdf684be"
+    "rgba_sha256": "a9b25fd85316071e8216d4b9b2d766b7206e242459bb06c89e26d2e9bdf684be",
+    "sem_chao_sha256": "a9b25fd85316071e8216d4b9b2d766b7206e242459bb06c89e26d2e9bdf684be"
    }
   },
   "tronco_em_pe/inclinado": {
@@ -889,7 +1017,8 @@
      16,
      59
     ],
-    "rgba_sha256": "c45601a90f6d30b83ffe20fe9c27a5cbd1fa6ad5a8fc276ebd31cf24cd7c92ca"
+    "rgba_sha256": "c45601a90f6d30b83ffe20fe9c27a5cbd1fa6ad5a8fc276ebd31cf24cd7c92ca",
+    "sem_chao_sha256": "c45601a90f6d30b83ffe20fe9c27a5cbd1fa6ad5a8fc276ebd31cf24cd7c92ca"
    }
   },
   "viga/fina": {
@@ -898,7 +1027,8 @@
      72,
      20
     ],
-    "rgba_sha256": "920abbdd56540b79164107b92071543950dbfa8ca9b17822dc14cbfad7bad91d"
+    "rgba_sha256": "920abbdd56540b79164107b92071543950dbfa8ca9b17822dc14cbfad7bad91d",
+    "sem_chao_sha256": "920abbdd56540b79164107b92071543950dbfa8ca9b17822dc14cbfad7bad91d"
    }
   },
   "viga/com topo": {
@@ -907,7 +1037,8 @@
      72,
      23
     ],
-    "rgba_sha256": "227d5ef4bedbdf29b59f8b46b7f1e09a83f46f9b70a447536ea36e649b0219f1"
+    "rgba_sha256": "227d5ef4bedbdf29b59f8b46b7f1e09a83f46f9b70a447536ea36e649b0219f1",
+    "sem_chao_sha256": "227d5ef4bedbdf29b59f8b46b7f1e09a83f46f9b70a447536ea36e649b0219f1"
    }
   },
   "viga/girada": {
@@ -916,7 +1047,8 @@
      40,
      44
     ],
-    "rgba_sha256": "c1deafa3440a573bdaf762fb3ce931667b566828045126ce4061c198dcb04a07"
+    "rgba_sha256": "c1deafa3440a573bdaf762fb3ce931667b566828045126ce4061c198dcb04a07",
+    "sem_chao_sha256": "c1deafa3440a573bdaf762fb3ce931667b566828045126ce4061c198dcb04a07"
    }
   }
  }

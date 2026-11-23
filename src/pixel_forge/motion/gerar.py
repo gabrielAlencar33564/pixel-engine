@@ -12,10 +12,11 @@ from ..core.recusa import Recusa
 from ..rig.fk import Skeleton
 from ..rig.modelo import Papeis, papeis_do_asset
 from .caminhada import passada_poses
+from .passo import passada_apoio
 from .receita import carregar, parado
 
 Gerador = Callable[[dict[str, Any], Papeis, Skeleton, dict[str, int]], dict[str, Any]]
-GERADORES: dict[str, Gerador] = {"parado": parado, "passada_poses": passada_poses}
+GERADORES: dict[str, Gerador] = {"parado": parado, "passada_poses": passada_poses, "passada_apoio": passada_apoio}
 
 
 def gerar_clipe(asset: AssetIR, receita: str, mp: dict[str, int]) -> Clipe:

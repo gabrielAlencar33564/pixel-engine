@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ..contracts.estilo import MaterialDef, StyleDoc
+from ..views.camera import LUZ
 
 
 @dataclass(frozen=True)
@@ -23,7 +24,7 @@ class EstiloRender:
 
 
 def estilo_render(style: StyleDoc) -> EstiloRender:
-    lx, ly, lz = style.shading.light_dir
+    lx, ly, lz = LUZ
     ups: dict[str, list[str]] = {}
     for m in style.materials:
         if m.cast_material is not None:

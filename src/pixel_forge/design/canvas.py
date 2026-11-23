@@ -1,12 +1,13 @@
 """O canvas pelo tamanho do asset: a caixa da geometria na tela de cada vista, na câmera física de 45° do kit (uma
-folga sobre o 0,35 do oblíquo), mais a margem. O pivô (a origem do mundo) cai onde a geometria manda e fica sempre
-dentro do canvas."""
+folga sobre o 0,35 do oblíquo), e a da sombra que ela projeta no chão (à direita da base, pela luz da câmera), mais a
+margem. O pivô (a origem do mundo) cai onde a geometria manda e fica sempre dentro do canvas."""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
+from ..views.camera import SOMBRA_POR_ALTURA
 from .vistas import pontos
 
 _S, _C = math.sin(math.radians(45)), math.cos(math.radians(45))
@@ -22,6 +23,13 @@ class _Caixa:
         x, y = p[0] * ca - p[1] * sa, p[0] * sa + p[1] * ca
         self.us.extend((x - r, x + r))
         self.vs.extend((y * _S - p[2] * _C - r, y * _S - p[2] * _C + r))
+        self.sombra(x + r, y * _S + r, p[2] + r)
+
+    def sombra(self, u: float, v_chao: float, z: float) -> None:
+        """A sombra no chão do ponto a ``z`` px de altura: ``SOMBRA_POR_ALTURA``·z à direita da base dele."""
+        if z > 0:
+            self.us.append(u + SOMBRA_POR_ALTURA * z)
+            self.vs.append(v_chao)
 
     def elipse(self, g: dict[str, Any], rot: tuple[int, int]) -> None:
         ca, sa = rot
@@ -35,6 +43,7 @@ class _Caixa:
         vv = ((cx * sa + cy * ca) / 256) * _S - (cz / 256) * _C
         dv = ry * _S + rz * _C
         self.vs.extend((vv - dv, vv + dv))
+        self.sombra(x + rx, ((cx * sa + cy * ca) / 256 + ry) * _S, cz / 256 + rz)
 
     def geometria(self, g: dict[str, Any], rot: tuple[int, int]) -> None:
         t = g["type"]

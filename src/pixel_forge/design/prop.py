@@ -3,13 +3,11 @@ contato, os pontos do jogo, as vistas declaradas (1, 2 ou 4) e o canvas do taman
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
 from ..contracts.composicao import Balanco, Composicao, Giro
 from ..core.recusa import Recusa
 from ..core.rng import Stream
-from ..views.camera import PROFUNDIDADE_PERMILLE
 from .canvas import canvas_do_prop
 from .composicao import conferir_medidas, conferir_nos, medidas, repeticoes, semente_do_no
 from .construtor import AssetBuilder, Junta, Parte, ellipse, q, qv
@@ -18,7 +16,17 @@ from .kit.movimento import Elo, sway_chain
 from .kit.peca import Ctx, ler_args
 from .kit.pilha import Pilha
 from .kit.registro import PECAS
-from .vistas import AZIMUTE, N_VISTAS, VISTAS, no_mundo, regras_da_vista, reparentar, sombra_da_vista
+from .vistas import (
+    AZIMUTE,
+    N_VISTAS,
+    SEN45,
+    VISTAS,
+    no_mundo,
+    regras_da_vista,
+    reparentar,
+    sombra_da_vista,
+    sombra_no_obliquo,
+)
 
 PRECISA = {"tronco": "balanco", "cadeia": "balanco", "giro": "giro"}
 
@@ -58,26 +66,15 @@ def validar_prop(comp: Composicao) -> None:
     conferir_nos(comp, conhecidas)
 
 
-SEN45 = math.sin(math.radians(45))
-
-
 def _sombra(b: AssetBuilder, comp: Composicao, env: dict[str, float]) -> None:
     """A sombra de contato com a proporção (≈ 3:1) na tela da câmera física de 45° do kit (a do canvas), deslocada
-    para o lado da sombra; :func:`_sombra_no_obliquo` a leva ao 3/4 oblíquo depois do canvas."""
+    para o lado da sombra; :func:`sombra_no_obliquo` a leva ao 3/4 oblíquo depois do canvas."""
     sh = comp.sombra
     if sh is None:
         return
     meia = valor(sh.meia_largura, env)
     g = ellipse(qv(valor(sh.dx, env), valor(sh.dy, env), 0), qv(meia, meia / (sh.proporcao_pm / 1000) / SEN45, 0.3))
     b.part("ground_shadow", "sombra", g, Parte(tags=("ground_shadow",), priority=-100))
-
-
-def _sombra_no_obliquo(b: AssetBuilder) -> None:
-    """A profundidade da sombra de contato reescalada do 45° para o 0,35 do oblíquo: ela continua 3:1 na tela."""
-    for p in b.parts:
-        if p["id"] == "ground_shadow":
-            r = p["geometry"]["radii_q8"]
-            r[1] = max(1, round(r[1] * SEN45 / (PROFUNDIDADE_PERMILLE / 1000)))
 
 
 def _ossos(b: AssetBuilder, comp: Composicao, env: dict[str, float]) -> tuple[list[Elo], tuple[float, ...] | None]:
@@ -150,6 +147,6 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     lms = [{"id": nome, "bone_id": "root", "point_q8": qv(*(valor(t, env) for t in ponto))}
            for nome, ponto in comp.landmarks.items()]
     canvas = canvas_do_prop(no_mundo(b.parts, b.bones), folga, tuple(AZIMUTE[v] for v in comp.vistas))
-    _sombra_no_obliquo(b)
+    sombra_no_obliquo(b.parts)
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": lms,
             "canvas": canvas, "views": _vistas(comp, b, regras, por_vista)}

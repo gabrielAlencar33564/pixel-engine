@@ -20,7 +20,16 @@ from typing import Any
 
 from ..rig.fk import Skeleton
 from ..rig.modelo import Papeis
-from .canais import Channels, ClipWriter, bend_guess, q_, rest_ankles, solve_feet
+from .canais import (
+    Channels,
+    ClipWriter,
+    bend_guess,
+    inclinacoes_de_repouso,
+    orienta_distais,
+    q_,
+    rest_ankles,
+    solve_feet,
+)
 
 DIR = Path(__file__).resolve().parents[1] / "dados" / "receitas"
 
@@ -133,19 +142,23 @@ def skirt_follow(r: Papeis, mp: dict[str, int]) -> Callable[[Channels], Channels
 
 
 def parado(rec: dict[str, Any], r: Papeis, skel: Skeleton, mp: dict[str, int]) -> dict[str, Any]:
-    """Em pé, os pés no repouso por IK, chaves com suavização (o ``idle``)."""
+    """Em pé, os pés no repouso por IK, chaves com suavização (o ``idle``); na perna de N segmentos, o IK põe o alvo
+    da cadeia (o jarrete) no repouso e os distais ficam na inclinação de repouso (a pata plana)."""
     duracao, k = rec["duracao_ms"], mp.get("scale_pm", 1000) / 1000
-    feet = [r.exige(p, "pe") for p in rec["pes"]]
+    feet = [r.alvo(r.exige(p, "pe")) for p in rec["pes"]]
     rest = rest_ankles(skel, feet)
     w = ClipWriter(skel)
     guess = bend_guess(skel, feet)
     skirt = skirt_follow(r, mp)
+    distais = inclinacoes_de_repouso(skel, r)
     for t in rec["chaves_ms"]:
         ch: Channels = dict(guess)
         ch.update(canais(rec, r, Instante(t, duracao, mp, k)))
         ch = solve_feet(skel, ch, rest)
         if skirt is not None:
             ch = skirt(ch)
+        if distais:
+            ch = orienta_distais(skel, ch, r, distais)
         w.key(t, rec["suave"], ch, ([0, 0, 0], list(rec.get("marcas", {}).get(str(t), []))))
     contacts = [{"bone_id": f, "start_ms": 0, "end_ms": duracao, "target_q8": list(rest[f])} for f in feet]
     return w.clip(rec["clip"], duracao, rec["amostras_ms"], contacts)

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from functools import cmp_to_key
+from math import isqrt
 
 import numpy as np
 import numpy.typing as npt
@@ -56,6 +57,26 @@ def raster_ellipse(w: int, h: int, o: int, centro: tuple[int, int], semi: tuple[
         return res
 
     return _windowed(w, h, o, (cu - hu, cu + hu, cv - hv, cv + hv), cheia)
+
+
+def raster_oriented_ellipse(w: int, h: int, o: int, centro: tuple[int, int], forma: tuple[int, int, int]) -> Mascara:
+    """A elipse girada: x dentro ⇔ xᵀ·adj(M)·x ≤ det(M), com M a forma 2×2 (q8²). Degenerada (det ≤ 0): vazia (o
+    render cobre o pixel do centro, como em toda primitiva menor que a grade)."""
+    cu, cv = centro
+    muu, muv, mvv = forma
+    det = muu * mvv - muv * muv
+    if det <= 0:
+        return np.zeros((h, w), dtype=bool)
+    ru, rv = isqrt(max(muu, 0)) + 1, isqrt(max(mvv, 0)) + 1
+
+    def cheia(ww: int, hh: int, ux: int, uy: int) -> Mascara:
+        xs, ys = _centers(ww, hh, ux, uy)
+        dx = (xs - cu)[None, :]
+        dy = (ys - cv)[:, None]
+        res: Mascara = dx * dx * mvv - 2 * dx * dy * muv + dy * dy * muu <= det
+        return res
+
+    return _windowed(w, h, o, (cu - ru, cu + ru, cv - rv, cv + rv), cheia)
 
 
 def _span(points: Pontos, pad: int) -> tuple[int, int, int, int]:

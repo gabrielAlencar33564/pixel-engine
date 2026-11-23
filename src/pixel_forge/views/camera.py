@@ -6,18 +6,33 @@ A altura aparece a cos(45°) e a profundidade a 0,35 na tela. Para o azimute ``a
     u  = pivô_u + x'                v  = pivô_v + y'·0,35 - z cos 45°
     profundidade = y' cos 45° + z sin 45°      (maior = mais perto da câmera)
 
-A origem do corpo cai no centro do pixel do pivô; a tela sai em q8 do canvas.
+A origem do corpo cai no centro do pixel do pivô; a tela sai em q8 do canvas. A luz é da câmera, como ela: vem de
+cima e da esquerda (``LUZ``, em direita, baixo e para a câmera), em todo asset e toda vista. A sombra de um ponto a
+``z`` px do chão cai ``SOMBRA_POR_ALTURA``·z px à direita da base dele na tela.
 """
 
 from __future__ import annotations
 
-from math import isqrt
+from math import cos, isqrt, radians, sin, sqrt
 
 from ..core.q8 import Q30_SHIFT, pos_to_q8, sin_cos_q30
 from ..rig.fk import Mat3, Vec3i, mat_t_vec
 
 ELEVACAO_MDEG = 45_000
 PROFUNDIDADE_PERMILLE = 350
+LUZ = (-1, -1, 1)
+
+
+def _sombra_por_altura() -> float:
+    """Quanto a sombra no chão anda na tela por px de altura: a luz da câmera no mundo (na vista S), −lx/lz."""
+    n = sqrt(sum(c * c for c in LUZ))
+    e = radians(ELEVACAO_MDEG / 1000)
+    lx = LUZ[0] / n
+    lz = (LUZ[1] * -cos(e) + LUZ[2] * sin(e)) / n
+    return -lx / lz
+
+
+SOMBRA_POR_ALTURA = _sombra_por_altura()
 _HALF = 1 << (Q30_SHIFT - 1)
 
 
@@ -57,6 +72,16 @@ class Camera:
             return None
         sign = -1 if cd < 0 else 1
         return (sign * cu * 1000 // norm, sign * cv * 1000 // norm, sign * cd * 1000 // norm)
+
+    def shape_q8(self, rot: Mat3, radii_q8: list[int]) -> tuple[int, int, int]:
+        """A matriz de forma (muu, muv, mvv), em q8², da projeção do elipsoide de raios ``radii_q8`` no espaço da peça:
+        M = Σ r² · w wᵀ, com w os eixos da tela no espaço da peça; a elipse fica inscrita na caixa de ``extent_q8``."""
+        wu, wv = mat_t_vec(rot, self.eu), mat_t_vec(rot, self.ev)
+        a = [r * x for r, x in zip(radii_q8, wu, strict=True)]
+        b = [r * x for r, x in zip(radii_q8, wv, strict=True)]
+        half = 1 << 59
+        return ((sum(x * x for x in a) + half) >> 60, (sum(x * y for x, y in zip(a, b, strict=True)) + half) >> 60,
+                (sum(y * y for y in b) + half) >> 60)
 
     def extent_q8(self, rot: Mat3, radii_q8: list[int], axis: Vec3i) -> int:
         """A meia-largura na tela (no eixo ``axis``) do elipsoide de raios ``radii_q8`` no espaço da peça."""

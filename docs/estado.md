@@ -31,17 +31,19 @@ fora a sombra das vistas E/N/W (mudança intencional). O estilo base com a palet
 O humano: o rig `humano` por papéis, o IK de duas juntas, o parado e a passada com IK, o corpo e as roupas
 (jaqueta, faixa, calça, olhos, cabelo, chapéu, bolsa, sandália, tabi, e as novas saia e lenço): **o vestido nas 8
 direções, parado e andando, 176 quadros iguais ao oráculo**; as 102 variações do kit (com as roupas) também. O porte
-por categoria, recusado no build com o porte típico na dica.
+por categoria, recusado no build com o porte típico na dica. O quadrúpede: o corpo canino no rig de pernas em Z
+com o IK de N segmentos, parado e no passo (112 quadros iguais ao antigo animando a mesma IR). O canvas inclui a sombra
+no chão (antes cortada); a luz é da câmera.
 
 ## Números
 
-| Medida | N0 | N1 | N2a | N2b | N2c |
-|---|---|---|---|---|---|
-| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 |
-| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 |
-| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes |
+| Medida | N0 | N1 | N2a | N2b | N2c | N2d |
+|---|---|---|---|---|---|---|
+| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 | 7 777 |
+| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 | 137 |
+| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes | 20 s, 198 testes |
 
 ## Próximo passo
 
-**N2, o resto:** o balanço e o giro do prop como clipe; o quadrúpede (o canino) com o rig por papéis e a passada;
-a corrida e a ação por acessório; o inventário das lições. Depois o **N3**: a CLI mínima e o acervo.
+**N3:** a CLI mínima (`previa`, `checar`, `olhar`, `conjunto`, `revisar`, `atualizar`) no acervo sem projeto, com a
+prévia sob os mesmos limites do build e menos de 1 min de máquina no estático.
