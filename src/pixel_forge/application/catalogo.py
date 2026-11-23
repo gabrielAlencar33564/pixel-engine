@@ -61,6 +61,8 @@ def catalogo(destino: Path) -> Path:
                       "ancoras": list(p.ancoras), "variacoes": [{"nome": n, "args": args} for n, args in p.variacoes],
                       "args": [{"nome": a.nome, "tipo": a.tipo, "descricao": a.descricao, "padrao": a.padrao}
                                for a in p.args],
+                      "partes": [pt.id for pt in ir_da_composicao(de_uma_peca(pid, p.variacoes[0][1])).parts
+                                 if pt.id != "ground_shadow"],
                       "prancha": _prancha(pid, destino).name})
     alvo = destino / "index.json"
     alvo.write_text(json.dumps({"pecas": pecas, "materiais": [m.id for m in estilo_base().materials]},

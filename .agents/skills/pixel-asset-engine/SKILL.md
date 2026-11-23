@@ -32,7 +32,8 @@ as medidas reais em metros e o que dá vida à coisa (a copa larga e baixa, a pa
 `pfe catalogo --json` grava `<acervo>/catalogo/index.json` e uma prancha por peça (as 3 variações, da esquerda para a
 direita). Cada peça tem o tipo (`prop`, `humanoide`, `quadrupede`), para que serve, os argumentos (nome, tipo, para que
 serve, padrão; sem padrão = obrigatório), as variações com os argumentos de cada uma (o jeito mais rápido de ver as
-unidades), as âncoras que deixa e a lista de materiais do estilo. Escolha as peças pela descrição e pela prancha. Só
+unidades), as partes que ela gera na primeira variação (os ids que os traços citam), as âncoras que deixa e a lista
+de materiais do estilo. Escolha as peças pela descrição e pela prancha. Só
 existe o que é vigente: a peça que não está no catálogo não existe.
 
 ## 4. A composição

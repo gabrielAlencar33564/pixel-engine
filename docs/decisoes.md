@@ -118,3 +118,8 @@ substituído). O porquê longo vai no commit.
   unidade. A `reference` (a ficha) vai até 2000 caracteres.
 - A largura da saia mede a barra pelo quadril (100 % reta, 160 % em A, 220 % rodada): pela coxa, dobrar a largura
   abria 2 px. O `olhar` amplia pelo tamanho do quadro (o humano saía a 1×).
+
+## N5, rodada 2
+
+- A prova passou. A dica do `TRACO` passou a listar as partes do asset (mandava rodar a prévia, que recusava o mesmo
+  traço), e o catálogo diz as partes de cada peça: depois da prova, sem rodada nova (a correção não muda pixel).

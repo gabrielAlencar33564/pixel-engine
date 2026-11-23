@@ -1,56 +1,57 @@
 # Estado da engine corrigida
 
-Plano: `docs/plano.md` (cópia do plano de 2026-11-23). Decisões: `docs/decisoes.md`. Regras: `docs/regras.md`.
-Oráculo: o `pixel-engine` em 3df5fe42 (motor 2.3.0), só leitura (I7: `git status` limpo no início e agora).
+Plano: `docs/plano.md`. Decisões: `docs/decisoes.md`. Regras: `docs/regras.md`. Oráculo: `pixel-engine` em 3df5fe42,
+só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prova de fora passou na rodada 2.**
 
-## Feito
+## O que a engine tem
 
-**N0 — o esqueleto com as travas.** Repositório novo (`main`, sem remoto), `uv`, ruff (F, ARG, ERA, C901, PLR0912/0913/
-0915, sem lista de exceções), mypy estrito em `src`, `tests` e `scripts`, e `scripts/check.py`. As travas, verdes no
-repositório vazio e cada uma com controle negativo (`tests/travas/`):
-- código limpo (I10): código morto por referência, nenhuma marca de silêncio, a config sem exceção;
-- camadas: render, rig e export não importam desenho nem movimento; núcleo e contratos não importam nada acima;
-- nada de asset em `src/` (I4) e nada de treino nem acervo rastreado (I2);
-- teto de 400 linhas por módulo e de 1 500 linhas em `docs/`;
-- uma fonte de regras (I6): `CLAUDE.md`, `AGENTS.md` e a skill citam `docs/regras.md`, sem repetir; o espelho da skill.
-O oráculo (`scripts/oraculo.py`): `git archive` do `pixel-engine` numa pasta temporária, com ambiente próprio.
+- **Núcleo** igual ao `pixel-engine` pixel a pixel (oráculo por `git archive`): q8, IR, FK/IK de 2 e de N segmentos,
+  a câmera 3/4 oblíqua, a projeção, o raster (z-buffer, tons, sombras, contornos, limpeza) e o pacote `pfe-jogo/1`.
+- **Kit vigente** (38 peças): construção, telhados, carpintaria, vãos, formas, flora (`pontilhado`, galhos, cortinas,
+  pena), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição num formato só, com o porte.
+- **Movimento:** o parado e a passada do humano, o parado e o passo do quadrúpede, o balanço e o giro do prop.
+- **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `checar`, `build`, `exportar`,
+  `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de pedido e 4 exemplos.
 
-**N1 — o núcleo por demanda.** Três fixtures sintéticas (`tests/fixtures/oraculo/`: o bloco com a bola e a caixa, o
-tronco de revolução, o telhado de faces pela normal), 7 vistas, **iguais pixel a pixel ao oráculo**, com controle
-negativo. Portados, já no padrão I10: q8 e Taylor, IR e estilo, FK de repouso, a câmera oblíqua, a projeção (leque,
-revolução, elipse), o raster (z-buffer, tons, textura, sombra entre peças e no chão, contornos, pixel-perfect,
-limpeza de cor isolada), o build e o export `pfe-jogo/1` com o leitor do jogo e o `--verificar` (o roundtrip).
+## Números contra a linha de base
 
-**N2 — a composição única, o kit e o humano.** O formato único (o da v2, sem versão nem migração),
-as recusas antes de montar, o prop com a sombra de contato, as pilhas, as vistas 1/2/4 e o canvas pelo tamanho; 18
-peças vigentes (madeira, pedra, telhados, carpintaria, vãos, formas) e 6 de flora (o tronco sólido, os galhos finos e
-grossos com a âncora das pontas, o `pontilhado`, os `galhos_em_pena`, as cortinas): **as 72 variações iguais ao
-oráculo** na mesma entrada, e 3 composições sintéticas (a árvore no balanço, o abrigo, o marco de 4 vistas) também,
-fora a sombra das vistas E/N/W (mudança intencional). O estilo base com a paleta por função e os verdes de folhosa;
-`pfe build <composição>` e `pfe catalogo`.
-O humano: o rig `humano` por papéis, o IK de duas juntas, o parado e a passada com IK, o corpo e as roupas
-(jaqueta, faixa, calça, olhos, cabelo, chapéu, bolsa, sandália, tabi, e as novas saia e lenço): **o vestido nas 8
-direções, parado e andando, 176 quadros iguais ao oráculo**; as 102 variações do kit (com as roupas) também. O porte
-por categoria, recusado no build com o porte típico na dica. O quadrúpede: o corpo canino no rig de pernas em Z
-com o IK de N segmentos, parado e no passo (112 quadros iguais ao antigo animando a mesma IR). O canvas inclui a sombra
-no chão (antes cortada); a luz é da câmera.
+| Medida | `pixel-engine` | engine nova |
+|---|---|---|
+| Linhas em `src/` | 32 701 | 8 259 |
+| Arquivos rastreados | 9 672 | 151 |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | 29 s, 226 testes |
+| Carvalho: relógio do agente | ~9 min | 3 min 49 s |
+| Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
+| Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
+| Recusa sem dica | 1 | 0 |
 
-**N3 — o caminho curto.** O `pfe` com `previa`, `checar`, `build`, `exportar` (`--verificar`, `--publicar`), `olhar`,
-`catalogo`, `conjunto`, `revisar` e `atualizar`, no acervo (`~/.pixel-forge/acervo`) e sem projeto. A prévia recusa o
-que o build recusa; a revisão do dono é o único caminho para publicar. Estático: prévia 0,5 s, checar 0,4 s, build e
-export em ~2 s de relógio cada (com a partida do Python).
+## A prova de fora
 
-**N4 — as regras e a skill.** A skill única (`.claude/skills/pixel-asset-engine/`, do pedido ao export), o espelho
-e o formulário de pedido gerados dela; os quatro exemplos em `tests/fixtures/exemplos/`; o balanço e o giro do prop.
+- **Rodada 1 (falhou):** o carvalho parou em tetos internos (canvas de 256 px, 64 vértices no galho) que vazavam como
+  erro da IR com dica genérica; havia falhas caladas (traço com parte inexistente, nó vazio, camada interna cobrindo o
+  nó seguinte). Poço e camponesa exportaram. Corrigido na causa (8b29bd8); acervo dela em `~/.pixel-forge/acervo-rodada1`.
+- **Rodada 2 (passou):** os 3 exports verificados; o carvalho com `pontilhado`; vistas 1, 1 e 8; uma recusa (`TRACO`,
+  com dica); nada piorado para passar; estático bem abaixo de 1 min de máquina. A dica do traço apontava para a prévia
+  que a recusava: agora lista as partes, e o catálogo diz as partes de cada peça.
+- Pranchas da rodada 2 em `~/.pixel-forge/acervo/olhar/` (`carvalho_roble.r1...`, `poco_pedra.r1...`,
+  `camponesa.r1...`) e `previas/camponesa.r1.png`.
 
-## Números
+## Mudanças intencionais de pixel (pranchas em `~/.pixel-forge/acervo/pranchas/mudancas/`, antes em cima)
 
-| Medida | N0 | N1 | N2a | N2b | N2c | N2d | N3 | N4 |
-|---|---|---|---|---|---|---|---|---|
-| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 | 7 777 | 8 115 | 8 203 |
-| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 | 137 | 143 | 151 |
-| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes | 17 s, 199 testes | 18 s, 207 testes | 22 s, 222 testes |
+1. A paleta por função e os verdes de folhosa (os materiais de cena saíram do estilo).
+2. A sombra de contato reescalada também nas vistas E, N e W (fica 3:1 na tela em toda vista).
+3. O canvas inclui a sombra que o asset projeta no chão (o antigo a cortava calado); a luz é da câmera.
+4. A pegada do quadrúpede gira com o corpo (a antiga, de lado, saía 2× mais longa e cortada).
+Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós da pilha.
 
-## Próximo passo
+## O que não veio ou não passou
 
-**N5:** a prova de fora com um subagente novo, sem contexto, nos três pedidos do plano (seção 7), até três rodadas.
+- A corrida, o galope, a ação por acessório e a bateria canina (sentar, deitar, latir, uivar): nenhum pedido os usa.
+- O que a rodada 2 apontou sem recusa: a copa do `pontilhado` não faz a linha reta de pasto; a palha não envelhece
+  para o cinza; o `olhar` do humano é grande e sem rótulos; a prévia não avisa parte escondida atrás de outra.
+- A camponesa: a saia larga em 3/4 lê como saco; o andar (igual ao antigo) gira o tronco nas diagonais.
+
+## Espera o dono
+
+A revisão artística das pranchas da prova e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
+arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`).

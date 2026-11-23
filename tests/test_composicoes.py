@@ -139,7 +139,7 @@ def test_o_traco_que_cita_parte_inexistente_e_recusado_com_as_parecidas() -> Non
     with pytest.raises(Recusa) as e:
         ir_da_composicao(_mourao(tracos=[{"id": "t", "description": "d", "parts": ["poste_frente"],
                                           "verification": "observable"}]))
-    assert e.value.codigo == "TRACO" and "pfe previa" in e.value.dica and e.value.onde == "/tracos/0/parts/0"
+    assert e.value.codigo == "TRACO" and "As partes do asset:" in e.value.dica and e.value.onde == "/tracos/0/parts/0"
 
 
 def test_o_asset_maior_que_o_sprite_e_recusado_com_a_medida() -> None:

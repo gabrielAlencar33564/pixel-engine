@@ -50,10 +50,11 @@ def _conferir_tracos(comp: Composicao, partes: list[str]) -> None:
     for i, t in enumerate(comp.tracos):
         for j, pid in enumerate(t.parts):
             if pid not in partes:
-                perto = difflib.get_close_matches(pid, partes, 4, 0.4) or sorted(partes)[:6]
+                perto = difflib.get_close_matches(pid, partes, 4, 0.4)
+                todas = ", ".join(partes[:80]) + (" ..." if len(partes) > 80 else "")
                 raise Recusa("TRACO", f"O traço '{t.id}' cita a parte '{pid}', que o asset não tem.",
-                             f"Parecidas: {', '.join(perto)}. A lista das partes sai em `pfe previa` (campo "
-                             "`partes`).", f"/tracos/{i}/parts/{j}")
+                             f"Parecidas: {', '.join(perto) or 'nenhuma'}. As partes do asset: {todas}.",
+                             f"/tracos/{i}/parts/{j}")
 
 
 def movimento(comp: Composicao) -> tuple[dict[str, str], dict[str, int]]:
