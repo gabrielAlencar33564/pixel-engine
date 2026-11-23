@@ -4,11 +4,14 @@ cópia, o ambiente e a saída ficam na pasta temporária.
 
 Uso:
     python scripts/oraculo.py --versao              # exporta (uma vez por commit) e mostra o commit e a versão antiga
-    python scripts/oraculo.py tests/fixtures/oraculo/bloco.json ...   # grava o esperado de cada caso
+    python scripts/oraculo.py tests/fixtures/oraculo/bloco.json ...   # grava o esperado de cada caso de IR
+    python scripts/oraculo.py --kit                 # grava o esperado de cada variação de cada peça do kit
 
-Um caso é a IR da engine nova (`ir`), o estilo (`estilo`, caminho relativo ao caso) e as vistas. O esperado
+Um caso de IR é a IR da engine nova (`ir`), o estilo (`estilo`, relativo ao caso) e as vistas; o esperado
 (`<caso>.esperado.json`) guarda, por vista, o tamanho e o sha256 do RGBA que o `pixel-engine` dá na mesma entrada,
-convertida para o formato antigo (os campos que a engine nova não tem levam o valor do estilo base antigo).
+convertida para o formato antigo (os campos que a engine nova não tem levam o valor do estilo base antigo). O kit:
+cada variação da prancha vira uma composição de um nó, no formato antigo com os nomes antigos dos materiais
+(`tests/fixtures/oraculo/materiais.json`), no estilo base antigo; o esperado vai em `kit.esperado.json`.
 """
 
 from __future__ import annotations
@@ -25,10 +28,14 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
+from pixel_forge.application.catalogo import de_uma_peca
+from pixel_forge.design.kit.registro import PECAS
+
 REPO = Path(os.environ.get("PFE_ORACULO_REPO", r"D:\gabri\Projetos\Gabriel\pixel-engine"))
 CACHE = Path(tempfile.gettempdir()) / "pfe-oraculo"
 # só o que instala e roda o motor antigo (o `challenge/` e o resto do treino ficam de fora da cópia)
 CAMINHOS = ["src", "presets", "schemas", "pyproject.toml", "README.md", "LICENSE"]
+FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "oraculo"
 DIRECOES = ("S", "SW", "W", "NW", "N", "NE", "E", "SE")
 
 
@@ -106,21 +113,69 @@ def asset_antigo(ir: dict[str, Any], estilo: dict[str, Any]) -> dict[str, Any]:
             "seams": [], "extensions": {}}
 
 
+def _trocar(v: Any, mapa: dict[str, str]) -> Any:
+    if isinstance(v, str):
+        return mapa.get(v, v)
+    return [_trocar(x, mapa) for x in v] if isinstance(v, list) else v
+
+
+def composicao_antiga(comp: dict[str, Any]) -> dict[str, Any]:
+    """A composição nova no formato antigo: os materiais com os nomes antigos e o id que o antigo deixa montar com
+    qualquer peça do kit (as que ele tirou pela regra dos dois usos)."""
+    mapa = json.loads((FIXTURES / "materiais.json").read_text(encoding="utf-8"))
+    nos = [{**n, "args": {k: _trocar(v, mapa) for k, v in n.get("args", {}).items()}} for n in comp["nos"]]
+    base = {k: v for k, v in comp.items() if k != "categoria"}
+    return {**base, "kind": "composition", "schema_version": "2.0.0", "id": "kit_peca",
+            "reference": "docs/references/README.md", "nos": nos,
+            "vistas": {d: {"ocultas": v.get("ocultas", [])} for d, v in comp["vistas"].items()}}
+
+
+def antigo(destino: Path, casos: list[dict[str, Any]], estilo: dict[str, Any] | None) -> dict[str, Any]:
+    entrada = {"casos": casos, "style": estilo}
+    saida: dict[str, Any] = json.loads(rodar(destino, Path(__file__).with_name("oraculo_antigo.py"),
+                                             json.dumps(entrada).encode()))
+    return {nome: {v: {"tamanho": q["tamanho"], "rgba_sha256": q["rgba_sha256"]} for v, q in vistas.items()}
+            for nome, vistas in saida.items()}
+
+
+def _salvar(alvo: Path, dado: dict[str, Any]) -> None:
+    alvo.write_text(json.dumps(dado, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+
+
 def gravar(destino: Path, sha: str, caso: Path) -> None:
     dado = json.loads(caso.read_text(encoding="utf-8"))
     estilo = json.loads((caso.parent / dado["estilo"]).read_text(encoding="utf-8"))
-    entrada = {"asset": asset_antigo(dado["ir"], estilo), "style": estilo_antigo(estilo), "vistas": dado["vistas"]}
-    saida = json.loads(rodar(destino, Path(__file__).with_name("oraculo_antigo.py"), json.dumps(entrada).encode()))
-    esperado = {"pixel_engine": sha, "vistas": {v: {"tamanho": q["tamanho"], "rgba_sha256": q["rgba_sha256"]}
-                                                 for v, q in saida.items()}}
-    caso.with_name(f"{caso.stem}.esperado.json").write_text(json.dumps(esperado, indent=1) + "\n", encoding="utf-8")
+    saida = antigo(destino, [{"nome": caso.stem, "asset": asset_antigo(dado["ir"], estilo),
+                              "vistas": dado["vistas"]}], estilo_antigo(estilo))[caso.stem]
+    _salvar(caso.with_name(f"{caso.stem}.esperado.json"), {"pixel_engine": sha, "vistas": saida})
     print(f"{caso.name}: " + ", ".join(f"{v} {q['rgba_sha256'][:12]}" for v, q in saida.items()))
+
+
+def estilo_base_antigo() -> dict[str, Any]:
+    """O estilo base novo com os nomes antigos dos materiais: o oráculo confere o porte na mesma entrada, e a troca de
+    paleta (os nomes por função, os materiais de cena que saíram, os verdes de folhosa) fica na prancha."""
+    mapa = json.loads((FIXTURES / "materiais.json").read_text(encoding="utf-8"))
+    novo = json.loads((Path(__file__).resolve().parents[1] / "src" / "pixel_forge" / "dados" / "estilo_base.json")
+                      .read_text(encoding="utf-8"))
+    mats = [{**m, "id": mapa.get(m["id"], m["id"]),
+             **({"cast_material": mapa[m["cast_material"]]} if m.get("cast_material") else {})}
+            for m in novo["materials"]]
+    return estilo_antigo({**novo, "materials": mats})
+
+
+def gravar_kit(destino: Path, sha: str) -> None:
+    casos = [{"nome": f"{pid}/{nome}", "composicao": composicao_antiga(de_uma_peca(pid, args).model_dump(mode="json")),
+              "vistas": ["S"]} for pid, p in sorted(PECAS.items()) if p.tipo == "prop" for nome, args in p.variacoes]
+    saida = antigo(destino, casos, estilo_base_antigo())
+    _salvar(FIXTURES / "kit.esperado.json", {"pixel_engine": sha, "casos": saida})
+    print(f"kit: {len(saida)} variações gravadas")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--versao", action="store_true", help="exporta e mostra o commit e a versão do motor antigo")
-    ap.add_argument("casos", nargs="*", type=Path, help="os casos para gravar o esperado")
+    ap.add_argument("--kit", action="store_true", help="grava o esperado das variações do kit")
+    ap.add_argument("casos", nargs="*", type=Path, help="os casos de IR para gravar o esperado")
     args = ap.parse_args(argv)
     sha = commit()
     destino = exportar(sha)
@@ -130,6 +185,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"pixel-engine {sha[:12]} | motor {rodar(destino, sonda, b'').decode().strip()} | {destino}")
     for caso in args.casos:
         gravar(destino, sha, caso)
+    if args.kit:
+        gravar_kit(destino, sha)
     return 0
 
 

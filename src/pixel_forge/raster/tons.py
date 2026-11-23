@@ -1,5 +1,6 @@
 """O tom de cada pixel pela peça dona dele: a peça chapada (com a textura do material), o sólido de revolução (pela
-normal) e a peça lisa (as faixas de luz e sombra pelo lado da luz, e o tom fundo onde outra peça a cobre)."""
+normal), o volume de esfera e a peça lisa (as faixas de luz e sombra pelo lado da luz, e o tom fundo onde outra peça a
+cobre). As peças ``shade_group`` do mesmo grupo de contorno sombreiam como um volume só (a união das máscaras)."""
 
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from .grade import Janela, Mascara, NaJanela, part_window, shift
 from .montagem import Buf16, Camadas
 from .revolucao import revolution_indices, surface
 from .textura import Indices, flat_texture_indices
+from .volume import volume_indices
 
 # o tom mais escuro da rampa só entra na peça lisa com o canvas mais largo que isto
 DEEP_SHADOW_WIDTH_PX = 32
@@ -42,6 +44,13 @@ def _revolucao(est: EstiloRender, c: DrawCommand, cam: Camadas, win: Janela, cas
     return revolution_indices(sf, prim.ce, NaJanela(win, fw, cast[win] & fw), est.materials[c.material], est.side)
 
 
+def _volume(est: EstiloRender, c: DrawCommand, massa: Mascara, win: Janela, cast: Mascara) -> Indices:
+    ys, xs = np.nonzero(massa)
+    fw = massa[win]
+    origem = (int(xs.min()) - win[1].start, int(ys.min()) - win[0].start)
+    return volume_indices(NaJanela(win, fw, cast[win] & fw), origem, est.materials[c.material], est.side)
+
+
 def _faixas(est: EstiloRender, c: DrawCommand, cam: Camadas, win: Janela, cast: Mascara) -> Indices:
     """A peça lisa: a faixa de sombra do lado oposto à luz, a de luz do lado dela (com área mínima) e o tom fundo da
     rampa onde outra peça a cobre pelo lado da luz."""
@@ -49,7 +58,7 @@ def _faixas(est: EstiloRender, c: DrawCommand, cam: Camadas, win: Janela, cast: 
     ramp = est.materials[c.material].ramp
     shadow_i, mid_i, light_i = (ramp[0], ramp[1], ramp[1]) if len(ramp) == 2 else (ramp[-3], ramp[-2], ramp[-1])
     deep_i = ramp[0] if len(ramp) >= 4 and cam.width > DEEP_SHADOW_WIDTH_PX else shadow_i
-    full = cam.full[c.part_id]
+    full = cam.massa.get(c.part_id, cam.full[c.part_id])
     fm = full[win]
     dark = np.zeros_like(fm)
     for k in range(1, sh.shadow_band_px + 1):
@@ -87,6 +96,8 @@ def sombrear(est: EstiloRender, cam: Camadas, index: Buf16, cast: Mascara) -> No
             region = _chapada(est, c, cam.full[p], win)
         elif isinstance(c.prim, RevolutionPrim):
             region = _revolucao(est, c, cam, win, cast)
+        elif "volume_sphere" in c.tags:
+            region = _volume(est, c, cam.massa.get(p, cam.full[p]), win, cast)
         else:
             region = _faixas(est, c, cam, win, cast)
         index[win][vis] = region[vis]

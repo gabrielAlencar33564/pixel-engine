@@ -17,9 +17,9 @@ import numpy as np
 import numpy.typing as npt
 
 from ..views.camera import ELEVACAO_MDEG, PROFUNDIDADE_PERMILLE
-from ..views.primitivas import EllipsePrim, Scene2D, SupElipsoide, SupLeque
+from ..views.primitivas import EllipsePrim, Scene2D, SupElipsoide, SupLeque, SupTubo
 from .estilo import EstiloRender
-from .formas import raster_ellipse, raster_polygon
+from .formas import raster_ellipse, raster_polygon, raster_tapered
 from .grade import MARGIN, Mascara, shift
 from .montagem import Buf16, Camadas, Tabelas
 from .profundidade import DEPTH_QUANT
@@ -130,6 +130,9 @@ def _ground_projection(scene: Scene2D, light: tuple[float, float, float], w: int
             pts = [chao(*p) for p in c.surface.pts]
             for b, d in zip(pts[1:], pts[2:], strict=False):
                 out |= raster_polygon(w, h, MARGIN, (pts[0], b, d))
+        elif isinstance(c.surface, SupTubo):
+            pts = [chao(*p) for p in c.surface.pts]
+            out |= raster_tapered(w, h, MARGIN, tuple(pts), c.surface.radii)
         elif isinstance(c.surface, SupElipsoide) and isinstance(c.prim, EllipsePrim):
             s = c.surface
             out |= raster_ellipse(w, h, MARGIN, chao(s.cu, s.cv, s.dc), (c.prim.hu, max(1, c.prim.hv // 2)))

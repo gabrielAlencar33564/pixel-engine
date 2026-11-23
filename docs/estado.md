@@ -21,18 +21,21 @@ negativo. Portados, já no padrão I10: q8 e Taylor, IR e estilo, FK de repouso,
 revolução, elipse), o raster (z-buffer, tons, textura, sombra entre peças e no chão, contornos, pixel-perfect,
 limpeza de cor isolada), o build e o export `pfe-jogo/1` com o leitor do jogo e o `--verificar` (o roundtrip).
 
+**N2 (em curso) — a composição única e o kit de construção.** O formato único (o da v2, sem versão nem migração),
+as recusas antes de montar, o prop com a sombra de contato, as pilhas, as vistas 1/2/4 e o canvas pelo tamanho; 18
+peças vigentes (madeira, pedra, telhados, carpintaria, vãos, formas), **as 54 variações iguais ao oráculo** na mesma
+entrada; o estilo base com a paleta por função e os verdes de folhosa; `pfe build <composição>` e `pfe catalogo`.
+
 ## Números
 
-| Medida | N0 | N1 |
-|---|---|---|
-| Linhas em `src/` | 1 | 2 431 |
-| Arquivos rastreados | 24 | 72 |
-| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes |
+| Medida | N0 | N1 | N2a |
+|---|---|---|---|
+| Linhas em `src/` | 1 | 2 431 | 4 210 |
+| Arquivos rastreados | 24 | 72 | 95 |
+| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes |
 
 ## Próximo passo
 
-**N2 — o kit vigente e as lições:** o inventário das lições em `docs/decisoes.md`; o formato único de composição;
-as peças vigentes contra o oráculo (construção, pedra, tronco, galhos, `pontilhado`, `galhos_em_pena`, cortina,
-corpo humano e canino, roupas gerais, saia e lenço como peças gerais); o rig por papéis, o IK e os geradores; o
-estilo base com a paleta por função, o porte por categoria e as vistas, checados. As versões completas da IR, das
-primitivas e do sólido varrido esperam no scratchpad da sessão (`n2/`), só como rascunho: refazer se sumir.
+**N2, o resto:** a flora (tronco sólido, galhos, `pontilhado`, `galhos_em_pena`, cortina) com o balanço; o porte por
+categoria checado; o humano (corpo, roupas gerais, saia e lenço) e o canino com o rig por papéis, o IK e os
+geradores (parado, passada, corrida, balanço, giro, ação); o inventário das lições em `docs/decisoes.md`.

@@ -30,6 +30,20 @@ class EllipseGeom(Strict):
     radii_q8: Annotated[list[Annotated[int, Field(ge=1, le=1 << 20, strict=True)]], Field(min_length=3, max_length=3)]
 
 
+class PolylineGeom(Strict):
+    type: Literal["polyline"]
+    points_q8: Annotated[list[Vec3], Field(min_length=2, max_length=64)]
+    thickness_px: Annotated[int, Field(ge=1, le=64, strict=True)]
+
+
+class TaperedPolylineGeom(Strict):
+    """Membro afunilado: segmentos com raio por ponto (q8 de tela), mais os discos das pontas."""
+
+    type: Literal["tapered_polyline"]
+    points_q8: Annotated[list[Vec3], Field(min_length=2, max_length=64)]
+    radii_q8: Annotated[list[Annotated[int, Field(ge=32, le=16384, strict=True)]], Field(min_length=2, max_length=64)]
+
+
 class BoundVertex(Strict):
     bone_id: Id
     point_q8: Vec3
@@ -42,7 +56,8 @@ class BoundPolygonGeom(Strict):
     vertices: Annotated[list[BoundVertex], Field(min_length=3, max_length=32)]
 
 
-Geometry = Annotated[RevolutionGeom | EllipseGeom | BoundPolygonGeom, Field(discriminator="type")]
+Geometry = Annotated[RevolutionGeom | EllipseGeom | BoundPolygonGeom | PolylineGeom | TaperedPolylineGeom,
+                     Field(discriminator="type")]
 
 
 class BoneDef(Strict):
@@ -56,7 +71,10 @@ class BoneDef(Strict):
 
 
 class LandmarkDef(Strict):
+    """Um ponto do jogo (a linha de base ``sort_front``, o ponto de uso), no osso dele."""
+
     id: Id
+    bone_id: Id
     point_q8: Vec3
 
 
@@ -65,7 +83,6 @@ class PartDef(Strict):
     bone_id: Id
     material: Id
     geometry: Geometry
-    landmarks: list[LandmarkDef] = Field(default_factory=list)
     tags: list[Id] = Field(default_factory=list)
     draw_priority: Annotated[int, Field(ge=-1000, le=1000, strict=True)] = 0
     outline_group: Id
@@ -77,7 +94,11 @@ class OcclusionRule(Strict):
 
 
 class ViewSpec(Strict):
+    """O que muda na vista: as partes ocultas, a geometria trocada (a sombra de contato girada), o viés de
+    profundidade e as regras frente/trás."""
+
     visibility: dict[Id, Literal["hidden"]] = Field(default_factory=dict)
+    geometria: dict[Id, Geometry] = Field(default_factory=dict)
     depth_bias: dict[Id, Annotated[int, Field(ge=-65536, le=65536, strict=True)]] = Field(default_factory=dict)
     occlusion_rules: list[OcclusionRule] = Field(default_factory=list)
 
@@ -95,3 +116,4 @@ class AssetIR(Strict):
     bones: list[BoneDef]
     parts: list[PartDef]
     views: dict[Direcao, ViewSpec]
+    landmarks: list[LandmarkDef] = Field(default_factory=list)

@@ -1,5 +1,5 @@
-"""O build: a IR e o estilo viram os quadros de cada clip e vista, gravados no acervo por conteúdo (o id do build é o
-hash da entrada e da versão do motor, então o mesmo pedido dá o mesmo build)."""
+"""O build: a composição vira a IR e os quadros de cada clip e vista, no estilo do jogo, gravados no acervo por
+conteúdo (o id do build é o hash da composição, do estilo e da versão do motor: o mesmo pedido dá o mesmo build)."""
 
 from __future__ import annotations
 
@@ -10,11 +10,12 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
-from ..contracts.estilo import StyleDoc
-from ..contracts.ir import AssetIR
+from ..contracts.composicao import Composicao
+from ..design.asset import ir_da_composicao
 from ..export.imagem import salvar_png
 from ..quality.quadro import conferir_quadro
 from ..raster.estilo import estilo_render
+from .estilo import estilo_base
 from .quadros import quadro_de_repouso
 
 ESTATICO_MS = 1000  # o quadro do estático dura 1 s (um quadro por vista)
@@ -36,10 +37,11 @@ class Build:
     manifesto: dict[str, Any]
 
 
-def construir(ir: AssetIR, style: StyleDoc, acervo: Path) -> Build:
+def construir(comp: Composicao, acervo: Path) -> Build:
     """Os quadros do estático (o repouso de cada vista), conferidos e gravados em ``builds/`` do acervo."""
     engine = versao_do_motor()
-    build_id = hash_canonico({"engine": engine, "ir": ir.model_dump(mode="json"),
+    ir, style = ir_da_composicao(comp), estilo_base()
+    build_id = hash_canonico({"engine": engine, "composicao": comp.model_dump(mode="json"),
                               "style": style.model_dump(mode="json")})
     pasta = acervo / "builds" / f"{ir.id}.r{ir.revision}.{build_id[:12]}"
     est = estilo_render(style)

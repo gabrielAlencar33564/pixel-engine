@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 Ponto = tuple[int, int]
 Ponto3 = tuple[int, int, int]
@@ -15,6 +15,18 @@ class EllipsePrim:
     cv: int
     hu: int
     hv: int
+
+
+@dataclass(frozen=True)
+class CapsulePrim:
+    points: tuple[Ponto, ...]
+    radius: int
+
+
+@dataclass(frozen=True)
+class TaperedPrim:
+    points: tuple[Ponto, ...]
+    radii: tuple[int, ...]
 
 
 @dataclass(frozen=True)
@@ -38,7 +50,7 @@ class RevolutionPrim:
         return tuple((round(s[0] * 256), round(s[1] * 256)) for s in self.stations)
 
 
-Prim = EllipsePrim | FanPrim | RevolutionPrim
+Prim = EllipsePrim | CapsulePrim | TaperedPrim | FanPrim | RevolutionPrim
 
 
 @dataclass(frozen=True)
@@ -58,11 +70,20 @@ class SupElipsoide:
 
 
 @dataclass(frozen=True)
+class SupTubo:
+    """O membro: os pontos (u, v, d) e os raios de tela; a profundidade é o eixo interpolado no ponto mais perto mais
+    √(r² − perp²), um tubo de seção circular."""
+
+    pts: tuple[Ponto3, ...]
+    radii: tuple[int, ...]
+
+
+@dataclass(frozen=True)
 class SupLeque:
     pts: tuple[Ponto3, ...]
 
 
-Superficie = SupPlana | SupElipsoide | SupLeque
+Superficie = SupPlana | SupElipsoide | SupTubo | SupLeque
 
 
 @dataclass(frozen=True)
@@ -74,7 +95,6 @@ class DrawCommand:
     depth: int
     prim: Prim
     surface: Superficie
-    landmarks: dict[str, Ponto3] = field(default_factory=dict)
     facing: Ponto3 | None = None  # a normal da face chapada (×1000, eixos de câmera), virada para a câmera
 
 
@@ -86,4 +106,4 @@ class Scene2D:
     pivot_q8: Ponto
     depth_bias_q8: dict[str, int]
     front_back: tuple[tuple[str, str], ...]
-    hidden_landmarks: dict[str, Ponto3]
+    landmarks: dict[str, Ponto3]  # os pontos do jogo, em q8 de tela (u, v) e a profundidade

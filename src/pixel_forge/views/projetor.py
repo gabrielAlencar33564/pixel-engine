@@ -7,7 +7,16 @@ import heapq
 from dataclasses import dataclass
 
 from ..contracts.base import Direcao
-from ..contracts.ir import AssetIR, BoundPolygonGeom, EllipseGeom, PartDef, RevolutionGeom
+from ..contracts.ir import (
+    AssetIR,
+    BoundPolygonGeom,
+    EllipseGeom,
+    Geometry,
+    PartDef,
+    PolylineGeom,
+    RevolutionGeom,
+    TaperedPolylineGeom,
+)
 from ..core.direcoes import AZIMUTE_MDEG
 from ..core.q8 import ONE_PX_POS, Q30_SHIFT, pos_to_q8, q8_to_pos
 from ..core.recusa import Recusa
@@ -15,6 +24,7 @@ from ..rig.fk import BoneWorld, Vec3i, mat_t_vec, mat_vec, vadd
 from ..rig.pose import Pose
 from .camera import Camera
 from .primitivas import (
+    CapsulePrim,
     DrawCommand,
     EllipsePrim,
     FanPrim,
@@ -25,6 +35,8 @@ from .primitivas import (
     Superficie,
     SupLeque,
     SupPlana,
+    SupTubo,
+    TaperedPrim,
 )
 
 
@@ -84,6 +96,23 @@ def _elipse(g: EllipseGeom, pc: _Peca) -> _Projetada:
     return _Projetada(prim, surface, depth)
 
 
+def _q8(pts: list[Vec3i]) -> tuple[Vec3i, ...]:
+    return tuple((p[0], p[1], pos_to_q8(p[2])) for p in pts)
+
+
+def _afunilada(g: TaperedPolylineGeom, pc: _Peca) -> _Projetada:
+    pts = [pc.tela(p) for p in g.points_q8]
+    return _Projetada(TaperedPrim(tuple((p[0], p[1]) for p in pts), tuple(g.radii_q8)),
+                      SupTubo(_q8(pts), tuple(g.radii_q8)), sum(p[2] for p in pts) // len(pts))
+
+
+def _polilinha(g: PolylineGeom, pc: _Peca) -> _Projetada:
+    pts = [pc.tela(p) for p in g.points_q8]
+    raio = g.thickness_px * 128
+    return _Projetada(CapsulePrim(tuple((p[0], p[1]) for p in pts), raio), SupTubo(_q8(pts), (raio,) * len(pts)),
+                      sum(p[2] for p in pts) // len(pts))
+
+
 def _revolucao(g: RevolutionGeom, pc: _Peca) -> _Projetada:
     o = g.origin_q8
     sts = []
@@ -100,21 +129,25 @@ def _leque(g: BoundPolygonGeom, pc: _Peca, chapada: bool) -> _Projetada:
     body = [pc.no_osso(pc.pose.world[vx.bone_id], vx.point_q8) for vx in g.vertices]
     pts = [pc.cam.project(p) for p in body]
     facing = pc.cam.facing_permille(body) if chapada else None
-    return _Projetada(FanPrim(tuple((p[0], p[1]) for p in pts)), SupLeque(tuple((p[0], p[1], pos_to_q8(p[2]))
-                                                                                for p in pts)),
-                      sum(p[2] for p in pts) // len(pts), facing)
+    return _Projetada(FanPrim(tuple((p[0], p[1]) for p in pts)), SupLeque(_q8(pts)), sum(p[2] for p in pts) // len(pts),
+                      facing)
 
 
-def _comando(part: PartDef, pc: _Peca) -> DrawCommand:
-    g = part.geometry
+def _projetar(g: Geometry, part: PartDef, pc: _Peca) -> _Projetada:
     if isinstance(g, EllipseGeom):
-        p = _elipse(g, pc)
-    elif isinstance(g, RevolutionGeom):
-        p = _revolucao(g, pc)
-    else:
-        p = _leque(g, pc, "flat" in part.tags)
-    lms = {lm.id: pc.tela(lm.point_q8) for lm in part.landmarks}
-    return DrawCommand(part.id, part.material, part.outline_group, tuple(part.tags), p.depth, p.prim, p.surface, lms,
+        return _elipse(g, pc)
+    if isinstance(g, RevolutionGeom):
+        return _revolucao(g, pc)
+    if isinstance(g, PolylineGeom):
+        return _polilinha(g, pc)
+    if isinstance(g, TaperedPolylineGeom):
+        return _afunilada(g, pc)
+    return _leque(g, pc, "flat" in part.tags)
+
+
+def _comando(part: PartDef, g: Geometry, pc: _Peca) -> DrawCommand:
+    p = _projetar(g, part, pc)
+    return DrawCommand(part.id, part.material, part.outline_group, tuple(part.tags), p.depth, p.prim, p.surface,
                        p.facing)
 
 
@@ -155,17 +188,13 @@ def project_view(asset: AssetIR, pose: Pose, direction: Direcao) -> Scene2D:
                      f"As vistas dele são {', '.join(asset.views)}.")
     cam = Camera(AZIMUTE_MDEG[direction], asset.canvas.pivot_px)
     offset = pose.render_offset_pos()
-    cmds: list[DrawCommand] = []
-    hidden: dict[str, Vec3i] = {}
-    for part in asset.parts:
-        pc = _Peca(cam, pose, pose.world[part.bone_id], offset)
-        if part.id in view.visibility:  # a peça oculta deixa os pontos dela no quadro
-            hidden.update({lm.id: pc.tela(lm.point_q8) for lm in part.landmarks})
-            continue
-        cmds.append(_comando(part, pc))
+    cmds = [_comando(part, view.geometria.get(part.id, part.geometry),
+                     _Peca(cam, pose, pose.world[part.bone_id], offset))
+            for part in asset.parts if part.id not in view.visibility]
+    pontos = {lm.id: _Peca(cam, pose, pose.world[lm.bone_id], offset).tela(lm.point_q8) for lm in asset.landmarks}
     rules = [(r.front, r.back) for r in view.occlusion_rules]
     q8bias = {k: q8_to_pos(v) for k, v in view.depth_bias.items()}
     prio = {p.id: p.draw_priority for p in asset.parts}
     ordered = order_commands(cmds, rules, q8bias, prio, direction)
     return Scene2D(direction, AZIMUTE_MDEG[direction], ordered, (cam.pu, cam.pv), dict(view.depth_bias),
-                   tuple(rules), hidden)
+                   tuple(rules), pontos)

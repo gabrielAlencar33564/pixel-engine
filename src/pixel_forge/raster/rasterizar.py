@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..views.primitivas import EllipsePrim, FanPrim, Prim, RevolutionPrim
-from .formas import Pontos, raster_bresenham, raster_ellipse, raster_polygon
+from ..views.primitivas import CapsulePrim, EllipsePrim, FanPrim, Prim, RevolutionPrim, TaperedPrim
+from .formas import Pontos, raster_bresenham, raster_capsule, raster_ellipse, raster_polygon, raster_tapered
 from .grade import MARGIN, Mascara
 from .revolucao import surface
 
@@ -36,6 +36,10 @@ def rasterize(prim: Prim, w: int, h: int) -> Mascara:
         return raster_ellipse(w, h, MARGIN, (prim.cu, prim.cv), (prim.hu, prim.hv))
     if isinstance(prim, RevolutionPrim):
         return surface(prim.stations, prim.sd, prim.ce, w, h).mask.copy()
+    if isinstance(prim, CapsulePrim):
+        return _draw_path(raster_capsule(w, h, MARGIN, prim.points, prim.radius), prim.points, closed=False)
+    if isinstance(prim, TaperedPrim):
+        return _draw_path(raster_tapered(w, h, MARGIN, prim.points, prim.radii), prim.points, closed=False)
     return _leque(prim, w, h)
 
 

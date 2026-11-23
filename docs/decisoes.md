@@ -35,3 +35,23 @@ substituído). O porquê longo vai no commit.
 - O quadro cortado pelo canvas e as cores acima do limite do estilo são recusas com dica, não um relatório (I8).
 - A ordem dos argumentos e o desenho por objetos (`Camadas`, `Tabelas`, `NaJanela`) vêm do teto de 5 argumentos e
   da complexidade 10: o render antigo passava 16 buffers soltos por função (I10).
+
+## N2
+
+- O formato único é o da v2 (as mesmas chaves), sem `kind` nem versão (não há versão a migrar, I5) e sem o campo
+  de rig (o tipo decide o rig); ganha a `categoria`, que o porte confere (seção 5).
+- A peça é uma função sobre os argumentos já lidos; as funções intermediárias das gramáticas antigas não vêm
+  (regra 3). Os auxiliares de desenho são métodos do contexto da peça (o teto de 5 argumentos não conta o `self`).
+- A regra dos dois usos do plano v2 não vale: a peça que não foi substituída é vigente (o bocal, o aro, a parede de
+  tábuas, o telhado de tabuinhas, o cercado, os fios) (objetivo; seção 5 lista as peças vigentes).
+- O oráculo do kit roda o `pixel-engine` com o estilo base novo nos nomes antigos: confere o porte na mesma entrada,
+  e a troca de paleta fica na prancha (I11).
+- Os materiais de cena (céu, lua, água, pena, crista, chama) saem do estilo; com eles muda a tinta de contorno que a
+  limpeza de cor isolada poupa (o índice 21 deixa de ser tinta). É parte da troca de paleta (seção 5).
+- Os ids fixos do bocal e do cercado ficam (no empate, a ordem de desenho depende do id); duas peças de id fixo na
+  mesma composição são recusadas com dica (I11; I8).
+- O catálogo e o build já leem a composição (antecipam o N3) para nada ficar usado só por teste (I10).
+- O teto da peça (12 argumentos, 250 linhas, 3 variações) é conferido pelo registro ao carregar, não só pelo teste
+  (mecanismo 2: a correção vira recusa).
+- A sombra de contato das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo só a S era): ela fica
+  3:1 na tela em toda vista. Mudança intencional, com prancha (objetivo).

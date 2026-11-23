@@ -1,0 +1,491 @@
+{
+ "pixel_engine": "3df5fe4230caed6bd9aca9f6fcfe2c0bc23027dd",
+ "casos": {
+  "aduelas/balde": {
+   "S": {
+    "tamanho": [
+     18,
+     15
+    ],
+    "rgba_sha256": "39a2e5326344a3b2872e58097036a621f0b362125569a6d7ed6adc55fc4ce3d4"
+   }
+  },
+  "aduelas/tonel": {
+   "S": {
+    "tamanho": [
+     28,
+     40
+    ],
+    "rgba_sha256": "f07778c277ba735e2280dda5ba0a3069b23fd6fc220003dc9178c4489b1de320"
+   }
+  },
+  "aduelas/tina": {
+   "S": {
+    "tamanho": [
+     38,
+     27
+    ],
+    "rgba_sha256": "f04358e5387ffe857eda73def05755ad7af040ed0fa03253d50c855e3776b890"
+   }
+  },
+  "aro/reto": {
+   "S": {
+    "tamanho": [
+     28,
+     15
+    ],
+    "rgba_sha256": "483eb9caef5c245bfaf1e10873418678e3a7bf4a5b2f0c9724da77ef46ac2e0b"
+   }
+  },
+  "aro/curvo": {
+   "S": {
+    "tamanho": [
+     28,
+     15
+    ],
+    "rgba_sha256": "ba1527c7a7f5d29dabfb3a2fa865735b83755b759348c99f2fa221c345cb48d8"
+   }
+  },
+  "aro/alça": {
+   "S": {
+    "tamanho": [
+     18,
+     11
+    ],
+    "rgba_sha256": "d846c66b535a9657449b75e696d2850b1f05d4ebd96e1935214184e3af098301"
+   }
+  },
+  "bocal/baixo": {
+   "S": {
+    "tamanho": [
+     56,
+     55
+    ],
+    "rgba_sha256": "98110ac2b7d55427ff0e579d5056aad804b69949a18ef8cbe2e312ccc31db1bd"
+   }
+  },
+  "bocal/médio": {
+   "S": {
+    "tamanho": [
+     56,
+     61
+    ],
+    "rgba_sha256": "1e87250443513bcd66ed02347c996e9aab8323058a76247f0a3ed87bdfc17ae2"
+   }
+  },
+  "bocal/largo": {
+   "S": {
+    "tamanho": [
+     76,
+     73
+    ],
+    "rgba_sha256": "7042596ec554f58e05f6462f7f8d77d0bc57fe8a5ebb64635fa17cbee80251e6"
+   }
+  },
+  "cercado/curto": {
+   "S": {
+    "tamanho": [
+     50,
+     24
+    ],
+    "rgba_sha256": "30a64ad4fc0169cadfbc1f5fb5558087e81a6fade12a4d38915e571c21d918fe"
+   }
+  },
+  "cercado/médio": {
+   "S": {
+    "tamanho": [
+     70,
+     27
+    ],
+    "rgba_sha256": "13abe688a716d81f01d40d1d9af4e5f66a1622d1937a3dba50eb6bd26afb9f23"
+   }
+  },
+  "cercado/alto": {
+   "S": {
+    "tamanho": [
+     70,
+     34
+    ],
+    "rgba_sha256": "b20ab39e63e29e5912dd0da2c3de5e590ed4e4bcd55cdf684b490430e7c6aed7"
+   }
+  },
+  "corda/esticada": {
+   "S": {
+    "tamanho": [
+     40,
+     20
+    ],
+    "rgba_sha256": "c54a6385f2e3e8a2039778b44da38463ffad20a883687b00cb0e9716daa09445"
+   }
+  },
+  "corda/frouxa": {
+   "S": {
+    "tamanho": [
+     40,
+     20
+    ],
+    "rgba_sha256": "da6191706986de9f638c5afe45aeea124be0e69dc44b9fd38b2ee5042347ff52"
+   }
+  },
+  "corda/vertical": {
+   "S": {
+    "tamanho": [
+     8,
+     31
+    ],
+    "rgba_sha256": "a33d3d3cc8eee20e1ac7c058fdfa0c628f2ee5a2eec2e1558a911efee963dc27"
+   }
+  },
+  "elipsoide/domo": {
+   "S": {
+    "tamanho": [
+     40,
+     40
+    ],
+    "rgba_sha256": "f89b27564d3bef95f8ce41ba001e941408f0d7006502d923822f363c07c42304"
+   }
+  },
+  "elipsoide/bola": {
+   "S": {
+    "tamanho": [
+     20,
+     25
+    ],
+    "rgba_sha256": "08cf87e83e079470c64895a1142213e427fe7f3e0c3d0dec7281d403c9f084b7"
+   }
+  },
+  "elipsoide/chapado": {
+   "S": {
+    "tamanho": [
+     26,
+     21
+    ],
+    "rgba_sha256": "38f958053c30a315cc8b7f359b11f31dd13781b6d1f6580f0667ec9ef2a7f41a"
+   }
+  },
+  "fios/monte": {
+   "S": {
+    "tamanho": [
+     36,
+     22
+    ],
+    "rgba_sha256": "279a0f8a97c667bfb5d5d7cefb4ca09608481529a70da4e57c4dfa89967c32e0"
+   }
+  },
+  "fios/ralo": {
+   "S": {
+    "tamanho": [
+     35,
+     22
+    ],
+    "rgba_sha256": "469a6c57b1143201d96ebbdaf8d81b2db7d4b9f992938b6baef4985926d4bb2f"
+   }
+  },
+  "fios/alto": {
+   "S": {
+    "tamanho": [
+     31,
+     27
+    ],
+    "rgba_sha256": "d1097827f0d9f2f045ae2b3f7c9f904691db100d4f22ee8c9c3bab2ac7c5c877"
+   }
+  },
+  "janela/quadrada": {
+   "S": {
+    "tamanho": [
+     26,
+     22
+    ],
+    "rgba_sha256": "fa117424d506d18b02487f34d990b2eebae1f36067c2fe7f1b6f986df277aee3"
+   }
+  },
+  "janela/alta": {
+   "S": {
+    "tamanho": [
+     24,
+     26
+    ],
+    "rgba_sha256": "11f38c902da5506749ea4eed5b5bccbd482ef24e0272391a02c31d8a2a1fb392"
+   }
+  },
+  "janela/larga": {
+   "S": {
+    "tamanho": [
+     36,
+     20
+    ],
+    "rgba_sha256": "b06b3c31047144515e0f6007cd8b1e4e20d5ae1f6b1efd128e3307ae212d84b4"
+   }
+  },
+  "muro_fiadas/baixo": {
+   "S": {
+    "tamanho": [
+     72,
+     24
+    ],
+    "rgba_sha256": "18e4849a0445fe7c61b783bfb9e6a08d0f9017f29823051cb0a53055bee0cc8c"
+   }
+  },
+  "muro_fiadas/com vão": {
+   "S": {
+    "tamanho": [
+     72,
+     40
+    ],
+    "rgba_sha256": "66ee6403588e3a450c0af04c0f02cc7abab32dd7409d59347d8f5aeb4ac8113a"
+   }
+  },
+  "muro_fiadas/empena": {
+   "S": {
+    "tamanho": [
+     72,
+     45
+    ],
+    "rgba_sha256": "7727fd50884b65c1d9d332af41b223114588ad16563b271323c2267d26bf12be"
+   }
+  },
+  "parede_tabuas/parede": {
+   "S": {
+    "tamanho": [
+     72,
+     45
+    ],
+    "rgba_sha256": "d2eabd991826a003dec97304998f5b016c6387c26c0890051030e8d0a0bcf6fe"
+   }
+  },
+  "parede_tabuas/empena": {
+   "S": {
+    "tamanho": [
+     72,
+     71
+    ],
+    "rgba_sha256": "4fa547d16ed721c0deb5e6ff2cc2c3044764ed062e02b926ef6467cb9b0206eb"
+   }
+  },
+  "parede_tabuas/tábua larga": {
+   "S": {
+    "tamanho": [
+     46,
+     36
+    ],
+    "rgba_sha256": "ea94856912ff2fbf36d87d9a549421cac4e77ac96c848c87fefcefeea78bee9f"
+   }
+  },
+  "poligono/de frente": {
+   "S": {
+    "tamanho": [
+     26,
+     17
+    ],
+    "rgba_sha256": "c2d396bcf109ee9c0670bb42bc62d5213524d339c0523a14bcc924cf5bcf9a0b"
+   }
+  },
+  "poligono/deitado": {
+   "S": {
+    "tamanho": [
+     26,
+     17
+    ],
+    "rgba_sha256": "a91f9ebb4a8fda8bf28e4b444d9448414450359566c31f063623b79e758f2340"
+   }
+  },
+  "poligono/sombra": {
+   "S": {
+    "tamanho": [
+     26,
+     17
+    ],
+    "rgba_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956"
+   }
+  },
+  "porta/estreita": {
+   "S": {
+    "tamanho": [
+     32,
+     46
+    ],
+    "rgba_sha256": "bb4503a59c18dc9406f81b52c84328f6e9eac3b990c29dcc23ded361950f6f44"
+   }
+  },
+  "porta/larga": {
+   "S": {
+    "tamanho": [
+     42,
+     49
+    ],
+    "rgba_sha256": "2f97684da46c8278d2bb969080bcf973efce68a9e24eb25fa643b8fd46f5cb86"
+   }
+  },
+  "porta/baixa": {
+   "S": {
+    "tamanho": [
+     30,
+     37
+    ],
+    "rgba_sha256": "ef0d61d74b8e133aaaae90e6885d08de0a8cbde72567bdb3ec872beb068f84a0"
+   }
+  },
+  "poste/fino": {
+   "S": {
+    "tamanho": [
+     10,
+     33
+    ],
+    "rgba_sha256": "d3dd41b8a82adfa1eff03820910a97d84168374e753cdb142774b675fb076f36"
+   }
+  },
+  "poste/grosso": {
+   "S": {
+    "tamanho": [
+     14,
+     40
+    ],
+    "rgba_sha256": "6b291d5820df994f6ac79cbe06e359641d1313dbbea385b11dcfcdb8a3954c40"
+   }
+  },
+  "poste/sem topo": {
+   "S": {
+    "tamanho": [
+     10,
+     53
+    ],
+    "rgba_sha256": "2792335b789da4b350ff6a1a3635a8a085f5862e6e74b120dc57f9c37ab410a1"
+   }
+  },
+  "tabuado/piso": {
+   "S": {
+    "tamanho": [
+     46,
+     26
+    ],
+    "rgba_sha256": "fa8a1ae468b3c2054b6f47b932570829490bf59c53093d61e32a37bd3b2a2ef9"
+   }
+  },
+  "tabuado/frente de caixa": {
+   "S": {
+    "tamanho": [
+     20,
+     16
+    ],
+    "rgba_sha256": "caafc491cec7f6ca23b20b46a17054c8e2c24cd2eaba69018c3a9cedb8fde105"
+   }
+  },
+  "tabuado/gasto e claro": {
+   "S": {
+    "tamanho": [
+     46,
+     26
+    ],
+    "rgba_sha256": "1074348f65e7a9f4385963299f83bdf97eab9e79670c3a7c6f8a50f33301489c"
+   }
+  },
+  "telhado_palha/água da frente": {
+   "S": {
+    "tamanho": [
+     72,
+     33
+    ],
+    "rgba_sha256": "3c5682498b7d3e8de23ac7e798df28032d50731013f5f016f721723ed4bcb041"
+   }
+  },
+  "telhado_palha/quadril": {
+   "S": {
+    "tamanho": [
+     40,
+     32
+    ],
+    "rgba_sha256": "a76261bbdb5043e46ad54f6d9b7a0387fc868830d637afb7890948ed2d7b261d"
+   }
+  },
+  "telhado_palha/sem fio claro": {
+   "S": {
+    "tamanho": [
+     72,
+     33
+    ],
+    "rgba_sha256": "c309fce279a487bc17dbdd30b9e9738286d3de8b3c2957cc0d10d76ef138d7b9"
+   }
+  },
+  "telhado_tabuinhas/alto": {
+   "S": {
+    "tamanho": [
+     76,
+     76
+    ],
+    "rgba_sha256": "f4e447b2011425e7c98bcb0fa230196e6defe6520fc4c82b802c187d7609ff8b"
+   }
+  },
+  "telhado_tabuinhas/raso": {
+   "S": {
+    "tamanho": [
+     76,
+     46
+    ],
+    "rgba_sha256": "be00527b5c6f067e03e8d2627cfea85210f6c3dcd912d573d57a98663c69b030"
+   }
+  },
+  "telhado_tabuinhas/sem empena": {
+   "S": {
+    "tamanho": [
+     60,
+     57
+    ],
+    "rgba_sha256": "a2252eeac4264fdfb2496003b217f5eca475cc555e8817911dcdfee3bf02981b"
+   }
+  },
+  "traco/fino": {
+   "S": {
+    "tamanho": [
+     28,
+     13
+    ],
+    "rgba_sha256": "baa35f7ed9a34e516f54fe56f082296305467f1dd7d57e561b38f05a755b8ef1"
+   }
+  },
+  "traco/largo": {
+   "S": {
+    "tamanho": [
+     8,
+     18
+    ],
+    "rgba_sha256": "87450854f790dbc5168950217a659a98552301137eb224192cdd9822da9e355a"
+   }
+  },
+  "traco/roliço": {
+   "S": {
+    "tamanho": [
+     34,
+     13
+    ],
+    "rgba_sha256": "eea14ad00c0496ab9408a23bbb0b1ddab3f0e977577840934b1d8442b26c4621"
+   }
+  },
+  "viga/fina": {
+   "S": {
+    "tamanho": [
+     72,
+     20
+    ],
+    "rgba_sha256": "920abbdd56540b79164107b92071543950dbfa8ca9b17822dc14cbfad7bad91d"
+   }
+  },
+  "viga/com topo": {
+   "S": {
+    "tamanho": [
+     72,
+     23
+    ],
+    "rgba_sha256": "227d5ef4bedbdf29b59f8b46b7f1e09a83f46f9b70a447536ea36e649b0219f1"
+   }
+  },
+  "viga/girada": {
+   "S": {
+    "tamanho": [
+     40,
+     44
+    ],
+    "rgba_sha256": "c1deafa3440a573bdaf762fb3ce931667b566828045126ce4061c198dcb04a07"
+   }
+  }
+ }
+}

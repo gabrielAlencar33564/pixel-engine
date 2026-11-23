@@ -12,10 +12,10 @@ from pathlib import Path
 from typing import Any
 
 from .application.build import construir
+from .application.catalogo import catalogo
 from .application.exportar import exportar, verificar
 from .contracts.carregar import ler
-from .contracts.estilo import StyleDoc
-from .contracts.ir import AssetIR
+from .contracts.composicao import Composicao
 from .core.recusa import Recusa
 
 EXIT_RECUSA = 2
@@ -27,7 +27,7 @@ def acervo(opcao: str | None) -> Path:
 
 
 def _build(a: argparse.Namespace) -> dict[str, Any]:
-    b = construir(ler(Path(a.ir), AssetIR), ler(Path(a.estilo), StyleDoc), acervo(a.acervo))
+    b = construir(ler(Path(a.composicao), Composicao), acervo(a.acervo))
     return {"build": str(b.pasta), "build_id": b.build_id,
             "quadros": sum(len(c["frames"]) for c in b.manifesto["clips"])}
 
@@ -43,19 +43,27 @@ def _exportar(a: argparse.Namespace) -> dict[str, Any]:
     return {"atlas": str(exportar(build))}
 
 
+def _catalogo(a: argparse.Namespace) -> dict[str, Any]:
+    destino = acervo(a.acervo) / "catalogo"
+    destino.mkdir(parents=True, exist_ok=True)
+    return {"index": str(catalogo(destino))}
+
+
 def _parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="pfe", description=__doc__)
     sub = ap.add_subparsers(dest="comando", required=True)
-    b = sub.add_parser("build", help="os quadros da IR, no acervo")
-    b.add_argument("ir")
-    b.add_argument("--estilo", required=True)
+    b = sub.add_parser("build", help="os quadros da composição, no acervo")
+    b.add_argument("composicao")
     b.add_argument("--acervo")
     b.set_defaults(fn=_build)
+    c = sub.add_parser("catalogo", help="as peças do kit: o schema e a prancha de cada uma")
+    c.add_argument("--acervo")
+    c.set_defaults(fn=_catalogo)
     e = sub.add_parser("exportar", help="o pacote do jogo (pfe-jogo/1) de um build")
     e.add_argument("build")
     e.add_argument("--verificar", action="store_true", help="relê o pacote e confere com o build")
     e.set_defaults(fn=_exportar)
-    for p in (b, e):
+    for p in (b, c, e):
         p.add_argument("--json", action="store_true")
     return ap
 

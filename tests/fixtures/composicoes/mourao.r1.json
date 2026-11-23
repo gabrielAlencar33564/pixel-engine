@@ -1,0 +1,24 @@
+{
+ "id": "mourao",
+ "revision": 1,
+ "description": "Fixture sintética: um mourão com a placa pregada, a sombra de contato e a linha de base",
+ "reference": "fixture sintética mínima, sem referência",
+ "tipo": "prop",
+ "categoria": "objeto",
+ "semente": 5,
+ "medidas": {"alto": "1.1m", "raio": "6cm"},
+ "sombra": {"meia_largura": "$raio * 3"},
+ "nos": [
+  {"id": "poste", "peca": "poste", "args": {"base": ["0", "0", "0"], "altura": "$alto", "raio": "$raio"}},
+  {"id": "placa", "peca": "viga", "camada": 2,
+   "args": {"x0": "-25cm", "x1": "25cm", "y": "$raio + 1cm", "z0": "$alto - 30cm", "z1": "$alto - 12cm",
+            "fundo": "2cm"}}
+ ],
+ "vistas": {"S": {}},
+ "landmarks": {"sort_front": ["0", "$raio + 1px", "0"]},
+ "movimento": ["static"],
+ "tracos": [
+  {"id": "placa_no_alto", "description": "A placa larga pregada no alto do mourão", "parts": ["placa", "poste"],
+   "verification": "observable", "reads_in_silhouette": true}
+ ]
+}

@@ -13,7 +13,7 @@ from __future__ import annotations
 import numpy as np
 import numpy.typing as npt
 
-from ..views.primitivas import SupElipsoide, Superficie, SupLeque, SupPlana
+from ..views.primitivas import SupElipsoide, Superficie, SupLeque, SupPlana, SupTubo
 from .grade import MARGIN, Mascara
 from .textura import Floats
 
@@ -34,6 +34,23 @@ def _elipsoide(s: SupElipsoide, px: Floats, py: Floats) -> Floats:
     disc = np.maximum(b * b - a33 * c, 0.0)
     res: Floats = s.dc + (-b + np.sqrt(disc)) / a33
     return res
+
+
+def _tubo(s: SupTubo, px: Floats, py: Floats) -> Floats:
+    best = np.full(px.shape, np.inf)
+    d = np.full(px.shape, float(s.pts[0][2]))
+    for (ax, ay, ad), (bx, by, bd), ra, rb in zip(s.pts, s.pts[1:], s.radii, s.radii[1:], strict=False):
+        ex, ey = float(bx - ax), float(by - ay)
+        len2 = ex * ex + ey * ey
+        t = np.zeros(px.shape) if len2 == 0 else np.clip(((px - ax) * ex + (py - ay) * ey) / len2, 0.0, 1.0)
+        qx, qy = px - (ax + t * ex), py - (ay + t * ey)
+        perp2 = qx * qx + qy * qy
+        r = ra + (rb - ra) * t
+        seg = ad + (bd - ad) * t + np.sqrt(np.maximum(r * r - perp2, 0.0))
+        take = perp2 < best
+        best = np.where(take, perp2, best)
+        d = np.where(take, seg, d)
+    return d
 
 
 def _leque(s: SupLeque, mask: Mascara, px: Floats, py: Floats) -> Floats:
@@ -70,6 +87,8 @@ def depth_map(surface: Superficie, mask: Mascara) -> npt.NDArray[np.int64]:
         d = np.full((h, w), float(surface.d))
     elif isinstance(surface, SupElipsoide):
         d = _elipsoide(surface, *_grid(w, h))
+    elif isinstance(surface, SupTubo):
+        d = _tubo(surface, *_grid(w, h))
     else:
         d = _leque(surface, mask, *_grid(w, h))
     res: npt.NDArray[np.int64] = np.floor(d * (DEPTH_QUANT / 256.0) + 0.5).astype(np.int64)

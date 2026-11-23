@@ -36,6 +36,7 @@ class Camadas:
     order: Buf32 = field(default_factory=lambda: np.zeros((0, 0), np.int32))
     shadow: Mascara = field(default_factory=lambda: np.zeros((0, 0), bool))
     shadow_mat: str | None = None
+    massa: dict[str, Mascara] = field(default_factory=dict)  # a união das máscaras do grupo ``shade_group``
 
     @property
     def part_ids(self) -> list[str]:
@@ -81,6 +82,11 @@ def compor(scene: Scene2D, materials: dict[str, MaterialDef], width: int, height
             sel = cam.full[front] & (cam.part == num[back])
             cam.part[sel] = num[front]
             cam.zbuf[sel] = np.maximum(cam.zbuf[sel], dmaps[front][sel])
+    for g in sorted({c.group for c in cmds.values()}):
+        membros = [p for p, c in cmds.items() if c.group == g and "shade_group" in c.tags]
+        if len(membros) > 1:
+            uniao: Mascara = np.logical_or.reduce([cam.full[p] for p in membros])
+            cam.massa.update({p: uniao for p in membros})
     opaque_z = cam.zbuf[cam.part != 0]
     zmin = int(opaque_z.min()) if opaque_z.size else 0
     cam.order = np.where(cam.part != 0, cam.zbuf - zmin + 1, 0).astype(np.int32)

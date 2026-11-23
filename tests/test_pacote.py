@@ -12,16 +12,13 @@ import pytest
 from pixel_forge.cli import main
 from pixel_forge.export.imagem import ler_rgba, salvar_png
 
-from .oraculo import CASOS, caso
+COMP = Path(__file__).parent / "fixtures" / "composicoes" / "mourao.r1.json"
 
 
 def _build(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> Path:
-    ir = tmp_path / "bloco.ir.json"
-    ir.write_text(json.dumps(caso("bloco")["ir"]), encoding="utf-8")
-    assert main(["build", str(ir), "--estilo", str(CASOS / "estilo.json"), "--acervo", str(tmp_path / "acervo"),
-                 "--json"]) == 0
+    assert main(["build", str(COMP), "--acervo", str(tmp_path / "acervo"), "--json"]) == 0
     res = json.loads(capsys.readouterr().out)["result"]
-    assert res["quadros"] == 2
+    assert res["quadros"] == 1
     return Path(res["build"])
 
 
@@ -30,7 +27,8 @@ def test_o_pacote_relido_da_os_quadros_do_build(tmp_path: Path, capsys: pytest.C
     assert main(["exportar", str(build), "--json"]) == 0
     atlas = Path(json.loads(capsys.readouterr().out)["result"]["atlas"])
     doc = json.loads(atlas.read_text(encoding="utf-8"))
-    assert doc["contract"] == "pfe-jogo/1" and doc["directions"] == ["S", "SE"]
+    assert doc["contract"] == "pfe-jogo/1" and doc["directions"] == ["S"]
+    assert set(doc["frames"][0]["landmarks"]) == {"sort_front"}
     assert doc["status"] == "preview" and doc["art_review"] == "pending"
     assert main(["exportar", str(build), "--verificar", "--json"]) == 0
     assert json.loads(capsys.readouterr().out)["result"] == {"verificado": True}
@@ -60,11 +58,11 @@ def test_controle_o_contrato_desconhecido_e_recusado(tmp_path: Path, capsys: pyt
     assert erro["code"] == "PACOTE_CONTRATO" and erro["hint"]
 
 
-def test_o_desenho_cortado_pelo_canvas_e_recusado_com_dica(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    dado = caso("bloco")["ir"]
-    dado["canvas"]["pivot_px"] = [4, 32]
-    ir = tmp_path / "cortado.json"
-    ir.write_text(json.dumps(dado), encoding="utf-8")
-    assert main(["build", str(ir), "--estilo", str(CASOS / "estilo.json"), "--acervo", str(tmp_path), "--json"]) == 2
+def test_a_peca_que_o_kit_nao_tem_e_recusada_com_dica(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    dado = json.loads(COMP.read_text(encoding="utf-8"))
+    dado["nos"][0]["peca"] = "pilar_grego"
+    comp = tmp_path / "x.r1.json"
+    comp.write_text(json.dumps(dado), encoding="utf-8")
+    assert main(["build", str(comp), "--acervo", str(tmp_path), "--json"]) == 2
     erro = json.loads(capsys.readouterr().out)["errors"][0]
-    assert erro["code"] == "QUADRO_CORTADO" and "canvas" in erro["hint"]
+    assert erro["code"] == "PECA" and "poste" in erro["hint"]

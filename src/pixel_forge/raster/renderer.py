@@ -52,9 +52,7 @@ def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D, bufs: tuple[Buf16,
     inside[MARGIN:MARGIN + height, MARGIN:MARGIN + width] = True
     outside = (alpha == 255) & ~inside
     crop = (slice(MARGIN, MARGIN + height), slice(MARGIN, MARGIN + width))
-    landmarks = {k: (u, v) for k, (u, v, _d) in scene.hidden_landmarks.items()}
-    for c in scene.commands:
-        landmarks.update({lid: (u, v) for lid, (u, v, _d) in c.landmarks.items()})
+    landmarks = {k: (u, v) for k, (u, v, _d) in scene.landmarks.items()}
     q = Quadro(width, height, index[crop].copy(), alpha[crop].copy(), landmarks, int(outside.sum()),
                part_table=cam.part_ids)
     if q.clipping_px:

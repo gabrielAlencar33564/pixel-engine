@@ -2,6 +2,8 @@
 
 - Um pixel (x, y) é coberto se o centro dele (256x+128, 256y+128) pertence à forma.
 - Elipse: (dx·hv)² + (dy·hu)² <= (hu·hv)², a fronteira inclusiva.
+- Cápsula: distância ao segmento <= raio, a fronteira inclusiva.
+- Membro afunilado: por segmento, distância perpendicular <= o raio interpolado, mais os discos das pontas.
 - Polígono: scanline par-ímpar; a aresta entra em y0 <= yc < y1 e o intervalo horizontal é [x_esq, x_dir): a borda
   compartilhada tem um dono só.
 """
@@ -54,6 +56,69 @@ def raster_ellipse(w: int, h: int, o: int, centro: tuple[int, int], semi: tuple[
         return res
 
     return _windowed(w, h, o, (cu - hu, cu + hu, cv - hv, cv + hv), cheia)
+
+
+def _span(points: Pontos, pad: int) -> tuple[int, int, int, int]:
+    us = [x for x, _ in points]
+    vs = [y for _, y in points]
+    return min(us) - pad, max(us) + pad, min(vs) - pad, max(vs) + pad
+
+
+def _capsula_cheia(w: int, h: int, o: tuple[int, int], points: Pontos, radius: int) -> Mascara:
+    xs, ys = _centers(w, h, o[0], o[1])
+    px = np.broadcast_to(xs[None, :], (h, w))
+    py = np.broadcast_to(ys[:, None], (h, w))
+    out = np.zeros((h, w), dtype=bool)
+    r2 = radius * radius
+    for (ax, ay), (bx, by) in zip(points, points[1:], strict=False):
+        ex, ey = bx - ax, by - ay
+        len2 = ex * ex + ey * ey
+        qx, qy = px - ax, py - ay
+        d_a = qx * qx + qy * qy
+        if len2 == 0:
+            out |= d_a <= r2
+            continue
+        dot = qx * ex + qy * ey
+        rx, ry = px - bx, py - by
+        cross = qx * ey - qy * ex
+        mid = (dot > 0) & (dot < len2) & (cross * cross <= r2 * len2)  # cross² <= r²·len2 é dist² <= r² no meio
+        out |= mid | ((dot <= 0) & (d_a <= r2)) | ((dot >= len2) & (rx * rx + ry * ry <= r2))
+    return out
+
+
+def raster_capsule(w: int, h: int, o: int, points: Pontos, radius: int) -> Mascara:
+    return _windowed(w, h, o, _span(points, abs(radius)),
+                     lambda ww, hh, ux, uy: _capsula_cheia(ww, hh, (ux, uy), points, radius))
+
+
+def _afunilada_cheia(w: int, h: int, o: tuple[int, int], points: Pontos, radii: tuple[int, ...]) -> Mascara:
+    """Em quartos de pixel (q2), para caber em int64 sem perder o centro do pixel (4x+2 exato):
+    cross² · len2 <= (ra · len2 + (rb − ra) · dot)² com 0 < dot < len2; os pontos e raios arredondados para q2."""
+    xs, ys = _centers(w, h, o[0], o[1])
+    px = np.broadcast_to((xs // 64)[None, :], (h, w))
+    py = np.broadcast_to((ys // 64)[:, None], (h, w))
+    pts = [((x + 32) >> 6, (y + 32) >> 6) for x, y in points]
+    rs = [(r + 32) >> 6 for r in radii]
+    out = np.zeros((h, w), dtype=bool)
+    for (ax, ay), (bx, by), ra, rb in zip(pts, pts[1:], rs, rs[1:], strict=False):
+        qx, qy = px - ax, py - ay
+        rx, ry = px - bx, py - by
+        out |= (qx * qx + qy * qy <= ra * ra) | (rx * rx + ry * ry <= rb * rb)
+        ex, ey = bx - ax, by - ay
+        len2 = ex * ex + ey * ey
+        if len2 == 0:
+            continue
+        dot = qx * ex + qy * ey
+        cross = qx * ey - qy * ex
+        lim = ra * len2 + (rb - ra) * dot
+        out |= (dot > 0) & (dot < len2) & (lim > 0) & (cross * cross * len2 <= lim * lim)
+    return out
+
+
+def raster_tapered(w: int, h: int, o: int, points: Pontos, radii: tuple[int, ...]) -> Mascara:
+    pad = max((abs(r) for r in radii), default=0) + 64  # um q2 de folga pelo arredondamento dos pontos e raios
+    return _windowed(w, h, o, _span(points, pad), lambda ww, hh, ux, uy: _afunilada_cheia(ww, hh, (ux, uy), points,
+                                                                                         radii))
 
 
 def raster_polygon(w: int, h: int, o: int, points: Pontos) -> Mascara:

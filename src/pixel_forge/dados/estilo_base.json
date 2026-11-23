@@ -1,0 +1,968 @@
+{
+ "id": "base",
+ "revision": 1,
+ "palette": [
+  {
+   "index": 0,
+   "id": "transparente",
+   "rgba": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "index": 1,
+   "id": "tinta",
+   "rgba": [
+    27,
+    23,
+    38,
+    255
+   ]
+  },
+  {
+   "index": 2,
+   "id": "sombra_chao",
+   "rgba": [
+    43,
+    38,
+    56,
+    255
+   ]
+  },
+  {
+   "index": 3,
+   "id": "pele_escura",
+   "rgba": [
+    168,
+    96,
+    78,
+    255
+   ]
+  },
+  {
+   "index": 4,
+   "id": "pele",
+   "rgba": [
+    217,
+    142,
+    110,
+    255
+   ]
+  },
+  {
+   "index": 5,
+   "id": "pele_clara",
+   "rgba": [
+    241,
+    191,
+    152,
+    255
+   ]
+  },
+  {
+   "index": 6,
+   "id": "azul_fundo",
+   "rgba": [
+    31,
+    58,
+    74,
+    255
+   ]
+  },
+  {
+   "index": 7,
+   "id": "azul_escuro",
+   "rgba": [
+    47,
+    88,
+    102,
+    255
+   ]
+  },
+  {
+   "index": 8,
+   "id": "azul",
+   "rgba": [
+    70,
+    128,
+    138,
+    255
+   ]
+  },
+  {
+   "index": 9,
+   "id": "azul_claro",
+   "rgba": [
+    111,
+    168,
+    164,
+    255
+   ]
+  },
+  {
+   "index": 10,
+   "id": "ferrugem_escura",
+   "rgba": [
+    107,
+    46,
+    42,
+    255
+   ]
+  },
+  {
+   "index": 11,
+   "id": "ferrugem",
+   "rgba": [
+    161,
+    71,
+    58,
+    255
+   ]
+  },
+  {
+   "index": 12,
+   "id": "ferrugem_clara",
+   "rgba": [
+    207,
+    110,
+    78,
+    255
+   ]
+  },
+  {
+   "index": 13,
+   "id": "couro_fundo",
+   "rgba": [
+    46,
+    31,
+    28,
+    255
+   ]
+  },
+  {
+   "index": 14,
+   "id": "couro_escuro",
+   "rgba": [
+    74,
+    49,
+    40,
+    255
+   ]
+  },
+  {
+   "index": 15,
+   "id": "couro",
+   "rgba": [
+    116,
+    80,
+    58,
+    255
+   ]
+  },
+  {
+   "index": 16,
+   "id": "couro_claro",
+   "rgba": [
+    156,
+    116,
+    80,
+    255
+   ]
+  },
+  {
+   "index": 17,
+   "id": "ambar_escuro",
+   "rgba": [
+    184,
+    102,
+    42,
+    255
+   ]
+  },
+  {
+   "index": 18,
+   "id": "ambar",
+   "rgba": [
+    240,
+    162,
+    58,
+    255
+   ]
+  },
+  {
+   "index": 19,
+   "id": "ambar_claro",
+   "rgba": [
+    255,
+    224,
+    138,
+    255
+   ]
+  },
+  {
+   "index": 20,
+   "id": "ardosia_escura",
+   "rgba": [
+    58,
+    59,
+    79,
+    255
+   ]
+  },
+  {
+   "index": 21,
+   "id": "ardosia",
+   "rgba": [
+    91,
+    93,
+    115,
+    255
+   ]
+  },
+  {
+   "index": 22,
+   "id": "osso",
+   "rgba": [
+    233,
+    226,
+    207,
+    255
+   ]
+  },
+  {
+   "index": 23,
+   "id": "musgo_escuro",
+   "rgba": [
+    47,
+    74,
+    43,
+    255
+   ]
+  },
+  {
+   "index": 24,
+   "id": "musgo",
+   "rgba": [
+    85,
+    122,
+    58,
+    255
+   ]
+  },
+  {
+   "index": 25,
+   "id": "musgo_claro",
+   "rgba": [
+    143,
+    176,
+    78,
+    255
+   ]
+  },
+  {
+   "index": 26,
+   "id": "pedra_clara",
+   "rgba": [
+    138,
+    140,
+    160,
+    255
+   ]
+  },
+  {
+   "index": 27,
+   "id": "rejunte",
+   "rgba": [
+    36,
+    34,
+    48,
+    255
+   ]
+  },
+  {
+   "index": 28,
+   "id": "agulha_funda",
+   "rgba": [
+    26,
+    46,
+    40,
+    255
+   ]
+  },
+  {
+   "index": 29,
+   "id": "agulha",
+   "rgba": [
+    42,
+    76,
+    56,
+    255
+   ]
+  },
+  {
+   "index": 30,
+   "id": "agulha_clara",
+   "rgba": [
+    102,
+    142,
+    84,
+    255
+   ]
+  },
+  {
+   "index": 31,
+   "id": "folha_escura",
+   "rgba": [
+    64,
+    102,
+    44,
+    255
+   ]
+  },
+  {
+   "index": 32,
+   "id": "folha",
+   "rgba": [
+    118,
+    158,
+    60,
+    255
+   ]
+  },
+  {
+   "index": 33,
+   "id": "folha_clara",
+   "rgba": [
+    184,
+    206,
+    96,
+    255
+   ]
+  },
+  {
+   "index": 34,
+   "id": "palha_escura",
+   "rgba": [
+    119,
+    80,
+    49,
+    255
+   ]
+  },
+  {
+   "index": 35,
+   "id": "palha",
+   "rgba": [
+    188,
+    146,
+    71,
+    255
+   ]
+  },
+  {
+   "index": 36,
+   "id": "palha_clara",
+   "rgba": [
+    227,
+    208,
+    131,
+    255
+   ]
+  },
+  {
+   "index": 41,
+   "id": "linho_sombra",
+   "rgba": [
+    166,
+    138,
+    167,
+    255
+   ]
+  },
+  {
+   "index": 42,
+   "id": "linho",
+   "rgba": [
+    222,
+    218,
+    214,
+    255
+   ]
+  },
+  {
+   "index": 43,
+   "id": "linho_claro",
+   "rgba": [
+    238,
+    244,
+    245,
+    255
+   ]
+  },
+  {
+   "index": 46,
+   "id": "folhosa_funda",
+   "rgba": [
+    28,
+    52,
+    38,
+    255
+   ]
+  },
+  {
+   "index": 47,
+   "id": "folhosa_escura",
+   "rgba": [
+    44,
+    82,
+    46,
+    255
+   ]
+  },
+  {
+   "index": 48,
+   "id": "folhosa",
+   "rgba": [
+    74,
+    118,
+    56,
+    255
+   ]
+  },
+  {
+   "index": 49,
+   "id": "folhosa_clara",
+   "rgba": [
+    122,
+    156,
+    74,
+    255
+   ]
+  }
+ ],
+ "materials": [
+  {
+   "id": "pele",
+   "ramp": [
+    3,
+    4,
+    5
+   ],
+   "outline_index": 10
+  },
+  {
+   "id": "pano_azul",
+   "ramp": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pano_ferrugem",
+   "ramp": [
+    10,
+    11,
+    12
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "couro",
+   "ramp": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "ambar",
+   "ramp": [
+    17,
+    18,
+    19
+   ],
+   "outline_index": 14
+  },
+  {
+   "id": "pano_cinza",
+   "ramp": [
+    20,
+    21
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "olho",
+   "ramp": [
+    1,
+    1
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "olho_claro",
+   "ramp": [
+    22,
+    22
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "sombra",
+   "ramp": [
+    2,
+    2
+   ],
+   "outline_index": 2
+  },
+  {
+   "id": "musgo",
+   "ramp": [
+    23,
+    24,
+    25
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pedra",
+   "ramp": [
+    20,
+    21,
+    26
+   ],
+   "outline_index": 27
+  },
+  {
+   "id": "rejunte",
+   "ramp": [
+    27,
+    27
+   ],
+   "outline_index": 27
+  },
+  {
+   "id": "metal",
+   "ramp": [
+    20,
+    21,
+    26
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "vidro_aceso",
+   "ramp": [
+    17,
+    18,
+    19
+   ],
+   "outline_index": 17
+  },
+  {
+   "id": "vidro",
+   "ramp": [
+    20,
+    21
+   ],
+   "outline_index": 17
+  },
+  {
+   "id": "casca",
+   "ramp": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "madeira_cortada",
+   "ramp": [
+    15,
+    16
+   ],
+   "outline_index": 13,
+   "cast_material": "tabua"
+  },
+  {
+   "id": "agulha",
+   "ramp": [
+    28,
+    29,
+    30
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "capim",
+   "ramp": [
+    23,
+    24,
+    25
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "capim_escuro",
+   "ramp": [
+    23,
+    23
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "capim_claro",
+   "ramp": [
+    25,
+    25
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pedra_escura",
+   "ramp": [
+    20,
+    20
+   ],
+   "outline_index": 27
+  },
+  {
+   "id": "agulha_escura",
+   "ramp": [
+    28,
+    28
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "agulha_clara",
+   "ramp": [
+    30,
+    30
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "folha",
+   "ramp": [
+    31,
+    32,
+    33
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "folha_escura",
+   "ramp": [
+    31,
+    31
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "folha_clara",
+   "ramp": [
+    33,
+    33
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "casca_clara",
+   "ramp": [
+    21,
+    26,
+    22
+   ],
+   "outline_index": 27
+  },
+  {
+   "id": "fibra",
+   "ramp": [
+    34,
+    35,
+    36
+   ],
+   "outline_index": 13,
+   "texture": {
+    "density_permille": 550,
+    "depth_permille": 260,
+    "jitter_permille": 80,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     5
+    ],
+    "lift_permille": 200,
+    "period_px": 3,
+    "seed": 5
+   }
+  },
+  {
+   "id": "linho",
+   "ramp": [
+    41,
+    42,
+    43
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pano_azul_escuro",
+   "ramp": [
+    6,
+    7,
+    8
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pano_marrom",
+   "ramp": [
+    13,
+    14,
+    15
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pano_vermelho",
+   "ramp": [
+    10,
+    11,
+    12
+   ],
+   "outline_index": 10
+  },
+  {
+   "id": "pelo_castanho",
+   "ramp": [
+    15,
+    16,
+    18
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "alvenaria_escura",
+   "ramp": [
+    20,
+    20
+   ],
+   "outline_index": 27,
+   "texture": {
+    "density_permille": 220,
+    "depth_permille": 1000,
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     3
+    ],
+    "lift_permille": 0,
+    "period_px": 2,
+    "seed": 23
+   },
+   "cast_material": "rejunte"
+  },
+  {
+   "id": "alvenaria",
+   "ramp": [
+    21,
+    21
+   ],
+   "outline_index": 27,
+   "texture": {
+    "density_permille": 220,
+    "depth_permille": 1000,
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     3
+    ],
+    "lift_permille": 0,
+    "period_px": 2,
+    "seed": 23
+   },
+   "cast_material": "alvenaria_escura"
+  },
+  {
+   "id": "alvenaria_clara",
+   "ramp": [
+    26,
+    26
+   ],
+   "outline_index": 27,
+   "texture": {
+    "density_permille": 220,
+    "depth_permille": 1000,
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     3
+    ],
+    "lift_permille": 0,
+    "period_px": 2,
+    "seed": 23
+   },
+   "cast_material": "alvenaria"
+  },
+  {
+   "id": "palha_escura",
+   "ramp": [
+    34,
+    34
+   ],
+   "outline_index": 13
+  },
+  {
+   "id": "palha",
+   "ramp": [
+    35,
+    35
+   ],
+   "outline_index": 13,
+   "cast_material": "palha_escura"
+  },
+  {
+   "id": "palha_clara",
+   "ramp": [
+    36,
+    36
+   ],
+   "outline_index": 13,
+   "cast_material": "palha"
+  },
+  {
+   "id": "tabua_funda",
+   "ramp": [
+    13,
+    13
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "tabua_escura",
+   "ramp": [
+    14,
+    14
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 450,
+    "depth_permille": 1000,
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     5
+    ],
+    "lift_permille": 1000,
+    "period_px": 3,
+    "seed": 11
+   },
+   "cast_material": "tabua_funda"
+  },
+  {
+   "id": "tabua",
+   "ramp": [
+    15,
+    15
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 450,
+    "depth_permille": 1000,
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     5
+    ],
+    "lift_permille": 1000,
+    "period_px": 3,
+    "seed": 11
+   },
+   "cast_material": "tabua_escura"
+  },
+  {
+   "id": "tabua_clara",
+   "ramp": [
+    16,
+    16
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 450,
+    "depth_permille": 1000,
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     5
+    ],
+    "lift_permille": 1000,
+    "period_px": 3,
+    "seed": 11
+   },
+   "cast_material": "tabua"
+  },
+  {
+   "id": "folhosa_funda",
+   "ramp": [
+    46,
+    46
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "folhosa_escura",
+   "ramp": [
+    47,
+    47
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "folhosa",
+   "ramp": [
+    47,
+    48,
+    49
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "folhosa_clara",
+   "ramp": [
+    49,
+    49
+   ],
+   "outline_index": 1
+  }
+ ],
+ "shading": {
+  "light_dir": [
+   -1,
+   -1,
+   1
+  ],
+  "shadow_band_px": 1,
+  "highlight_band_px": 1,
+  "highlight_min_area_px": 10,
+  "cast_shadow_px": 5
+ },
+ "max_opaque_colors": 45
+}
