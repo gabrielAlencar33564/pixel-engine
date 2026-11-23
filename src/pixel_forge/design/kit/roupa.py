@@ -222,18 +222,20 @@ def saia(v: Veste) -> Vista:
     hip_z, ankle_z = c["quadril_z"], c["tornozelo_z"]
     hem_z = hip_z - (hip_z - ankle_z) * v.pct("comprimento_pct", 100) + 0.5
     queda = hip_z - hem_z
+    # a barra sobre a largura do quadril: 100 % cai reta, 160 % abre em A, 200 % bem rodada
     abre = v.pct("largura_pct", 160)
+    meia = c["quadril_larg_x"] * 0.72
     for side, sx in SIDES:
         v.b.bone(f"skirt_{side}", "pelvis_tilt", qv(sx * c["quadril_x"], 0, 0), Junta("x", q(queda),
                                                                                        (-35_000, 35_000)))
-        v.part(f"skirt_{side}", taper((0.0, 1.0), queda, (c["quadril_larg_x"] * 0.72, c["r_coxa"] * abre + 0.6)),
-               (f"skirt_{side}", "skirt"))
-    v.part("skirt_mid", taper((0.0, 1.0), queda, (c["quadril_larg_x"] * 0.9, c["r_coxa"] * abre * 1.15 + 0.6)),
+        v.part(f"skirt_{side}", taper((0.0, 1.0), queda, (meia, meia * abre)), (f"skirt_{side}", "skirt"))
+    v.part("skirt_mid", taper((0.0, 1.0), queda, (c["quadril_larg_x"] * 0.9, c["quadril_larg_x"] * 0.9 * abre)),
            ("pelvis_tilt", "skirt"))
     v.part("skirt_waist", ellipse(qv(0, -0.1, 0.6), qv(c["quadril_larg_x"] * 1.12 + 0.4, c["peito_y"] * 0.95 + 0.4,
                                                        0.05 * c["estatura"] + 0.4)), ("pelvis_tilt", "skirt"))
-    v.part("skirt_hem", polyline([qv(-c["r_coxa"] * abre * 1.4, c["r_coxa"] * 0.9, -queda + 0.6),
-                                  qv(c["r_coxa"] * abre * 1.4, c["r_coxa"] * 0.9, -queda + 0.6)], 1),
+    borda = c["quadril_x"] + meia * abre - 0.5
+    v.part("skirt_hem", polyline([qv(-borda, c["r_coxa"] * 0.9, -queda + 0.6),
+                                  qv(borda, c["r_coxa"] * 0.9, -queda + 0.6)], 1),
            ("pelvis_tilt", "skirt"), v.mat2)
     cobre = ["pelvis_block"] + [f"{p}_{s}" for s, _ in SIDES for p in ("thigh", "j_hip", "j_knee", "shin")]
     return Vista(cobre=cobre, rules=[regra("skirt_waist", "skirt_mid"), regra("skirt_waist", "skirt_l"),

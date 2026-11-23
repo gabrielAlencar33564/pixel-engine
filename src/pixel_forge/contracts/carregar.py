@@ -17,8 +17,10 @@ def validar[M: BaseModel](dado: Any, modelo: type[M], nome: str) -> M:
     except ValidationError as exc:
         erro = exc.errors()[0]
         onde = "/" + "/".join(str(p) for p in erro["loc"])
-        raise Recusa("DOC_INVALIDO", f"{nome}: {erro['msg']} em {onde}.",
-                     "Corrija o campo apontado; o formato está na skill e nos exemplos.", onde) from None
+        recebido = repr(erro.get("input"))
+        recebido = recebido if len(recebido) <= 80 else recebido[:77] + "..."
+        raise Recusa("DOC_INVALIDO", f"{nome}: {erro['msg']} em {onde} (recebido: {recebido}).",
+                     f"Em {onde}: {erro['msg']}. Os campos e os limites estão na seção 4 da skill.", onde) from None
 
 
 def ler[M: BaseModel](caminho: Path, modelo: type[M]) -> M:

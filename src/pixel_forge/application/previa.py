@@ -45,7 +45,7 @@ def previa(comp: Composicao, acervo: Path) -> dict[str, Any]:
     alt = altura_m(ir)
     return {"prancha": str(alvo), "amplia": amplia, "vistas": list(ir.views),
             "canvas": [ir.canvas.width, ir.canvas.height], "altura_m": round(alt, 2),
-            "porte": f"{alt / ESTATURA_M:.2f}× o humano ({comp.categoria})", "partes": len(ir.parts),
+            "porte": f"{alt / ESTATURA_M:.2f}× o humano ({comp.categoria})", "partes": [p.id for p in ir.parts],
             "segundos": round(time.perf_counter() - t0, 2)}
 
 

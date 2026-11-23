@@ -58,7 +58,7 @@ def catalogo(destino: Path) -> Path:
     pecas = []
     for pid, p in sorted(PECAS.items()):
         pecas.append({"id": pid, "tipo": p.tipo, "descricao": p.descricao, "vistas": list(p.vistas),
-                      "ancoras": list(p.ancoras), "variacoes": [n for n, _ in p.variacoes],
+                      "ancoras": list(p.ancoras), "variacoes": [{"nome": n, "args": args} for n, args in p.variacoes],
                       "args": [{"nome": a.nome, "tipo": a.tipo, "descricao": a.descricao, "padrao": a.padrao}
                                for a in p.args],
                       "prancha": _prancha(pid, destino).name})

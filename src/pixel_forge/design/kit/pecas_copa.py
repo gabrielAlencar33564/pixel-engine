@@ -198,7 +198,8 @@ PECAS_COPA = [
                ["0.9", "0.45", "-0.15"]),
              X("caida", "fracoes", "a metade de baixo pende: abaixo de v, desce tanto", ["-1", "0"]),
              X("cachos", "ancora", "as pontas dos galhos onde sai um cacho a mais ('<nó>.pontas')", ""),
-             X("pontos", "fracoes", "a densidade ‰, o achatado (0 = redondo) e o brilho ‰", ["660", "0", "70"])),
+             X("pontos", "fracoes", "a densidade ‰ (0 a 1000), o achatado (fator da altura do cacho: 0 = redondo, "
+          "0.52 = almofada) e o brilho ‰ (0 a 1000)", ["660", "0", "70"])),
         _pontilhado, (("copa de folha", {"copa": COPA_V, "n": "30", "raio": ["19cm", "26cm"], "tons": TONS_FOLHOSA,
                                          "pontos": ["700", "0", "0"]}),
                       ("almofada", {"copa": COPA_V, "n": "4", "raio": ["37cm", "44cm"], "tons": TONS_AGULHA,

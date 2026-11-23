@@ -20,7 +20,7 @@ def olhar(build: Path) -> dict[str, Any]:
     linhas = [[pac.quadros[n].rgba for n in seq["frames"]] for _, seq in sorted(pac.sequencias.items())]
     quadros = [q for linha in linhas for q in linha]
     cores = max(len({tuple(c) for c in q[q[..., 3] == 255].tolist()}) for q in quadros)
-    amplia = amplia_para(max(q.shape[0] for q in quadros) * len(linhas), 960)
+    amplia = amplia_para(max(q.shape[0] for q in quadros), 400 if len(linhas) == 1 else 200)
     alvo = build.parent.parent / "olhar" / f"{build.name}.png"
     salvar_png(alvo, grade(linhas, amplia))
     return {"prancha": str(alvo), "amplia": amplia, "status": pac.status, "art_review": pac.art_review,

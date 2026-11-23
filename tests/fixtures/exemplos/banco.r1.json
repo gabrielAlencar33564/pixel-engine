@@ -14,6 +14,6 @@
  ],
  "vistas": {"S": {}},
  "movimento": ["static"],
- "tracos": [{"id": "assento", "description": "O assento de tábuas lê sobre os pés", "parts": ["assento_tabua_0"],
+ "tracos": [{"id": "assento", "description": "O assento de tábuas lê sobre os pés", "parts": ["assento_00", "assento_01", "assento_02"],
              "verification": "observable"}]
 }

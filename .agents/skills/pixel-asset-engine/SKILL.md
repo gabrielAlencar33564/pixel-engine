@@ -29,10 +29,11 @@ as medidas reais em metros e o que dá vida à coisa (a copa larga e baixa, a pa
 
 ## 3. O kit
 
-`pfe catalogo --json` grava `<acervo>/catalogo/index.json` e uma prancha por peça (3 variações). Cada peça tem o tipo
-(`prop`, `humanoide`, `quadrupede`), para que serve, os argumentos (nome, tipo, para que serve, padrão; sem padrão =
-obrigatório), as âncoras que deixa e a lista de materiais do estilo. Escolha as peças pela descrição e pela prancha.
-Só existe o que é vigente: a peça que não está no catálogo não existe.
+`pfe catalogo --json` grava `<acervo>/catalogo/index.json` e uma prancha por peça (as 3 variações, da esquerda para a
+direita). Cada peça tem o tipo (`prop`, `humanoide`, `quadrupede`), para que serve, os argumentos (nome, tipo, para que
+serve, padrão; sem padrão = obrigatório), as variações com os argumentos de cada uma (o jeito mais rápido de ver as
+unidades), as âncoras que deixa e a lista de materiais do estilo. Escolha as peças pela descrição e pela prancha. Só
+existe o que é vigente: a peça que não está no catálogo não existe.
 
 ## 4. A composição
 
@@ -58,8 +59,12 @@ Um JSON `<id>.r<n>.json` (o `<id>` em minúsculas, `_` e dígitos). Campos:
 
 **Um nó:** `{"id", "peca", "args"}` e, se precisar: `repete` (`{"sobre": "lados", "n": 2}` dá `$lado` −1 e 1;
 `"linha"` dá `$i` e `$t`; `"anel"` dá `$cos` e `$sen`), `grupo` (o contorno: partes do mesmo grupo não se contornam
-entre si), `pilha` e `camada` (na mesma face, a camada maior cobre a menor), `osso` (`raiz`; com balanço, `tronco` ou
-`cadeia`; com giro, `giro`). Um argumento pode citar a âncora de um nó de antes: `"cachos": "galhos.pontas"`.
+entre si), `pilha` e `camada` (na mesma pilha, o nó de camada maior cobre o de camada menor que ele toca; as faces
+internas de uma peça ficam entre a camada dela e a seguinte; para nada se cobrir, use pilhas diferentes), `osso`
+(`raiz`; com balanço, `tronco` ou `cadeia`; com giro, `giro`). Um argumento pode citar a âncora de um nó de antes: `"cachos": "galhos.pontas"`.
+
+**Limites:** `description` e os textos dos traços até 400 caracteres, `reference` até 2000, até 64 nós, e o sprite até
+512 px de lado (o canvas inclui a sombra no chão, à direita). Passar de um limite é recusa com a medida e a dica.
 
 **Coordenadas:** +X à esquerda do asset, +Y para a frente (a câmera do S), +Z para cima; a origem é o pé do asset.
 
@@ -91,8 +96,8 @@ ficha dele): `tests/fixtures/exemplos/banco.r1.json` (estático de vista única)
 O acervo é `~/.pixel-forge/acervo` (ou `--acervo`, ou `PFE_ACERVO`). Grave a composição em `<acervo>/composicoes/`.
 
 1. `pfe previa <composição> --json`: o repouso de cada vista com as mesmas recusas do build, a prancha
-   (`previas/<id>.r<n>.png`, recorte real ampliado até 4×) e os números (vistas, canvas, altura, porte). Leia os
-   números, depois a prancha; ajuste a composição e repita.
+   (`previas/<id>.r<n>.png`, recorte real ampliado até 4×) e os números (vistas, canvas, altura, porte e os ids das
+   `partes`, que os traços citam). Leia os números, depois a prancha; ajuste a composição e repita.
 2. `pfe conjunto <composição> ... --json`: os assets lado a lado pelo chão, com o humano de 1,65 m de régua.
 3. `pfe checar <composição> --json`: todos os quadros do build conferidos (os clipes de quem anda), sem gravar.
 4. `pfe build <composição> --json`: os quadros no acervo; devolve o `build`.
@@ -100,8 +105,8 @@ O acervo é `~/.pixel-forge/acervo` (ou `--acervo`, ou `PFE_ACERVO`). Grave a co
    JSON) e a releitura dele contra o build.
 6. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números.
 
-Toda recusa vem como `{"ok": false, "errors": [{"code", "message", "hint", "path"}]}`: siga a dica e corrija a
-composição.
+Toda recusa vem como `{"ok": false, "errors": [{"code", "message", "hint", "path"}]}`, com o caminho na composição:
+siga a dica e corrija. A recusa `MOTOR` é defeito da engine, não seu: pare e registre.
 
 ## 6. Completar e corrigir
 

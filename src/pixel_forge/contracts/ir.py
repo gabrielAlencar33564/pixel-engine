@@ -15,6 +15,7 @@ Inteiro = Annotated[int, Field(strict=True)]
 
 
 Plano = Literal["xz", "yz", "xy"]
+MAX_CANVAS = 512  # o lado do sprite, em px
 Vertices = Annotated[list[Vec2], Field(min_length=3, max_length=64)]
 
 
@@ -130,8 +131,8 @@ class ViewSpec(Strict):
 
 
 class CanvasDef(Strict):
-    width: Annotated[int, Field(ge=8, le=256, strict=True)]
-    height: Annotated[int, Field(ge=8, le=256, strict=True)]
+    width: Annotated[int, Field(ge=8, le=MAX_CANVAS, strict=True)]
+    height: Annotated[int, Field(ge=8, le=MAX_CANVAS, strict=True)]
     pivot_px: Vec2
 
 

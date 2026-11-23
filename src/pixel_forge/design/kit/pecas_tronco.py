@@ -59,6 +59,9 @@ def _galhos_finos(c: Ctx, a: dict[str, Any]) -> None:
                                       l0 + (l1 - l0) * c.st.randint(0, 100) / 100, lado * a["curva"]), a["material"])
 
 
+MAX_LINHAS = 32
+
+
 @dataclass(frozen=True)
 class Curva:
     """O galho grosso: a Bézier quadrática de ``p0`` por ``ctrl`` até ``p1`` no plano xz, afinando de ``w0`` a ``w1``,
@@ -73,7 +76,8 @@ class Curva:
 
 def _linhas(cv: Curva, osso: OssoDaAltura) -> list[tuple[Any, ...]]:
     (x0, z0), (cx, cz), (x1, z1) = cv.p0, cv.ctrl, cv.p1
-    n = max(4, round(math.hypot(x1 - x0, z1 - z0) / (2.5 * K)))
+    # uma linha a cada 2,5 px, até 32 linhas: o polígono do trecho (as duas bordas) cabe nos 64 vértices da IR
+    n = min(MAX_LINHAS - 1, max(4, round(math.hypot(x1 - x0, z1 - z0) / (2.5 * K))))
     rows = []
     for i in range(n + 1):
         s = i / n

@@ -128,3 +128,41 @@ def test_controle_o_giro_que_nao_divide_o_periodo_e_recusado_ja_na_previa() -> N
     with pytest.raises(Recusa) as e:
         ir_da_composicao(_cata_vento(6))  # 800 ms não se divide em 6 quadros
     assert e.value.codigo == "GIRO" and "quadros" in e.value.dica
+
+
+def _mourao(**mudar: Any) -> Composicao:
+    dado = json.loads((CASOS.parent / "composicoes" / "mourao.r1.json").read_text(encoding="utf-8"))
+    return validar({**dado, **mudar}, Composicao, "teste")
+
+
+def test_o_traco_que_cita_parte_inexistente_e_recusado_com_as_parecidas() -> None:
+    with pytest.raises(Recusa) as e:
+        ir_da_composicao(_mourao(tracos=[{"id": "t", "description": "d", "parts": ["poste_frente"],
+                                          "verification": "observable"}]))
+    assert e.value.codigo == "TRACO" and "pfe previa" in e.value.dica and e.value.onde == "/tracos/0/parts/0"
+
+
+def test_o_asset_maior_que_o_sprite_e_recusado_com_a_medida() -> None:
+    dado = json.loads((CASOS.parent / "composicoes" / "mourao.r1.json").read_text(encoding="utf-8"))
+    no = dado["nos"][0]
+    with pytest.raises(Recusa) as e:
+        ir_da_composicao(_mourao(categoria="estrutura", tracos=[],
+                                 nos=[{**no, "args": {**no["args"], "altura": "30m"}}]))
+    assert e.value.codigo == "TAMANHO" and "px por metro" in e.value.dica and "×" in e.value.mensagem
+
+
+def test_o_no_que_nao_desenha_nada_e_recusado() -> None:
+    no = {"id": "parede", "peca": "parede_tabuas", "args": {"x0": "-1m", "x1": "1m", "y": "0", "z0": "1m",
+                                                             "altura": "1m"}}
+    with pytest.raises(Recusa) as e:
+        ir_da_composicao(_mourao(nos=[no], tracos=[]))
+    assert e.value.codigo == "NO_VAZIO" and e.value.onde == "/nos/0/args"
+
+
+def test_o_galho_longo_cabe_no_teto_de_vertices() -> None:
+    """O galho grosso de uma copa de 8 m: o polígono do trecho tem no máximo 32 linhas (64 vértices)."""
+    dado = json.loads((CASOS / "composicoes" / "arvore.r1.json").read_text(encoding="utf-8"))
+    dado["medidas"] = {**dado["medidas"], "h": "6m", "a": "4m"}
+    dado["categoria"] = "arvore_grande"
+    ir = ir_da_composicao(validar(dado, Composicao, "teste"))
+    assert any(p.id.startswith("galhos") for p in ir.parts)

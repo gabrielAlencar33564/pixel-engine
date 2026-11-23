@@ -104,7 +104,8 @@ PECAS_MADEIRA = [
     Peca("parede_tabuas", "Parede de tábuas em pé com o topo em empena, cada tábua com a variação dela", (
         X("x0", "comprimento", "borda esquerda"), X("x1", "comprimento", "borda direita"),
         X("y", "comprimento", "o plano da face (frente = +y)"), X("z0", "comprimento", "base", "0"),
-        X("altura", "comprimento", "altura nas bordas"), X("empena", "comprimento", "quanto o meio sobe", "0"),
+        X("altura", "comprimento", "a cota do topo nas bordas, medida do chão (não de z0)"),
+        X("empena", "comprimento", "quanto o meio sobe", "0"),
         X("largura", "comprimento", "largura de cada tábua", "16cm"),
         X("desgaste", "inteiro", "a chance (%) de canto gasto", "20")),
         _parede_tabuas, (("parede", {"x0": "-1m", "x1": "1m", "y": "0", "altura": "1.6m"}),

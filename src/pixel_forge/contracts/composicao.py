@@ -14,6 +14,7 @@ from .base import Direcao, Id, PosInt, Strict
 Expr = Annotated[str, StringConstraints(min_length=1, max_length=240)]
 ArgValue = bool | Expr | list[Expr] | list[list[Expr]]
 Texto = Annotated[str, StringConstraints(min_length=1, max_length=400)]
+Ficha = Annotated[str, StringConstraints(min_length=1, max_length=2000)]
 Categoria = Literal["arvore_grande", "arvore_pequena", "arbusto", "casa", "estrutura", "objeto", "prop_de_mao",
                     "humano", "quadrupede"]
 
@@ -102,7 +103,7 @@ class Composicao(Strict):
     id: Id
     revision: PosInt
     description: Texto
-    reference: Texto  # a ficha: a referência concreta, as medidas reais e o que dá vida à coisa
+    reference: Ficha  # a ficha: a referência concreta, as medidas reais e o que dá vida à coisa
     tipo: Literal["prop", "humanoide", "quadrupede"]
     categoria: Categoria
     semente: Annotated[int, Field(ge=0, le=999_999, strict=True)]

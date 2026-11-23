@@ -103,3 +103,18 @@ substituído). O porquê longo vai no commit.
   `.agents/skills/` e o formulário `docs/pedido.md`, e o teste confere que estão em dia (I6, sem texto em dobro).
 - Os quatro exemplos são assets do padrão vigente sem relação com os pedidos da prova (um banco, uma folhosa, um
   viajante, um canino) e passam pelo mesmo `renderizar` do build.
+
+## N5, rodada 1 → motor
+
+- A recusa de formato diz a regra, o campo e o valor recebido; a IR que sai inválida é `MOTOR` (defeito da engine),
+  nunca um erro do pedido com o caminho da IR.
+- O sprite vai até 512 px de lado (a árvore grande de 6 m com a sombra no chão passava de 256); passar disso é
+  `TAMANHO`, com a medida e a escala na dica. O galho grosso tem até 32 linhas: nunca passa dos 64 vértices.
+- O traço que cita parte inexistente é recusado com as parecidas; a prévia lista os ids das partes. O nó que não
+  desenha nada é recusado (`NO_VAZIO`).
+- A camada do nó separa os nós (`camada × 100`): as faces internas de uma peça (o miolo do bocal) não sobem mais por
+  cima do nó de camada seguinte.
+- O catálogo traz os argumentos de cada variação; as descrições ambíguas (o achatado, a cota da parede) dizem a
+  unidade. A `reference` (a ficha) vai até 2000 caracteres.
+- A largura da saia mede a barra pelo quadril (100 % reta, 160 % em A, 220 % rodada): pela coxa, dobrar a largura
+  abria 2 px. O `olhar` amplia pelo tamanho do quadro (o humano saía a 1×).

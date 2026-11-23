@@ -87,7 +87,7 @@ PECAS_HUMANO = [
             ("larga", {"material": "pano_cinza", "largura": "180%"}),
             ("presa", {"material": "pano_azul", "detalhe": "linho", "barra": "1"}))),
     _roupa("saia", "Saia em A da cintura à canela ou ao tornozelo: as metades seguem a coxa com atraso ao andar", (
-           DETALHE, X("largura", "escalar", "a abertura da barra sobre a coxa", "160%"),
+           DETALHE, X("largura", "escalar", "a barra sobre o quadril: 100% reta, 160% em A, 220% rodada", "160%"),
            X("comprimento", "escalar", "a fração da perna que ela cobre (100% = até o tornozelo)", "100%")),
            {"largura": "largura_pct", "comprimento": "comprimento_pct"},
            (("longa", {"material": "pano_marrom"}), ("rodada", {"material": "pano_azul_escuro", "largura": "220%"}),

@@ -31,6 +31,11 @@ from .vistas import (
 PRECISA = {"tronco": "balanco", "cadeia": "balanco", "giro": "giro"}
 
 
+# a camada do nó separa os nós de uma pilha; as faces internas de uma peça (o miolo do bocal, os pregos da tábua) vão
+# em camadas acima da do nó, sem chegar à do nó seguinte
+CAMADAS_DO_NO = 100
+
+
 def _receita[R: (Balanco, Giro)](comp: Composicao, tipo: type[R]) -> R | None:
     return next((m for m in comp.movimento if isinstance(m, tipo)), None)
 
@@ -127,10 +132,14 @@ def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[
         for pid, rv in repeticoes(no):
             args = ler_args(peca, no.args, {**env, **rv}, f"/nos/{i}")
             ctx = Ctx(b, Stream(semente_do_no(comp.semente, pid)), pid, no.grupo or no.id,
-                      pilhas.setdefault(no.pilha, Pilha()), no.camada, regras, vistas, cadeia, no.osso, ancoras,
-                      por_vista, no.id)
+                      pilhas.setdefault(no.pilha, Pilha()), no.camada * CAMADAS_DO_NO, regras, vistas, cadeia, no.osso,
+                      ancoras, por_vista, no.id)
             n0 = len(b.parts)
             peca.desenha(ctx, args)
+            if len(b.parts) == n0:
+                raise Recusa("NO_VAZIO", f"Nó '{pid}': a peça '{no.peca}' não desenhou nada com esses argumentos.",
+                             "Confira as medidas dela no catálogo (a cota, o comprimento, a largura): o que ela cobre "
+                             "ficou vazio.", f"/nos/{i}/args")
             reparentar(b.parts[n0:], no.osso, cadeia, centro_giro)
     return regras + [r for s in pilhas.values() for r in s.rules()], por_vista
 
