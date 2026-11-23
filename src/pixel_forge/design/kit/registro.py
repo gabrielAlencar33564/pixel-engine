@@ -7,10 +7,12 @@ import inspect
 
 from .peca import MAX_ARGS, MAX_LINHAS, Peca
 from .pecas_carpintaria import PECAS_CARPINTARIA
+from .pecas_copa import PECAS_COPA
 from .pecas_formas import PECAS_FORMAS
 from .pecas_madeira import PECAS_MADEIRA
 from .pecas_pedra import PECAS_PEDRA
 from .pecas_telhado import PECAS_TELHADO
+from .pecas_tronco import PECAS_TRONCO
 from .pecas_vaos import PECAS_VAOS
 
 
@@ -24,4 +26,5 @@ def conferida(p: Peca) -> Peca:
 
 
 PECAS: dict[str, Peca] = {p.id: conferida(p) for p in (*PECAS_MADEIRA, *PECAS_PEDRA, *PECAS_TELHADO,
-                                                        *PECAS_CARPINTARIA, *PECAS_VAOS, *PECAS_FORMAS)}
+                                                        *PECAS_CARPINTARIA, *PECAS_VAOS, *PECAS_FORMAS, *PECAS_TRONCO,
+                                                        *PECAS_COPA)}

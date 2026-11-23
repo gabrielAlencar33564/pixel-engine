@@ -55,3 +55,6 @@ substituído). O porquê longo vai no commit.
   (mecanismo 2: a correção vira recusa).
 - A sombra de contato das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo só a S era): ela fica
   3:1 na tela em toda vista. Mudança intencional, com prancha (objetivo).
+- O tronco em pé só tem o modo sólido de revolução: o chapado e o de volume por máscara eram o jeito substituído
+  (I3: pedir `solido`, `sombra` ou `marca` é argumento desconhecido, recusado com a lista do que a peça aceita).
+- A folhagem de copa é o `pontilhado`; a peça `pacotes` não existe no kit (seção 5; I3).

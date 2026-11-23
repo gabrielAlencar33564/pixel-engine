@@ -95,12 +95,15 @@ def _ossos(b: AssetBuilder, comp: Composicao, env: dict[str, float]) -> tuple[li
     return cadeia, centro
 
 
-def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[list[Elo], Any]) -> list[Any]:
-    """Os nós na ordem do arquivo, cada repetição com a semente dela, no osso do nó; devolve as regras das pilhas."""
+def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[list[Elo], Any]
+         ) -> tuple[list[Any], dict[str, dict[str, Any]]]:
+    """Os nós na ordem do arquivo, cada repetição com a semente dela, no osso do nó; devolve as regras das pilhas e o
+    que as peças mudam por vista."""
     cadeia, centro_giro = ossos
     pilhas: dict[str, Pilha] = {}
     regras: list[dict[str, Any]] = []
     ancoras: dict[str, list[Any]] = {}
+    por_vista: dict[str, dict[str, Any]] = {}
     vistas: dict[str, int] = {v: AZIMUTE[v] for v in comp.vistas}
     for i, no in enumerate(comp.nos):
         peca = PECAS[no.peca]
@@ -108,20 +111,22 @@ def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[
             args = ler_args(peca, no.args, {**env, **rv}, f"/nos/{i}")
             ctx = Ctx(b, Stream(semente_do_no(comp.semente, pid)), pid, no.grupo or no.id,
                       pilhas.setdefault(no.pilha, Pilha()), no.camada, regras, vistas, cadeia, no.osso, ancoras,
-                      no=no.id)
+                      por_vista, no.id)
             n0 = len(b.parts)
             peca.desenha(ctx, args)
             reparentar(b.parts[n0:], no.osso, cadeia, centro_giro)
-    return regras + [r for s in pilhas.values() for r in s.rules()]
+    return regras + [r for s in pilhas.values() for r in s.rules()], por_vista
 
 
-def _vistas(comp: Composicao, b: AssetBuilder, regras: list[Any]) -> dict[str, Any]:
+def _vistas(comp: Composicao, b: AssetBuilder, regras: list[Any], por_vista: dict[str, dict[str, Any]]
+            ) -> dict[str, Any]:
     out: dict[str, Any] = {}
     sombra = next((p for p in b.parts if p["id"] == "ground_shadow"), None)
     for d, vista in comp.vistas.items():
         az = AZIMUTE[d]
         v: dict[str, Any] = {"occlusion_rules": regras_da_vista(b.parts, regras, az),
-                             "visibility": dict.fromkeys(vista.ocultas, "hidden")}
+                             "visibility": dict.fromkeys(vista.ocultas, "hidden"),
+                             "depth_bias": por_vista.get(d, {}).get("depth_bias", {})}
         if sombra is not None and az:
             v["geometria"] = {"ground_shadow": sombra_da_vista(sombra["geometry"], az)}
         out[d] = v
@@ -134,7 +139,7 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     b = AssetBuilder()
     ossos = _ossos(b, comp, env)
     _sombra(b, comp, env)
-    regras = _nos(b, comp, env, ossos)
+    regras, por_vista = _nos(b, comp, env, ossos)
     ids = [p["id"] for p in b.parts]
     repetidos = sorted({x for x in ids if ids.count(x) > 1})
     if repetidos:
@@ -147,4 +152,4 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     canvas = canvas_do_prop(no_mundo(b.parts, b.bones), folga, tuple(AZIMUTE[v] for v in comp.vistas))
     _sombra_no_obliquo(b)
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": lms,
-            "canvas": canvas, "views": _vistas(comp, b, regras)}
+            "canvas": canvas, "views": _vistas(comp, b, regras, por_vista)}

@@ -36,6 +36,9 @@ CACHE = Path(tempfile.gettempdir()) / "pfe-oraculo"
 # só o que instala e roda o motor antigo (o `challenge/` e o resto do treino ficam de fora da cópia)
 CAMINHOS = ["src", "presets", "schemas", "pyproject.toml", "README.md", "LICENSE"]
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "oraculo"
+# os argumentos que a peça antiga pedia para os modos que não vieram (o tronco chapado e o de volume por máscara): o
+# antigo os recebe, com o modo sólido ligado, e os ignora
+SO_NO_ANTIGO = {"tronco_em_pe": {"sombra": "plank_deep", "marca": "plank_deep", "pe": "plank_deep", "solido": True}}
 DIRECOES = ("S", "SW", "W", "NW", "N", "NE", "E", "SE")
 
 
@@ -123,7 +126,8 @@ def composicao_antiga(comp: dict[str, Any]) -> dict[str, Any]:
     """A composição nova no formato antigo: os materiais com os nomes antigos e o id que o antigo deixa montar com
     qualquer peça do kit (as que ele tirou pela regra dos dois usos)."""
     mapa = json.loads((FIXTURES / "materiais.json").read_text(encoding="utf-8"))
-    nos = [{**n, "args": {k: _trocar(v, mapa) for k, v in n.get("args", {}).items()}} for n in comp["nos"]]
+    nos = [{**n, "args": {**SO_NO_ANTIGO.get(n["peca"], {}),
+                          **{k: _trocar(v, mapa) for k, v in n.get("args", {}).items()}}} for n in comp["nos"]]
     base = {k: v for k, v in comp.items() if k != "categoria"}
     return {**base, "kind": "composition", "schema_version": "2.0.0", "id": "kit_peca",
             "reference": "docs/references/README.md", "nos": nos,
@@ -171,10 +175,23 @@ def gravar_kit(destino: Path, sha: str) -> None:
     print(f"kit: {len(saida)} variações gravadas")
 
 
+def gravar_composicoes(destino: Path, sha: str) -> None:
+    """As composições sintéticas de ``composicoes/``, em todas as vistas delas."""
+    casos = []
+    for arq in sorted((FIXTURES / "composicoes").glob("*.json")):
+        comp = json.loads(arq.read_text(encoding="utf-8"))
+        casos.append({"nome": arq.name.removesuffix(".r1.json"), "composicao": composicao_antiga(comp),
+                      "vistas": list(comp["vistas"])})
+    saida = antigo(destino, casos, estilo_base_antigo())
+    _salvar(FIXTURES / "composicoes.esperado.json", {"pixel_engine": sha, "casos": saida})
+    print(f"composições: {len(saida)} gravadas")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--versao", action="store_true", help="exporta e mostra o commit e a versão do motor antigo")
     ap.add_argument("--kit", action="store_true", help="grava o esperado das variações do kit")
+    ap.add_argument("--composicoes", action="store_true", help="grava o esperado das composições sintéticas")
     ap.add_argument("casos", nargs="*", type=Path, help="os casos de IR para gravar o esperado")
     args = ap.parse_args(argv)
     sha = commit()
@@ -187,6 +204,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         gravar(destino, sha, caso)
     if args.kit:
         gravar_kit(destino, sha)
+    if args.composicoes:
+        gravar_composicoes(destino, sha)
     return 0
 
 

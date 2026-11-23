@@ -23,19 +23,22 @@ limpeza de cor isolada), o build e o export `pfe-jogo/1` com o leitor do jogo e 
 
 **N2 (em curso) — a composição única e o kit de construção.** O formato único (o da v2, sem versão nem migração),
 as recusas antes de montar, o prop com a sombra de contato, as pilhas, as vistas 1/2/4 e o canvas pelo tamanho; 18
-peças vigentes (madeira, pedra, telhados, carpintaria, vãos, formas), **as 54 variações iguais ao oráculo** na mesma
-entrada; o estilo base com a paleta por função e os verdes de folhosa; `pfe build <composição>` e `pfe catalogo`.
+peças vigentes (madeira, pedra, telhados, carpintaria, vãos, formas) e 6 de flora (o tronco sólido, os galhos finos e
+grossos com a âncora das pontas, o `pontilhado`, os `galhos_em_pena`, as cortinas): **as 72 variações iguais ao
+oráculo** na mesma entrada, e 3 composições sintéticas (a árvore no balanço, o abrigo, o marco de 4 vistas) também,
+fora a sombra das vistas E/N/W (mudança intencional). O estilo base com a paleta por função e os verdes de folhosa;
+`pfe build <composição>` e `pfe catalogo`.
 
 ## Números
 
-| Medida | N0 | N1 | N2a |
-|---|---|---|---|
-| Linhas em `src/` | 1 | 2 431 | 4 210 |
-| Arquivos rastreados | 24 | 72 | 95 |
-| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes |
+| Medida | N0 | N1 | N2a | N2b |
+|---|---|---|---|---|
+| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 |
+| Arquivos rastreados | 24 | 72 | 101 | 111 |
+| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes |
 
 ## Próximo passo
 
-**N2, o resto:** a flora (tronco sólido, galhos, `pontilhado`, `galhos_em_pena`, cortina) com o balanço; o porte por
-categoria checado; o humano (corpo, roupas gerais, saia e lenço) e o canino com o rig por papéis, o IK e os
-geradores (parado, passada, corrida, balanço, giro, ação); o inventário das lições em `docs/decisoes.md`.
+**N2, o resto:** o porte por categoria checado; o movimento (o clipe, a pose por instante, o balanço e o giro do
+prop); o humano (corpo, roupas gerais, saia e lenço) e o canino com o rig por papéis, o IK e os geradores (parado,
+passada, corrida, ação por acessório); o inventário das lições em `docs/decisoes.md`.

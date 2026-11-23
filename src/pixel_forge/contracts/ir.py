@@ -14,6 +14,32 @@ from .base import Direcao, Id, Mdeg, NonNegInt, Strict, Vec2, Vec3
 Inteiro = Annotated[int, Field(strict=True)]
 
 
+Plano = Literal["xz", "yz", "xy"]
+Vertices = Annotated[list[Vec2], Field(min_length=3, max_length=64)]
+
+
+class PolygonGeom(Strict):
+    """Polígono plano no plano ``plane`` a partir de ``origin_q8``."""
+
+    type: Literal["polygon"]
+    plane: Plano
+    origin_q8: Vec3
+    vertices_q8: Vertices
+
+
+class StippleGeom(Strict):
+    """O polígono pontilhado: só ``density_permille`` das células de ``cell_px`` px acendem, por um hash inteiro da
+    célula e de ``seed``, contado da origem projetada da peça (o pontilhado anda junto com o osso, sem fervura)."""
+
+    type: Literal["stipple"]
+    plane: Plano
+    origin_q8: Vec3
+    vertices_q8: Vertices
+    density_permille: Annotated[int, Field(ge=1, le=1000, strict=True)]
+    seed: Annotated[int, Field(ge=0, le=65535, strict=True)]
+    cell_px: Annotated[int, Field(ge=1, le=4, strict=True)]
+
+
 class RevolutionGeom(Strict):
     """Sólido de revolução em pé: cada estação ``[z, r, dx]`` (q8) dá a altura acima de ``origin_q8``, o raio e o
     desvio do eixo em x, com ``z`` crescente."""
@@ -56,8 +82,8 @@ class BoundPolygonGeom(Strict):
     vertices: Annotated[list[BoundVertex], Field(min_length=3, max_length=32)]
 
 
-Geometry = Annotated[RevolutionGeom | EllipseGeom | BoundPolygonGeom | PolylineGeom | TaperedPolylineGeom,
-                     Field(discriminator="type")]
+Geometry = Annotated[RevolutionGeom | EllipseGeom | BoundPolygonGeom | PolylineGeom | TaperedPolylineGeom
+                     | PolygonGeom | StippleGeom, Field(discriminator="type")]
 
 
 class BoneDef(Strict):

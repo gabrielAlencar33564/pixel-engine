@@ -56,6 +56,13 @@ class Ctx:
     por_vista: dict[str, dict[str, dict[str, Any]]] = field(default_factory=dict)
     no: str = ""
 
+    def deixa(self, nome: str, pontos: list[Any]) -> None:
+        """Deixa a âncora ``<nó>.<nome>`` (as repetições do nó somam os pontos) para os nós seguintes."""
+        self.ancoras.setdefault(f"{self.no or self.pid}.{nome}", []).extend(pontos)
+
+    def ancora(self, ref: str) -> list[Any]:
+        return list(self.ancoras.get(ref, [])) if ref else []
+
     def poly(self, pid: str, mat: str, pts: list[Vec], camada: int, tags: tuple[str, ...] = FLAT) -> None:
         """Uma face chapada pelos pontos (na raiz), empilhada na pilha da face."""
         self.b.part(pid, mat, bound_polygon(pts), Parte(group=self.grupo, tags=tags))

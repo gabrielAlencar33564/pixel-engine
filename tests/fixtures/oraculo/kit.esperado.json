@@ -136,6 +136,33 @@
     "rgba_sha256": "a33d3d3cc8eee20e1ac7c058fdfa0c628f2ee5a2eec2e1558a911efee963dc27"
    }
   },
+  "cortinas/cheias": {
+   "S": {
+    "tamanho": [
+     83,
+     53
+    ],
+    "rgba_sha256": "65c3ca5c6605f58007edda9243f5f8ac7bc6b11c0cd2bb614b99e1441c96644b"
+   }
+  },
+  "cortinas/poucas": {
+   "S": {
+    "tamanho": [
+     74,
+     51
+    ],
+    "rgba_sha256": "0f49bac64e8024ece1d3da3abccacdd81cfc5a476f7408e2f7e158a473715766"
+   }
+  },
+  "cortinas/curtas": {
+   "S": {
+    "tamanho": [
+     69,
+     47
+    ],
+    "rgba_sha256": "e82c5cdb821195850c5009906d264fb9b4fab6412d7239b7fd73b3ec587f2c18"
+   }
+  },
   "elipsoide/domo": {
    "S": {
     "tamanho": [
@@ -188,6 +215,87 @@
      27
     ],
     "rgba_sha256": "d1097827f0d9f2f045ae2b3f7c9f904691db100d4f22ee8c9c3bab2ac7c5c877"
+   }
+  },
+  "galhos_em_pena/alta": {
+   "S": {
+    "tamanho": [
+     65,
+     107
+    ],
+    "rgba_sha256": "e2a337b7ca82b401053b21d7ca779b6e78441da12dfd4b469b46a4e5557fad71"
+   }
+  },
+  "galhos_em_pena/jovem": {
+   "S": {
+    "tamanho": [
+     48,
+     66
+    ],
+    "rgba_sha256": "ad09845a382ad2b0c25039ad3b2b9afaadb87488447a8b2ee6f59b0722204c00"
+   }
+  },
+  "galhos_em_pena/rala": {
+   "S": {
+    "tamanho": [
+     57,
+     86
+    ],
+    "rgba_sha256": "55253786b52cb123b21fac488782c5f65ff385c4207a550c090d40d56488ef5f"
+   }
+  },
+  "galhos_finos/três": {
+   "S": {
+    "tamanho": [
+     23,
+     55
+    ],
+    "rgba_sha256": "bf149599b9cb46c3973de518b1259b07b0a3c7bd2d21edcf09b7bddfadb8c1b6"
+   }
+  },
+  "galhos_finos/dois": {
+   "S": {
+    "tamanho": [
+     17,
+     36
+    ],
+    "rgba_sha256": "ac2ebb1517532749a9836845e994752d16e653cd14a3daac270e04b8615f79e2"
+   }
+  },
+  "galhos_finos/abertos": {
+   "S": {
+    "tamanho": [
+     36,
+     45
+    ],
+    "rgba_sha256": "e6118a2ffacf0f74c5f61ff624ee1c3bce19a7153618b76f67c54bbf1f46f661"
+   }
+  },
+  "galhos_grossos/em leque": {
+   "S": {
+    "tamanho": [
+     61,
+     91
+    ],
+    "rgba_sha256": "7aadbb68b3648bd704011ea037aac76d7b5e752179f356f474f847db317cc2bc"
+   }
+  },
+  "galhos_grossos/andares": {
+   "S": {
+    "tamanho": [
+     57,
+     89
+    ],
+    "rgba_sha256": "2ead5597be81ca0813ed917fb2609b2b021f4a0d1b012f10d67bf7967069290d"
+   }
+  },
+  "galhos_grossos/aberto": {
+   "S": {
+    "tamanho": [
+     68,
+     89
+    ],
+    "rgba_sha256": "69fd4a16a154a569817de9092188cd1c3d567bc12817ebb08c7041f7556f5c8a"
    }
   },
   "janela/quadrada": {
@@ -296,6 +404,33 @@
      17
     ],
     "rgba_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956"
+   }
+  },
+  "pontilhado/copa de folha": {
+   "S": {
+    "tamanho": [
+     86,
+     94
+    ],
+    "rgba_sha256": "4371727ff5f119bd926f2beed8d4909ba08b97d3b18cb12d8b15add005e4152c"
+   }
+  },
+  "pontilhado/almofada": {
+   "S": {
+    "tamanho": [
+     79,
+     97
+    ],
+    "rgba_sha256": "87285b63d9eef896a9191f553859462551450e1da84b6c3585cdb93fa44459e5"
+   }
+  },
+  "pontilhado/rala": {
+   "S": {
+    "tamanho": [
+     65,
+     91
+    ],
+    "rgba_sha256": "1b7bb18a5cc756e08d6d5d62de6f5f25289c55f57e01e76521d467bb900f76fc"
    }
   },
   "porta/estreita": {
@@ -458,6 +593,33 @@
      13
     ],
     "rgba_sha256": "eea14ad00c0496ab9408a23bbb0b1ddab3f0e977577840934b1d8442b26c4621"
+   }
+  },
+  "tronco_em_pe/fino": {
+   "S": {
+    "tamanho": [
+     12,
+     66
+    ],
+    "rgba_sha256": "a8c6e17d3c896e130a12d29ef703102c3c20423951c6542138f84f175aaa5b31"
+   }
+  },
+  "tronco_em_pe/grosso": {
+   "S": {
+    "tamanho": [
+     16,
+     52
+    ],
+    "rgba_sha256": "a9b25fd85316071e8216d4b9b2d766b7206e242459bb06c89e26d2e9bdf684be"
+   }
+  },
+  "tronco_em_pe/inclinado": {
+   "S": {
+    "tamanho": [
+     16,
+     59
+    ],
+    "rgba_sha256": "c45601a90f6d30b83ffe20fe9c27a5cbd1fa6ad5a8fc276ebd31cf24cd7c92ca"
    }
   },
   "viga/fina": {

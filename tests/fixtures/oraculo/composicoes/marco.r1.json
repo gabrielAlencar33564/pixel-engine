@@ -1,0 +1,21 @@
+{
+ "id": "marco", "revision": 1,
+ "description": "Fixture sintética: um marco de pedra com uma bola e uma haste, nas 4 vistas cardinais",
+ "reference": "fixture sintética mínima", "tipo": "prop", "categoria": "objeto", "semente": 9,
+ "medidas": {"r": "20cm"},
+ "sombra": {"meia_largura": "$r * 2"},
+ "nos": [
+  {"id": "base", "peca": "poligono", "args": {"pontos": [["-$r", "$r", "0"], ["$r", "$r", "0"], ["$r", "$r", "40cm"],
+                                                         ["-$r", "$r", "40cm"]], "material": "pedra"}},
+  {"id": "topo", "peca": "poligono", "args": {"pontos": [["-$r", "-$r", "40cm"], ["$r", "-$r", "40cm"],
+                                                         ["$r", "$r", "40cm"], ["-$r", "$r", "40cm"]], "material": "pedra"}},
+  {"id": "bola", "peca": "elipsoide", "args": {"centro": ["0", "0", "52cm"], "raios": ["12cm", "12cm", "12cm"],
+                                               "material": "pedra"}},
+  {"id": "haste", "peca": "traco", "args": {"pontos": [["5cm", "0", "60cm"], ["5cm", "0", "1m"]], "material": "metal",
+                                            "raio": "2cm"}}
+ ],
+ "vistas": {"S": {}, "E": {}, "N": {}, "W": {}}, "landmarks": {"sort_front": ["0", "$r", "0"]},
+ "movimento": ["static"],
+ "tracos": [{"id": "bola_no_topo", "description": "A bola de pedra no topo", "parts": ["bola"],
+             "verification": "observable"}]
+}

@@ -1,0 +1,25 @@
+{
+ "id": "abrigo", "revision": 1,
+ "description": "Fixture sintética: parede de pedra com porta e janela, duas águas de palha e um poste na frente",
+ "reference": "fixture sintética mínima", "tipo": "prop", "categoria": "casa", "semente": 77,
+ "medidas": {"l": "1.6m", "alt": "1.5m", "y": "50cm"},
+ "sombra": {"meia_largura": "$l * 1.1"},
+ "nos": [
+  {"id": "parede", "peca": "muro_fiadas", "args": {"x0": "-$l", "x1": "$l", "y": "$y", "altura": "$alt",
+   "vaos": [["-90cm", "-30cm", "0", "1.5m"], ["40cm", "90cm", "70cm", "1.2m"]]}},
+  {"id": "porta", "peca": "porta", "args": {"x0": "-90cm", "x1": "-30cm", "altura": "1.45m", "y": "$y"}},
+  {"id": "janela", "peca": "janela", "args": {"x0": "40cm", "x1": "90cm", "z0": "70cm", "z1": "1.15m", "y": "$y"}},
+  {"id": "agua_e", "peca": "telhado_palha", "camada": 10,
+   "args": {"beiral_esq": ["-$l - 15cm", "$y + 25cm", "$alt"], "beiral_dir": ["0", "$y + 25cm", "$alt"],
+            "cume_dir": ["0", "0", "$alt + 1m"], "cume_esq": ["-$l - 15cm", "0", "$alt + 1m"]}},
+  {"id": "agua_d", "peca": "telhado_palha", "camada": 10,
+   "args": {"beiral_esq": ["0", "$y + 25cm", "$alt"], "beiral_dir": ["$l + 15cm", "$y + 25cm", "$alt"],
+            "cume_dir": ["$l + 15cm", "0", "$alt + 1m"], "cume_esq": ["0", "0", "$alt + 1m"], "fios_claros": false}},
+  {"id": "poste", "peca": "poste", "camada": 20, "args": {"base": ["$l * 0.6", "$y + 40cm", "0"], "altura": "1.2m",
+                                                          "raio": "6cm"}}
+ ],
+ "vistas": {"S": {}}, "landmarks": {"sort_front": ["0", "$y + 1px", "0"], "door": ["-60cm", "$y + 10cm", "0"]},
+ "movimento": ["static"],
+ "tracos": [{"id": "porta_de_tabuas", "description": "A porta de tábuas na parede", "parts": ["porta_b0"],
+             "verification": "observable"}]
+}

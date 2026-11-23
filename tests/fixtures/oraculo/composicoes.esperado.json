@@ -1,0 +1,53 @@
+{
+ "pixel_engine": "3df5fe4230caed6bd9aca9f6fcfe2c0bc23027dd",
+ "casos": {
+  "abrigo": {
+   "S": {
+    "tamanho": [
+     124,
+     87
+    ],
+    "rgba_sha256": "9004017642f702c406f47b9d6d83dcfb3b27828cae01d0cad405481acc08a5f1"
+   }
+  },
+  "arvore": {
+   "S": {
+    "tamanho": [
+     110,
+     88
+    ],
+    "rgba_sha256": "60c4ac401030a5b4131bd4ae2969ea6ccd73b2b6353fa5128ee660e24dedbf2e"
+   }
+  },
+  "marco": {
+   "S": {
+    "tamanho": [
+     38,
+     42
+    ],
+    "rgba_sha256": "48b49c183cba17cde44fea9ba39fdc9423d05abd5dffe8f48121a3eaf221fe68"
+   },
+   "E": {
+    "tamanho": [
+     38,
+     42
+    ],
+    "rgba_sha256": "88f9d874a1d85b72d69d9f0da3f225b140a48f5efeffecad3e7bad1f714a42d7"
+   },
+   "N": {
+    "tamanho": [
+     38,
+     42
+    ],
+    "rgba_sha256": "490d3211aaaff7a92f463222ebcff5e70f4ee0e4f21266a1e84783a6653e4669"
+   },
+   "W": {
+    "tamanho": [
+     38,
+     42
+    ],
+    "rgba_sha256": "d8ac41156c31a6173e70a96a8531eaac633827ce9db11206005bd9ef622ac42e"
+   }
+  }
+ }
+}

@@ -70,5 +70,10 @@ def polyline(points: list[list[int]], thickness: int) -> dict[str, Any]:
     return {"type": "polyline", "points_q8": points, "thickness_px": thickness}
 
 
+def polygon(origin: list[int], verts: list[list[int]]) -> dict[str, Any]:
+    """Um polígono no plano xz a partir de ``origin`` (q8)."""
+    return {"type": "polygon", "plane": "xz", "origin_q8": origin, "vertices_q8": verts}
+
+
 def bound_polygon(pts: list[Vec], bone: str = "root") -> dict[str, Any]:
     return {"type": "bound_polygon", "vertices": [{"bone_id": bone, "point_q8": qv(*p)} for p in pts]}
