@@ -1,0 +1,19 @@
+{
+ "pixel_engine": "3df5fe4230caed6bd9aca9f6fcfe2c0bc23027dd",
+ "vistas": {
+  "S": {
+   "tamanho": [
+    48,
+    40
+   ],
+   "rgba_sha256": "287110c3529e88886ee98b210ae5cfd0e702bc04182fe948fae37dcdc9c945f1"
+  },
+  "SE": {
+   "tamanho": [
+    48,
+    40
+   ],
+   "rgba_sha256": "ef76048f84204f1dd33601e523b7a4f072c415cce64c3d42835a0a74ef2c6ea5"
+  }
+ }
+}

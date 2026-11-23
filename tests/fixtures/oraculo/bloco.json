@@ -1,0 +1,565 @@
+{
+ "ir": {
+  "id": "bloco",
+  "revision": 1,
+  "canvas": {
+   "width": 48,
+   "height": 40,
+   "pivot_px": [
+    24,
+    32
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "parent_id": null,
+    "rest_translation_q8": [
+     0,
+     0,
+     0
+    ],
+    "rest_rotation_mdeg": 0,
+    "rotation_axis": "z",
+    "length_q8": 0,
+    "angle_limits_mdeg": [
+     -180000,
+     180000
+    ]
+   }
+  ],
+  "parts": [
+   {
+    "id": "bloco_topo",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "bloco",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        -1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        -1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        1536,
+        2560
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "bloco_frente",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "bloco",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        1536,
+        2560
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "bloco_fundo",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "bloco",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        -1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        -1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        -1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        -1536,
+        2560
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "bloco_lado_x",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "bloco",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        -1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2048,
+        -1536,
+        2560
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "bloco_lado_mx",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "bloco",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        -1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        1536,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        1536,
+        2560
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2048,
+        -1536,
+        2560
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "caixa_topo",
+    "bone_id": "root",
+    "material": "pedra_clara",
+    "outline_group": "caixa",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        2816,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        2816,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "caixa_frente",
+    "bone_id": "root",
+    "material": "pedra_clara",
+    "outline_group": "caixa",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        2816,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        2816,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        2816,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        2816,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "caixa_fundo",
+    "bone_id": "root",
+    "material": "pedra_clara",
+    "outline_group": "caixa",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "caixa_lado_x",
+    "bone_id": "root",
+    "material": "pedra_clara",
+    "outline_group": "caixa",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        2816,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        2816,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -1536,
+        1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "caixa_lado_mx",
+    "bone_id": "root",
+    "material": "pedra_clara",
+    "outline_group": "caixa",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        2816,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        2816,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -3584,
+        1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "bola",
+    "bone_id": "root",
+    "material": "bola",
+    "outline_group": "bola",
+    "geometry": {
+     "type": "ellipse",
+     "center_q8": [
+      768,
+      256,
+      3584
+     ],
+     "radii_q8": [
+      1024,
+      1024,
+      1024
+     ]
+    }
+   },
+   {
+    "id": "sombra",
+    "bone_id": "root",
+    "material": "chao",
+    "outline_group": "sombra",
+    "tags": [
+     "ground_shadow"
+    ],
+    "draw_priority": -100,
+    "geometry": {
+     "type": "ellipse",
+     "center_q8": [
+      0,
+      0,
+      0
+     ],
+     "radii_q8": [
+      2816,
+      2304,
+      256
+     ]
+    }
+   }
+  ],
+  "views": {
+   "S": {},
+   "SE": {}
+  }
+ },
+ "estilo": "estilo.json",
+ "vistas": [
+  "S",
+  "SE"
+ ]
+}

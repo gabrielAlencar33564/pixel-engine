@@ -1,0 +1,26 @@
+{
+ "pixel_engine": "3df5fe4230caed6bd9aca9f6fcfe2c0bc23027dd",
+ "vistas": {
+  "S": {
+   "tamanho": [
+    48,
+    40
+   ],
+   "rgba_sha256": "68bdeab982531a6299958747e506763cb2f760b7065551a6cb355e1543b14eee"
+  },
+  "E": {
+   "tamanho": [
+    48,
+    40
+   ],
+   "rgba_sha256": "08190d0fa0480f108a6a5f941a171e8adbe636e449d7b50d8560cffa9e801b1b"
+  },
+  "N": {
+   "tamanho": [
+    48,
+    40
+   ],
+   "rgba_sha256": "7979e82feb3fbb457fd29a7a5b362bef2136cd7ba2ac904cfe5bd60138a7315d"
+  }
+ }
+}

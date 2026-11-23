@@ -1,0 +1,469 @@
+{
+ "ir": {
+  "id": "face",
+  "revision": 1,
+  "canvas": {
+   "width": 48,
+   "height": 40,
+   "pivot_px": [
+    24,
+    30
+   ]
+  },
+  "bones": [
+   {
+    "id": "root",
+    "parent_id": null,
+    "rest_translation_q8": [
+     0,
+     0,
+     0
+    ],
+    "rest_rotation_mdeg": 0,
+    "rotation_axis": "z",
+    "length_q8": 0,
+    "angle_limits_mdeg": [
+     -180000,
+     180000
+    ]
+   }
+  ],
+  "parts": [
+   {
+    "id": "parede_topo",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "parede",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        -1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        -1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "parede_frente",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "parede",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline",
+     "tone_up"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "parede_fundo",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "parede",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        -1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        -1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        -1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        -1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "parede_lado_x",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "parede",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        -1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2304,
+        -1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "parede_lado_mx",
+    "bone_id": "root",
+    "material": "pedra",
+    "outline_group": "parede",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        -1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        1792,
+        0
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        1792,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2304,
+        -1792,
+        1280
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "agua_s",
+    "bone_id": "root",
+    "material": "tabua",
+    "outline_group": "telhado",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2816,
+        2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2816,
+        2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        0,
+        0,
+        3840
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "agua_n",
+    "bone_id": "root",
+    "material": "tabua",
+    "outline_group": "telhado",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2816,
+        -2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2816,
+        -2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        0,
+        0,
+        3840
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "agua_e",
+    "bone_id": "root",
+    "material": "tabua",
+    "outline_group": "telhado",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2816,
+        -2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        2816,
+        2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        0,
+        0,
+        3840
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "agua_w",
+    "bone_id": "root",
+    "material": "tabua",
+    "outline_group": "telhado",
+    "tags": [
+     "flat",
+     "lit_by_normal",
+     "no_inner_outline"
+    ],
+    "geometry": {
+     "type": "bound_polygon",
+     "vertices": [
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2816,
+        -2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        -2816,
+        2304,
+        1280
+       ]
+      },
+      {
+       "bone_id": "root",
+       "point_q8": [
+        0,
+        0,
+        3840
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": "sombra",
+    "bone_id": "root",
+    "material": "chao",
+    "outline_group": "sombra",
+    "tags": [
+     "ground_shadow"
+    ],
+    "draw_priority": -100,
+    "geometry": {
+     "type": "ellipse",
+     "center_q8": [
+      0,
+      0,
+      0
+     ],
+     "radii_q8": [
+      3072,
+      2560,
+      256
+     ]
+    }
+   }
+  ],
+  "views": {
+   "S": {},
+   "E": {},
+   "N": {}
+  }
+ },
+ "estilo": "estilo.json",
+ "vistas": [
+  "S",
+  "E",
+  "N"
+ ]
+}

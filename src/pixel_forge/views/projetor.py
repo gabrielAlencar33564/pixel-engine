@@ -1,0 +1,171 @@
+"""A projeção da pose numa vista: cada peça vira um comando de desenho (a primitiva 2D, a profundidade, a superfície
+para o z-buffer e a normal da face chapada), na ordem de desenho da vista."""
+
+from __future__ import annotations
+
+import heapq
+from dataclasses import dataclass
+
+from ..contracts.base import Direcao
+from ..contracts.ir import AssetIR, BoundPolygonGeom, EllipseGeom, PartDef, RevolutionGeom
+from ..core.direcoes import AZIMUTE_MDEG
+from ..core.q8 import ONE_PX_POS, Q30_SHIFT, pos_to_q8, q8_to_pos
+from ..core.recusa import Recusa
+from ..rig.fk import BoneWorld, Vec3i, mat_t_vec, mat_vec, vadd
+from ..rig.pose import Pose
+from .camera import Camera
+from .primitivas import (
+    DrawCommand,
+    EllipsePrim,
+    FanPrim,
+    Prim,
+    RevolutionPrim,
+    Scene2D,
+    SupElipsoide,
+    Superficie,
+    SupLeque,
+    SupPlana,
+)
+
+
+@dataclass(frozen=True)
+class _Peca:
+    """O que a geometria precisa para ser projetada: a câmera, a pose, o osso da peça e o deslocamento do render."""
+
+    cam: Camera
+    pose: Pose
+    bw: BoneWorld
+    offset: Vec3i
+
+    def no_osso(self, bw: BoneWorld, p: list[int] | Vec3i) -> Vec3i:
+        local = (q8_to_pos(p[0]), q8_to_pos(p[1]), q8_to_pos(p[2]))
+        return vadd(vadd(bw.pos, mat_vec(bw.rot, local)), self.offset)
+
+    def tela(self, p: list[int] | Vec3i) -> Vec3i:
+        return self.cam.project(self.no_osso(self.bw, p))
+
+
+@dataclass(frozen=True)
+class _Projetada:
+    prim: Prim
+    surface: Superficie
+    depth: int
+    facing: Vec3i | None = None
+
+
+def ellipsoid_inverse(m: tuple[float, float, float, float, float, float]
+                      ) -> tuple[float, float, float, float, float, float] | None:
+    """A inversa simétrica de [[m11 m12 m13] [m12 m22 m23] [m13 m23 m33]] pela adjunta."""
+    m11, m12, m13, m22, m23, m33 = m
+    c11 = m22 * m33 - m23 * m23
+    c12 = m13 * m23 - m12 * m33
+    c13 = m12 * m23 - m13 * m22
+    det = m11 * c11 + m12 * c12 + m13 * c13
+    if det <= 0:
+        return None
+    c22 = m11 * m33 - m13 * m13
+    c23 = m12 * m13 - m11 * m23
+    c33 = m11 * m22 - m12 * m12
+    return (c11 / det, c12 / det, c13 / det, c22 / det, c23 / det, c33 / det)
+
+
+def _elipse(g: EllipseGeom, pc: _Peca) -> _Projetada:
+    u, v, depth = pc.tela(g.center_q8)
+    cam, rot = pc.cam, pc.bw.rot
+    prim = EllipsePrim(u, v, cam.extent_q8(rot, g.radii_q8, cam.eu), cam.extent_q8(rot, g.radii_q8, cam.ev))
+    w = [mat_t_vec(rot, ax) for ax in (cam.eu, cam.ev, cam.ed)]
+    rv = [[r * x for r, x in zip(g.radii_q8, wi, strict=True)] for wi in w]
+
+    def m(i: int, j: int) -> float:
+        return float(sum(a * b for a, b in zip(rv[i], rv[j], strict=True))) / float(1 << 60)
+
+    inv = ellipsoid_inverse((m(0, 0), m(0, 1), m(0, 2), m(1, 1), m(1, 2), m(2, 2)))
+    surface: Superficie = SupPlana(pos_to_q8(depth)) if inv is None else SupElipsoide(u, v, pos_to_q8(depth), inv)
+    return _Projetada(prim, surface, depth)
+
+
+def _revolucao(g: RevolutionGeom, pc: _Peca) -> _Projetada:
+    o = g.origin_q8
+    sts = []
+    for z, r, dx in g.stations:
+        u, v, d = pc.tela((o[0] + dx, o[1], o[2] + z))
+        sts.append((u / 256, v / 256, d / ONE_PX_POS, r / 256, z / 256))
+    depth = sum(int(s[2] * ONE_PX_POS) for s in sts) // len(sts)
+    prim = RevolutionPrim(tuple(sts), pc.cam.sd / (1 << Q30_SHIFT), pc.cam.ce / (1 << Q30_SHIFT))
+    return _Projetada(prim, SupPlana(pos_to_q8(depth)), depth)
+
+
+def _leque(g: BoundPolygonGeom, pc: _Peca, chapada: bool) -> _Projetada:
+    """O polígono de vértices em ossos; a face chapada guarda a normal (a luz e a sombra pelo plano)."""
+    body = [pc.no_osso(pc.pose.world[vx.bone_id], vx.point_q8) for vx in g.vertices]
+    pts = [pc.cam.project(p) for p in body]
+    facing = pc.cam.facing_permille(body) if chapada else None
+    return _Projetada(FanPrim(tuple((p[0], p[1]) for p in pts)), SupLeque(tuple((p[0], p[1], pos_to_q8(p[2]))
+                                                                                for p in pts)),
+                      sum(p[2] for p in pts) // len(pts), facing)
+
+
+def _comando(part: PartDef, pc: _Peca) -> DrawCommand:
+    g = part.geometry
+    if isinstance(g, EllipseGeom):
+        p = _elipse(g, pc)
+    elif isinstance(g, RevolutionGeom):
+        p = _revolucao(g, pc)
+    else:
+        p = _leque(g, pc, "flat" in part.tags)
+    lms = {lm.id: pc.tela(lm.point_q8) for lm in part.landmarks}
+    return DrawCommand(part.id, part.material, part.outline_group, tuple(part.tags), p.depth, p.prim, p.surface, lms,
+                       p.facing)
+
+
+def order_commands(cmds: list[DrawCommand], rules: list[tuple[str, str]], biases: dict[str, int],
+                   priorities: dict[str, int], direction: str) -> list[DrawCommand]:
+    """Ordena pela profundidade com o viés, a prioridade e o id; as regras frente/trás por topologia estável."""
+    base = sorted(cmds, key=lambda c: (c.depth + biases.get(c.part_id, 0), priorities.get(c.part_id, 0), c.part_id))
+    if not rules:
+        return base
+    index = {c.part_id: i for i, c in enumerate(base)}
+    succ: dict[str, set[str]] = {c.part_id: set() for c in base}
+    indeg = {c.part_id: 0 for c in base}
+    for front, back in rules:
+        if front in index and back in index and front not in succ[back]:
+            succ[back].add(front)
+            indeg[front] += 1
+    heap = [(index[p], p) for p, d in indeg.items() if d == 0]
+    heapq.heapify(heap)
+    out: list[DrawCommand] = []
+    by_id = {c.part_id: c for c in base}
+    while heap:
+        _, p = heapq.heappop(heap)
+        out.append(by_id[p])
+        for q in sorted(succ[p]):
+            indeg[q] -= 1
+            if indeg[q] == 0:
+                heapq.heappush(heap, (index[q], q))
+    if len(out) != len(base):
+        raise Recusa("OCLUSAO_CICLO", f"As regras de oclusão da vista {direction} formam um ciclo.",
+                     "Tire uma das regras frente/trás do ciclo.")
+    return out
+
+
+def project_view(asset: AssetIR, pose: Pose, direction: Direcao) -> Scene2D:
+    view = asset.views.get(direction)
+    if view is None:
+        raise Recusa("VISTA_AUSENTE", f"O asset não declara a vista {direction}.",
+                     f"As vistas dele são {', '.join(asset.views)}.")
+    cam = Camera(AZIMUTE_MDEG[direction], asset.canvas.pivot_px)
+    offset = pose.render_offset_pos()
+    cmds: list[DrawCommand] = []
+    hidden: dict[str, Vec3i] = {}
+    for part in asset.parts:
+        pc = _Peca(cam, pose, pose.world[part.bone_id], offset)
+        if part.id in view.visibility:  # a peça oculta deixa os pontos dela no quadro
+            hidden.update({lm.id: pc.tela(lm.point_q8) for lm in part.landmarks})
+            continue
+        cmds.append(_comando(part, pc))
+    rules = [(r.front, r.back) for r in view.occlusion_rules]
+    q8bias = {k: q8_to_pos(v) for k, v in view.depth_bias.items()}
+    prio = {p.id: p.draw_priority for p in asset.parts}
+    ordered = order_commands(cmds, rules, q8bias, prio, direction)
+    return Scene2D(direction, AZIMUTE_MDEG[direction], ordered, (cam.pu, cam.pv), dict(view.depth_bias),
+                   tuple(rules), hidden)

@@ -15,16 +15,24 @@ repositório vazio e cada uma com controle negativo (`tests/travas/`):
 - uma fonte de regras (I6): `CLAUDE.md`, `AGENTS.md` e a skill citam `docs/regras.md`, sem repetir; o espelho da skill.
 O oráculo (`scripts/oraculo.py`): `git archive` do `pixel-engine` numa pasta temporária, com ambiente próprio.
 
+**N1 — o núcleo por demanda.** Três fixtures sintéticas (`tests/fixtures/oraculo/`: o bloco com a bola e a caixa, o
+tronco de revolução, o telhado de faces pela normal), 7 vistas, **iguais pixel a pixel ao oráculo**, com controle
+negativo. Portados, já no padrão I10: q8 e Taylor, IR e estilo, FK de repouso, a câmera oblíqua, a projeção (leque,
+revolução, elipse), o raster (z-buffer, tons, textura, sombra entre peças e no chão, contornos, pixel-perfect,
+limpeza de cor isolada), o build e o export `pfe-jogo/1` com o leitor do jogo e o `--verificar` (o roundtrip).
+
 ## Números
 
-| Medida | N0 |
-|---|---|
-| Linhas em `src/` | 1 |
-| Arquivos rastreados | 21 |
-| `check.py` completo | 9 s, 18 testes |
+| Medida | N0 | N1 |
+|---|---|---|
+| Linhas em `src/` | 1 | 2 431 |
+| Arquivos rastreados | 24 | 72 |
+| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes |
 
 ## Próximo passo
 
-**N1 — o núcleo por demanda:** portar o mínimo para renderizar e exportar, igual ao oráculo, três fixtures sintéticas
-(um bloco com sombra projetada, um tronco sólido de revolução, uma face com a luz pela normal). Ler antes a seção 4
-do plano (o que nunca se porta).
+**N2 — o kit vigente e as lições:** o inventário das lições em `docs/decisoes.md`; o formato único de composição;
+as peças vigentes contra o oráculo (construção, pedra, tronco, galhos, `pontilhado`, `galhos_em_pena`, cortina,
+corpo humano e canino, roupas gerais, saia e lenço como peças gerais); o rig por papéis, o IK e os geradores; o
+estilo base com a paleta por função, o porte por categoria e as vistas, checados. As versões completas da IR, das
+primitivas e do sólido varrido esperam no scratchpad da sessão (`n2/`), só como rascunho: refazer se sumir.

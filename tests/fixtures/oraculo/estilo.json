@@ -1,0 +1,310 @@
+{
+ "id": "oraculo",
+ "revision": 1,
+ "palette": [
+  {
+   "index": 0,
+   "id": "transparente",
+   "rgba": [
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "index": 1,
+   "id": "tinta",
+   "rgba": [
+    20,
+    16,
+    24,
+    255
+   ]
+  },
+  {
+   "index": 2,
+   "id": "pedra_escura",
+   "rgba": [
+    70,
+    66,
+    72,
+    255
+   ]
+  },
+  {
+   "index": 3,
+   "id": "pedra",
+   "rgba": [
+    110,
+    104,
+    110,
+    255
+   ]
+  },
+  {
+   "index": 4,
+   "id": "pedra_clara",
+   "rgba": [
+    150,
+    144,
+    148,
+    255
+   ]
+  },
+  {
+   "index": 5,
+   "id": "bola_1",
+   "rgba": [
+    60,
+    40,
+    30,
+    255
+   ]
+  },
+  {
+   "index": 6,
+   "id": "bola_2",
+   "rgba": [
+    110,
+    70,
+    45,
+    255
+   ]
+  },
+  {
+   "index": 7,
+   "id": "bola_3",
+   "rgba": [
+    160,
+    110,
+    70,
+    255
+   ]
+  },
+  {
+   "index": 8,
+   "id": "bola_4",
+   "rgba": [
+    205,
+    160,
+    110,
+    255
+   ]
+  },
+  {
+   "index": 9,
+   "id": "casca_1",
+   "rgba": [
+    40,
+    28,
+    20,
+    255
+   ]
+  },
+  {
+   "index": 10,
+   "id": "casca_2",
+   "rgba": [
+    70,
+    50,
+    34,
+    255
+   ]
+  },
+  {
+   "index": 11,
+   "id": "casca_3",
+   "rgba": [
+    100,
+    74,
+    50,
+    255
+   ]
+  },
+  {
+   "index": 12,
+   "id": "casca_4",
+   "rgba": [
+    135,
+    104,
+    72,
+    255
+   ]
+  },
+  {
+   "index": 13,
+   "id": "tabua_escura",
+   "rgba": [
+    80,
+    50,
+    30,
+    255
+   ]
+  },
+  {
+   "index": 14,
+   "id": "tabua",
+   "rgba": [
+    120,
+    80,
+    48,
+    255
+   ]
+  },
+  {
+   "index": 15,
+   "id": "tabua_clara",
+   "rgba": [
+    160,
+    116,
+    72,
+    255
+   ]
+  },
+  {
+   "index": 16,
+   "id": "chao",
+   "rgba": [
+    40,
+    44,
+    36,
+    255
+   ]
+  },
+  {
+   "index": 17,
+   "id": "tinta_madeira",
+   "rgba": [
+    30,
+    20,
+    14,
+    255
+   ]
+  }
+ ],
+ "materials": [
+  {
+   "id": "pedra_escura",
+   "ramp": [
+    2,
+    2
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "pedra",
+   "ramp": [
+    2,
+    3,
+    4
+   ],
+   "outline_index": 1,
+   "cast_material": "pedra_escura"
+  },
+  {
+   "id": "pedra_clara",
+   "ramp": [
+    3,
+    4,
+    4
+   ],
+   "outline_index": 1,
+   "cast_material": "pedra"
+  },
+  {
+   "id": "bola",
+   "ramp": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "casca",
+   "ramp": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "outline_index": 17,
+   "texture": {
+    "kind": "dashes",
+    "period_px": 3,
+    "length_px": [
+     2,
+     5
+    ],
+    "density_permille": 550,
+    "depth_permille": 260,
+    "lift_permille": 200,
+    "jitter_permille": 80,
+    "seed": 5
+   }
+  },
+  {
+   "id": "tabua_escura",
+   "ramp": [
+    13,
+    13
+   ],
+   "outline_index": 17
+  },
+  {
+   "id": "tabua",
+   "ramp": [
+    13,
+    14,
+    15
+   ],
+   "outline_index": 17,
+   "cast_material": "tabua_escura",
+   "texture": {
+    "kind": "dashes",
+    "period_px": 2,
+    "length_px": [
+     2,
+     3
+    ],
+    "density_permille": 220,
+    "depth_permille": 1000,
+    "lift_permille": 300,
+    "jitter_permille": 0,
+    "seed": 23
+   }
+  },
+  {
+   "id": "tabua_clara",
+   "ramp": [
+    14,
+    15,
+    15
+   ],
+   "outline_index": 17,
+   "cast_material": "tabua"
+  },
+  {
+   "id": "chao",
+   "ramp": [
+    16,
+    16
+   ],
+   "outline_index": 16
+  }
+ ],
+ "shading": {
+  "light_dir": [
+   -1,
+   -1,
+   1
+  ],
+  "shadow_band_px": 1,
+  "highlight_band_px": 1,
+  "highlight_min_area_px": 10,
+  "cast_shadow_px": 5
+ },
+ "max_opaque_colors": 32
+}
