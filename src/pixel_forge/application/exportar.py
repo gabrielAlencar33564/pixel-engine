@@ -27,12 +27,14 @@ def pasta_do_pacote(build: Path) -> Path:
     return build.parent.parent / "exports" / build.name
 
 
-def exportar(build: Path) -> Path:
+def exportar(build: Path, aprovado: bool = False) -> Path:
+    """O pacote do jogo; ``aprovado`` só com a revisão humana registrada (``revisao.publicar``)."""
     m = ler_manifesto(build)
     quadros = [QuadroDoAtlas(c["clip"], c["direction"], f["index"], ler_rgba(build / f["path"]), f["pivot_px"],
                              f["landmarks"], f["duration_ms"], f["events"]) for c in m["clips"] for f in c["frames"]]
     seqs = [Sequencia(c["clip"], c["direction"], c["loop"], c["root_deltas_q8"]) for c in m["clips"]]
-    cab = Cabecalho(m["asset"]["id"], m["asset"]["revision"], m["engine"], m["build_id"], "preview", "pending")
+    cab = Cabecalho(m["asset"]["id"], m["asset"]["revision"], m["engine"], m["build_id"],
+                    "release_candidate" if aprovado else "preview", "approved" if aprovado else "pending")
     return escrever_pacote(pasta_do_pacote(build), cab, quadros, seqs)
 
 

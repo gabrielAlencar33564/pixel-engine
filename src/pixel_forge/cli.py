@@ -1,34 +1,50 @@
-"""A CLI ``pfe``. Toda resposta com ``--json`` é um objeto curto: ``{"ok": true, "result": {...}}`` ou
+"""A CLI ``pfe``: o caminho curto de um asset no acervo, sem projeto de jogo.
+
+    previa <composição>        o repouso de cada vista, com as recusas do build, e a prancha
+    checar <composição>        todos os quadros do build conferidos, sem gravar nada
+    build <composição>         os quadros no acervo (a composição entra em composicoes/, identidade imutável)
+    exportar <build>           o pacote do jogo (pfe-jogo/1); --verificar relê e confere; --publicar pede a revisão
+    olhar <build>              a prancha de todos os quadros do pacote e os números
+    catalogo                   as peças do kit: para que servem, os argumentos e a prancha
+    conjunto <composições...>  os assets lado a lado, na mesma escala, com o humano de régua
+    revisar <build>            o estado da revisão; o dono registra com --veredito, --nota e --por
+    atualizar <composição>     o desenho mudado como a revisão seguinte no acervo
+
+Toda resposta com ``--json`` é um objeto curto: ``{"ok": true, "result": {...}}`` ou
 ``{"ok": false, "errors": [{"code", "message", "hint", "path"}]}``. Toda recusa traz código e dica."""
 
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
+from .application import acervo, previa, revisao
 from .application.build import construir
 from .application.catalogo import catalogo
 from .application.exportar import exportar, verificar
+from .application.olhar import olhar
 from .contracts.carregar import ler
 from .contracts.composicao import Composicao
 from .core.recusa import Recusa
 
 EXIT_RECUSA = 2
+Comando = Callable[[argparse.Namespace], dict[str, Any]]
 
 
-def acervo(opcao: str | None) -> Path:
-    """O acervo de trabalho (fora do git): ``--acervo``, ``PFE_ACERVO`` ou ``~/.pixel-forge/acervo``."""
-    return Path(opcao or os.environ.get("PFE_ACERVO") or Path.home() / ".pixel-forge" / "acervo")
+def _comp(a: argparse.Namespace) -> Composicao:
+    return ler(Path(a.composicao), Composicao)
 
 
 def _build(a: argparse.Namespace) -> dict[str, Any]:
-    b = construir(ler(Path(a.composicao), Composicao), acervo(a.acervo))
-    return {"build": str(b.pasta), "build_id": b.build_id,
+    comp = _comp(a)
+    pasta = acervo.pasta_do_acervo(a.acervo)
+    registrada = acervo.registrar(comp, pasta)
+    b = construir(comp, pasta)
+    return {"build": str(b.pasta), "build_id": b.build_id, "composicao": str(registrada),
             "quadros": sum(len(c["frames"]) for c in b.manifesto["clips"])}
 
 
@@ -40,37 +56,63 @@ def _exportar(a: argparse.Namespace) -> dict[str, Any]:
             raise Recusa("EXPORT_DIVERGE", f"O pacote relido diverge do build: {'; '.join(problemas[:5])}.",
                          "Exporte de novo com `pfe exportar <build>`.")
         return {"verificado": True}
-    return {"atlas": str(exportar(build))}
+    return {"atlas": str(revisao.publicar(build) if a.publicar else exportar(build))}
 
 
 def _catalogo(a: argparse.Namespace) -> dict[str, Any]:
-    destino = acervo(a.acervo) / "catalogo"
+    destino = acervo.pasta_do_acervo(a.acervo) / "catalogo"
     destino.mkdir(parents=True, exist_ok=True)
     return {"index": str(catalogo(destino))}
 
 
+def _revisar(a: argparse.Namespace) -> dict[str, Any]:
+    build = Path(a.build)
+    if a.veredito is None:
+        return revisao.estado(build)
+    return revisao.registrar(build, a.veredito, a.nota or "", a.por or "")
+
+
+COMANDOS: dict[str, tuple[str, Comando, tuple[str, ...]]] = {
+    "previa": ("o repouso de cada vista com as recusas do build, e a prancha",
+               lambda a: previa.previa(_comp(a), acervo.pasta_do_acervo(a.acervo)), ("composicao", "--acervo")),
+    "checar": ("todos os quadros do build conferidos, sem gravar", lambda a: previa.checar(_comp(a)),
+               ("composicao",)),
+    "build": ("os quadros da composição, no acervo", _build, ("composicao", "--acervo")),
+    "exportar": ("o pacote do jogo (pfe-jogo/1) de um build", _exportar, ("build", "--verificar", "--publicar")),
+    "olhar": ("a prancha de todos os quadros do pacote e os números", lambda a: olhar(Path(a.build)), ("build",)),
+    "catalogo": ("as peças do kit: para que servem, os argumentos e a prancha", _catalogo, ("--acervo",)),
+    "conjunto": ("os assets lado a lado, na mesma escala, com o humano de régua",
+                 lambda a: previa.conjunto([ler(Path(c), Composicao) for c in a.composicoes],
+                                           acervo.pasta_do_acervo(a.acervo)), ("composicoes", "--acervo")),
+    "revisar": ("o estado da revisão do dono; o dono registra o veredito", _revisar,
+                ("build", "--veredito", "--nota", "--por")),
+    "atualizar": ("o desenho mudado como a revisão seguinte no acervo",
+                  lambda a: {"composicao": str(acervo.atualizar(_comp(a), acervo.pasta_do_acervo(a.acervo)))},
+                  ("composicao", "--acervo")),
+}
+BANDEIRAS = {"--verificar", "--publicar"}
+
+
 def _parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(prog="pfe", description=__doc__)
+    ap = argparse.ArgumentParser(prog="pfe", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="comando", required=True)
-    b = sub.add_parser("build", help="os quadros da composição, no acervo")
-    b.add_argument("composicao")
-    b.add_argument("--acervo")
-    b.set_defaults(fn=_build)
-    c = sub.add_parser("catalogo", help="as peças do kit: o schema e a prancha de cada uma")
-    c.add_argument("--acervo")
-    c.set_defaults(fn=_catalogo)
-    e = sub.add_parser("exportar", help="o pacote do jogo (pfe-jogo/1) de um build")
-    e.add_argument("build")
-    e.add_argument("--verificar", action="store_true", help="relê o pacote e confere com o build")
-    e.set_defaults(fn=_exportar)
-    for p in (b, c, e):
+    for nome, (ajuda, fn, args) in COMANDOS.items():
+        p = sub.add_parser(nome, help=ajuda)
+        for arg in args:
+            if arg in BANDEIRAS:
+                p.add_argument(arg, action="store_true")
+            elif arg == "composicoes":
+                p.add_argument(arg, nargs="+")
+            else:
+                p.add_argument(arg, choices=revisao.VEREDITOS if arg == "--veredito" else None)
         p.add_argument("--json", action="store_true")
+        p.set_defaults(fn=fn)
     return ap
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     a = _parser().parse_args(argv)
-    fn: Callable[[argparse.Namespace], dict[str, Any]] = a.fn
+    fn: Comando = a.fn
     try:
         res = fn(a)
     except Recusa as r:

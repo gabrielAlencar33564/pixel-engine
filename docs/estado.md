@@ -35,15 +35,20 @@ por categoria, recusado no build com o porte típico na dica. O quadrúpede: o c
 com o IK de N segmentos, parado e no passo (112 quadros iguais ao antigo animando a mesma IR). O canvas inclui a sombra
 no chão (antes cortada); a luz é da câmera.
 
+**N3 — o caminho curto.** O `pfe` com `previa`, `checar`, `build`, `exportar` (`--verificar`, `--publicar`), `olhar`,
+`catalogo`, `conjunto`, `revisar` e `atualizar`, no acervo (`~/.pixel-forge/acervo`) e sem projeto. A prévia recusa o
+que o build recusa; a revisão do dono é o único caminho para publicar. Estático: prévia 0,5 s, checar 0,4 s, build e
+export em ~2 s de relógio cada (com a partida do Python).
+
 ## Números
 
-| Medida | N0 | N1 | N2a | N2b | N2c | N2d |
-|---|---|---|---|---|---|---|
-| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 | 7 777 |
-| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 | 137 |
-| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes | 20 s, 198 testes |
+| Medida | N0 | N1 | N2a | N2b | N2c | N2d | N3 |
+|---|---|---|---|---|---|---|---|
+| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 | 7 777 | 8 115 |
+| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 | 137 | 143 |
+| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes | 17 s, 199 testes | 18 s, 207 testes |
 
 ## Próximo passo
 
-**N3:** a CLI mínima (`previa`, `checar`, `olhar`, `conjunto`, `revisar`, `atualizar`) no acervo sem projeto, com a
-prévia sob os mesmos limites do build e menos de 1 min de máquina no estático.
+**N4:** o `docs/regras.md`, o `CLAUDE.md` e o `AGENTS.md` curtos, a skill única (e o espelho), o formulário de pedido
+e os quatro exemplos em `tests/fixtures/exemplos/`.

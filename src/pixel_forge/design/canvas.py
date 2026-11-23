@@ -13,10 +13,21 @@ from .vistas import pontos
 _S, _C = math.sin(math.radians(45)), math.cos(math.radians(45))
 
 
+# o que projeta sombra no chão no render: as faces de vértices em ossos, os traços e as elipses alinhadas à tela (o
+# pontilhado, o polígono plano, a revolução e o detalhe não projetam)
+PROJETAM = ("bound_polygon", "polyline", "tapered_polyline", "ellipse")
+NAO_PROJETAM = frozenset({"ground_shadow", "detail", "no_cast", "oriented"})
+
+
+def projeta(part: dict[str, Any]) -> bool:
+    return part["geometry"]["type"] in PROJETAM and not NAO_PROJETAM & set(part["tags"])
+
+
 class _Caixa:
     def __init__(self) -> None:
         self.us: list[float] = []
         self.vs: list[float] = []
+        self.projeta = False  # a parte da vez projeta sombra no chão
 
     def ponto(self, p: tuple[float, float, float], r: float, rot: tuple[int, int]) -> None:
         ca, sa = rot
@@ -27,7 +38,7 @@ class _Caixa:
 
     def sombra(self, u: float, v_chao: float, z: float) -> None:
         """A sombra no chão do ponto a ``z`` px de altura: ``SOMBRA_POR_ALTURA``·z à direita da base dele."""
-        if z > 0:
+        if self.projeta and z > 0:
             self.us.append(u + SOMBRA_POR_ALTURA * z)
             self.vs.append(v_chao)
 
@@ -71,6 +82,7 @@ def canvas_do_prop(parts: list[dict[str, Any]], margem: int, azimutes: tuple[int
         caixa.ponto((0.0, 0.0, 0.0), 0.5, rot)  # o pixel do pivô (e o ponto logo acima dele) cabe no canvas
         caixa.ponto((0.0, 0.0, 0.01), 0.5, rot)
         for p in parts:
+            caixa.projeta = projeta(p)
             caixa.geometria(p["geometry"], rot)
     u0, u1 = math.floor(min(caixa.us)) - margem, math.ceil(max(caixa.us)) + margem
     v0, v1 = math.floor(min(caixa.vs)) - margem, math.ceil(max(caixa.vs)) + margem

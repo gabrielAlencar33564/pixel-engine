@@ -8,9 +8,8 @@ import json
 from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
-from ..contracts.base import Direcao
 from ..contracts.composicao import Composicao
 from ..contracts.ir import AssetIR
 from ..design.asset import ir_da_composicao, movimento
@@ -19,6 +18,7 @@ from ..export.imagem import salvar_png
 from ..motion.gerar import gerar_clipe
 from ..quality.quadro import conferir_quadro
 from ..raster.estilo import EstiloRender, estilo_render
+from ..raster.renderer import Quadro
 from ..rig.fk import Skeleton
 from ..rig.pose import Pose, avaliar, rest_pose, sample_channels
 from .estilo import estilo_base
@@ -68,14 +68,48 @@ def instantes(ir: AssetIR, clip: str, receita: str, mp: dict[str, int]) -> tuple
             for i, t in enumerate(st)], c.loop
 
 
-def _quadro(pasta: Path, ir: AssetIR, est: EstiloRender, onde: tuple[str, str], it: Instante) -> dict[str, Any]:
-    clip, direcao = onde
-    q = quadro_da_pose(ir, est, it.pose, cast(Direcao, direcao))
-    conferir_quadro(q, est.doc, f"{clip}/{direcao}/{it.index}")
-    rgba = q.to_rgba({p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in est.doc.palette})
-    rel = f"frames/{clip}/{direcao.lower()}/{it.index:03d}.png"
+@dataclass(frozen=True)
+class Sequencia:
+    """Os quadros de um clipe numa direção, já conferidos (RGBA), com o laço e os instantes."""
+
+    clip: str
+    direcao: str
+    loop: bool
+    instantes: list[Instante]
+    quadros: list[Quadro]
+
+
+@dataclass(frozen=True)
+class Renderizado:
+    ir: AssetIR
+    est: EstiloRender
+    sequencias: list[Sequencia]
+
+
+def renderizar(comp: Composicao) -> Renderizado:
+    """Todos os quadros que o build grava, com as mesmas recusas (o porte, o quadro cortado, as cores): o ``checar``
+    e o ``build`` passam por aqui (I8)."""
+    ir, style = ir_da_composicao(comp), estilo_base()
+    conferir_porte(comp.categoria, ir)
+    est = estilo_render(style)
+    pedidos, mp = movimento(comp)
+    seqs = []
+    for clip, receita in pedidos.items():
+        its, loop = instantes(ir, clip, receita, mp)
+        for direcao in ir.views:
+            quadros = [quadro_da_pose(ir, est, it.pose, direcao) for it in its]
+            for it, q in zip(its, quadros, strict=True):
+                conferir_quadro(q, style, f"{clip}/{direcao}/{it.index}")
+            seqs.append(Sequencia(clip, direcao, loop, its, quadros))
+    return Renderizado(ir, est, seqs)
+
+
+def _gravar(pasta: Path, r: Renderizado, s: Sequencia, i: int) -> dict[str, Any]:
+    it, q = s.instantes[i], s.quadros[i]
+    rgba = q.to_rgba({p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in r.est.doc.palette})
+    rel = f"frames/{s.clip}/{s.direcao.lower()}/{it.index:03d}.png"
     salvar_png(pasta / rel, rgba)
-    return {"index": it.index, "path": rel, "duration_ms": it.duration_ms, "pivot_px": list(ir.canvas.pivot_px),
+    return {"index": it.index, "path": rel, "duration_ms": it.duration_ms, "pivot_px": list(r.ir.canvas.pivot_px),
             "events": [], "landmarks": {k: [u >> 8, v >> 8] for k, (u, v) in sorted(q.landmarks.items())},
             "rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest()}
 
@@ -83,21 +117,14 @@ def _quadro(pasta: Path, ir: AssetIR, est: EstiloRender, onde: tuple[str, str], 
 def construir(comp: Composicao, acervo: Path) -> Build:
     """Os quadros de cada clipe em cada direção, conferidos e gravados em ``builds/`` do acervo."""
     engine = versao_do_motor()
-    ir, style = ir_da_composicao(comp), estilo_base()
-    conferir_porte(comp.categoria, ir)
+    r = renderizar(comp)
     build_id = hash_canonico({"engine": engine, "composicao": comp.model_dump(mode="json"),
-                              "style": style.model_dump(mode="json")})
-    pasta = acervo / "builds" / f"{ir.id}.r{ir.revision}.{build_id[:12]}"
-    est = estilo_render(style)
-    pedidos, mp = movimento(comp)
-    clips = []
-    for clip, receita in pedidos.items():
-        its, loop = instantes(ir, clip, receita, mp)
-        for direcao in ir.views:
-            clips.append({"clip": clip, "direction": direcao, "loop": loop,
-                          "root_deltas_q8": [it.root_delta_q8 for it in its],
-                          "frames": [_quadro(pasta, ir, est, (clip, direcao), it) for it in its]})
-    manifesto = {"build_id": build_id, "engine": engine, "asset": {"id": ir.id, "revision": ir.revision},
+                              "style": r.est.doc.model_dump(mode="json")})
+    pasta = acervo / "builds" / f"{r.ir.id}.r{r.ir.revision}.{build_id[:12]}"
+    clips = [{"clip": s.clip, "direction": s.direcao, "loop": s.loop,
+              "root_deltas_q8": [it.root_delta_q8 for it in s.instantes],
+              "frames": [_gravar(pasta, r, s, i) for i in range(len(s.quadros))]} for s in r.sequencias]
+    manifesto = {"build_id": build_id, "engine": engine, "asset": {"id": r.ir.id, "revision": r.ir.revision},
                  "clips": clips}
     (pasta / "manifest.json").write_text(json.dumps(manifesto, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return Build(pasta, build_id, manifesto)

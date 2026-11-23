@@ -81,3 +81,16 @@ substituído). O porquê longo vai no commit.
   quadro inteiro com o antigo animando a mesma IR nova (o passo antigo pede `gait` 1, o único que a engine faz).
 - As receitas são dados do motor conferidos por teste: o `exige` do passo (o `gait`) e a recusa do balanço curto não
   vêm (nenhum pedido muda a receita).
+
+## N3
+
+- O asset vive no acervo como `composicoes/<id>.r<n>.json`; o `build` o registra. A mesma revisão com outro desenho é
+  recusada (`IDENTIDADE`) e o `atualizar` grava a seguinte: é a identidade imutável sem `identity/` nem candidatos
+  (a composição não sorteia; I5, "o menor que funciona").
+- O `checar` e o `build` passam pelo mesmo percurso (`renderizar`, com o porte, o quadro cortado e as cores); a
+  `previa` aplica as mesmas recusas ao repouso de cada vista e grava a prancha (I8).
+- O `revisar` guarda o veredito do dono por build (`aprovado` ou `ajustar`, a nota e quem); o `exportar --publicar`
+  só sai com o aprovado (`release_candidate`, `approved`). Nenhum comando aprova sozinho (I9).
+- O `olhar` lê o pacote como o jogo lê; o `conjunto` põe os assets pelo chão, com o humano de 1,65 m de régua.
+- O canvas só mede a sombra no chão das partes que o render projeta (faces, traços e elipses alinhadas): a copa
+  pontilhada não projeta, e a árvore voltava 50 px mais larga sem isso.

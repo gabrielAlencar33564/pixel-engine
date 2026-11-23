@@ -7,8 +7,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 from ..contracts.carregar import validar
 from ..contracts.composicao import Composicao
 from ..core.direcoes import DIRECOES
@@ -17,9 +15,9 @@ from ..design.kit.registro import PECAS
 from ..export.imagem import salvar_png
 from ..raster.estilo import estilo_render
 from .estilo import estilo_base
+from .prancha import grade
 from .quadros import quadro_de_repouso
 
-FUNDO = (112, 116, 104, 255)  # o tom médio do chão, para a prancha ler como no jogo
 AMPLIA = 3
 
 
@@ -44,26 +42,14 @@ def de_uma_peca(peca: str, args: dict[str, Any]) -> Composicao:
                     "tracos": []}, Composicao, f"variação de {peca}")
 
 
-def _rgba_da_variacao(peca: str, args: dict[str, Any]) -> np.ndarray[Any, np.dtype[np.uint8]]:
-    style = estilo_base()
-    q = quadro_de_repouso(ir_da_composicao(de_uma_peca(peca, args)), estilo_render(style), "S")
-    rgba = q.to_rgba({p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in style.palette})
-    fundo = np.empty_like(rgba)
-    fundo[...] = FUNDO
-    fundo[rgba[..., 3] == 255] = rgba[rgba[..., 3] == 255]
-    return np.repeat(np.repeat(fundo, AMPLIA, axis=0), AMPLIA, axis=1)
-
-
 def _prancha(peca: str, destino: Path) -> Path:
-    imagens = [_rgba_da_variacao(peca, args) for _, args in PECAS[peca].variacoes]
-    alto = max(i.shape[0] for i in imagens)
-    linha = np.zeros((alto, sum(i.shape[1] for i in imagens) + 4 * (len(imagens) - 1), 4), dtype=np.uint8)
-    x = 0
-    for img in imagens:
-        linha[alto - img.shape[0]:, x:x + img.shape[1]] = img
-        x += img.shape[1] + 4
+    """As 3 variações da peça, a 3×, na vista S."""
+    style = estilo_base()
+    est, pal = estilo_render(style), {p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in style.palette}
+    imagens = [quadro_de_repouso(ir_da_composicao(de_uma_peca(peca, args)), est, "S").to_rgba(pal)
+               for _, args in PECAS[peca].variacoes]
     alvo = destino / f"{peca}.png"
-    salvar_png(alvo, linha)
+    salvar_png(alvo, grade([imagens], AMPLIA))
     return alvo
 
 
