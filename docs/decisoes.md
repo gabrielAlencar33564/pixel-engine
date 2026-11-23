@@ -96,3 +96,10 @@ substituído). O porquê longo vai no commit.
   pontilhada não projeta, e a árvore voltava 50 px mais larga sem isso.
 - O balanço por deslocamento e o giro do prop vêm junto (o contrato os declara: aceitar e não gerar seria mentir, I8);
   o balanço da árvore sintética é igual ao antigo quadro a quadro; a recusa do giro mora na validação (a prévia a vê).
+
+## N4
+
+- A skill é a fonte do caminho; `scripts/skill.py` gera dela a tabela de porte (dos dados do motor), o espelho em
+  `.agents/skills/` e o formulário `docs/pedido.md`, e o teste confere que estão em dia (I6, sem texto em dobro).
+- Os quatro exemplos são assets do padrão vigente sem relação com os pedidos da prova (um banco, uma folhosa, um
+  viajante, um canino) e passam pelo mesmo `renderizar` do build.

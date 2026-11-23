@@ -1,0 +1,23 @@
+{
+ "id": "arvore_folhosa", "revision": 1,
+ "description": "Árvore folhosa de quintal: tronco curto, galhos grossos em leque e a copa redonda em cachos pontilhados",
+ "reference": "Folhosa jovem de quintal: 3 m de altura, copa redonda de 2,8 m com a base a 1 m, tronco de 30 cm; a vida está nos cachos de folha com luz em cima e o miolo escuro",
+ "tipo": "prop", "categoria": "arvore_pequena", "semente": 77,
+ "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.35", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
+ "sombra": {"meia_largura": "$a * 0.5", "dy": "-1px"},
+ "nos": [
+  {"id": "tronco", "peca": "tronco_em_pe", "grupo": "tronco",
+   "args": {"altura": "$copa0", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca"}},
+  {"id": "galhos", "peca": "galhos_grossos", "grupo": "galhos",
+   "args": {"base": "$copa0 * 0.9", "copa": ["$a", "$c", "$cz"], "n": "5", "largura": ["3px", "4px"],
+            "ponta": "1.2px", "material": "tabua_escura", "claro": "casca"}},
+  {"id": "copa", "peca": "pontilhado", "grupo": "copa",
+   "args": {"copa": ["$a", "$c", "$cz"], "n": "20", "raio": ["6px", "8px"], "cachos": "galhos.pontas",
+            "tons": [["folhosa_clara", "folhosa_clara", "folhosa"], ["folhosa", "folhosa_clara", "folhosa_escura"],
+                     ["folhosa_escura", "folhosa", "folhosa_funda"]], "pontos": ["720", "0", "0"]}}
+ ],
+ "vistas": {"S": {}}, "landmarks": {"sort_front": ["0", "0", "0"]},
+ "movimento": ["static"],
+ "tracos": [{"id": "copa_redonda", "description": "A copa redonda sobre o tronco", "parts": ["copa_00"],
+             "verification": "observable"}]
+}

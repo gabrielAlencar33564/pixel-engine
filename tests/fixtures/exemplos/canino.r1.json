@@ -1,0 +1,15 @@
+{
+ "id": "canino", "revision": 1,
+ "description": "Cão de fazenda de pelo curto: orelha caída, cauda enrolada, patas claras",
+ "reference": "Vira-lata de porte médio: 50 cm na cernelha, 55 cm do peito à garupa, cabeça de 24 cm; pelo castanho com patas e peito claros",
+ "tipo": "quadrupede", "categoria": "quadrupede", "semente": 9,
+ "nos": [
+  {"id": "corpo", "peca": "corpo_canino", "args": {"altura": "0.50m", "comprimento": "0.55m", "cabeca": "0.24m",
+   "cauda": "0.25m", "orelha": "0", "cauda_alta": "1", "pelagem": "pelo_castanho", "meias": "olho_claro",
+   "olhos": "olho"}}
+ ],
+ "vistas": {"S": {}, "SW": {}, "W": {}, "NW": {}, "N": {}, "NE": {}, "E": {}, "SE": {}},
+ "movimento": ["idle", "walk"],
+ "tracos": [{"id": "cauda_enrolada", "description": "A cauda enrolada por cima da garupa", "parts": ["tail_brush"],
+             "verification": "observable"}]
+}

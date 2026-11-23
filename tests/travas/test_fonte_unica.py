@@ -3,8 +3,12 @@ pela skill única, e nenhum deles repete uma regra dele. A skill tem o espelho e
 
 from __future__ import annotations
 
+import importlib.util
 import re
 from pathlib import Path
+from types import ModuleType
+
+import pytest
 
 from .fontes import ROOT
 
@@ -61,3 +65,22 @@ def test_controle_a_regra_repetida_e_o_espelho_velho_sao_achados(tmp_path: Path)
         "AGENTS.md repete: Quem anda tem as 8 direções.",
         "o espelho de engine em .agents/skills/ difere",
     ]
+
+
+def _script_da_skill() -> ModuleType:
+    spec = importlib.util.spec_from_file_location("skill_script", ROOT / "scripts" / "skill.py")
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_a_tabela_de_porte_o_espelho_e_o_pedido_estao_em_dia() -> None:
+    """Gerados da skill e dos dados do motor por ``scripts/skill.py``."""
+    assert _script_da_skill().velhos() == []
+
+
+def test_controle_a_faixa_mudada_deixa_a_skill_velha(monkeypatch: pytest.MonkeyPatch) -> None:
+    mod = _script_da_skill()
+    monkeypatch.setitem(mod.FAIXAS, "arbusto", (0.2, 1.0, "~0,6×"))
+    assert mod.SKILL in mod.velhos()

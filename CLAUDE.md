@@ -5,4 +5,5 @@ o estado e o próximo passo, em `docs/estado.md`; as decisões, em `docs/decisoe
 
 - Instalação: `uv sync`. Validação antes de cada commit: `uv run python scripts/check.py` (`--fast` no ciclo rápido).
 - Oráculo de pixel: `uv run python scripts/oraculo.py` (lê o `pixel-engine` por `git archive`, nunca escreve nele).
-- Para criar, completar ou corrigir um asset, use a skill `.claude/skills/pixel-asset-engine/`.
+- Para criar, completar ou corrigir um asset, use a skill `.claude/skills/pixel-asset-engine/`. Depois de editá-la,
+  `uv run python scripts/skill.py` refaz a tabela de porte, o espelho em `.agents/skills/` e o `docs/pedido.md`.

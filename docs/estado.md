@@ -40,15 +40,17 @@ no chão (antes cortada); a luz é da câmera.
 que o build recusa; a revisão do dono é o único caminho para publicar. Estático: prévia 0,5 s, checar 0,4 s, build e
 export em ~2 s de relógio cada (com a partida do Python).
 
+**N4 — as regras e a skill.** A skill única (`.claude/skills/pixel-asset-engine/`, do pedido ao export), o espelho
+e o formulário de pedido gerados dela; os quatro exemplos em `tests/fixtures/exemplos/`; o balanço e o giro do prop.
+
 ## Números
 
-| Medida | N0 | N1 | N2a | N2b | N2c | N2d | N3 |
-|---|---|---|---|---|---|---|---|
-| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 | 7 777 | 8 115 |
-| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 | 137 | 143 |
-| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes | 17 s, 199 testes | 18 s, 207 testes |
+| Medida | N0 | N1 | N2a | N2b | N2c | N2d | N3 | N4 |
+|---|---|---|---|---|---|---|---|---|
+| Linhas em `src/` | 1 | 2 431 | 4 833 | 5 613 | 7 228 | 7 777 | 8 115 | 8 203 |
+| Arquivos rastreados | 24 | 72 | 101 | 111 | 127 | 137 | 143 | 151 |
+| `check.py` completo | 9 s, 18 testes | 9 s, 26 testes | 10 s, 83 testes | 12 s, 108 testes | 17 s, 182 testes | 17 s, 199 testes | 18 s, 207 testes | 22 s, 222 testes |
 
 ## Próximo passo
 
-**N4:** o `docs/regras.md`, o `CLAUDE.md` e o `AGENTS.md` curtos, a skill única (e o espelho), o formulário de pedido
-e os quatro exemplos em `tests/fixtures/exemplos/`.
+**N5:** a prova de fora com um subagente novo, sem contexto, nos três pedidos do plano (seção 7), até três rodadas.

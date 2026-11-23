@@ -1,0 +1,19 @@
+{
+ "id": "viajante", "revision": 1,
+ "description": "Viajante a pé: blusa de manga comprida, calça presa na canela, chapéu de aba larga e bolsa a tiracolo",
+ "reference": "Viajante de estrada de 1,72 m: roupa de linho e lã, chapéu de palha velha, bolsa de couro no quadril direito",
+ "tipo": "humanoide", "categoria": "humano", "semente": 12,
+ "nos": [
+  {"id": "corpo", "peca": "corpo_humano", "args": {"estatura": "1.72m", "pele": "pele", "juntas": "pele"}},
+  {"id": "blusa", "peca": "jaqueta", "args": {"material": "linho", "manga": "3", "largura": "115%"}},
+  {"id": "calca", "peca": "calca", "args": {"material": "pano_azul", "detalhe": "couro", "barra": "1"}},
+  {"id": "pes", "peca": "tabi", "args": {"material": "couro"}},
+  {"id": "olhos", "peca": "olhos", "args": {"material": "olho"}},
+  {"id": "chapeu", "peca": "chapeu", "args": {"material": "fibra", "largura": "150%"}},
+  {"id": "bolsa", "peca": "bolsa", "args": {"material": "couro"}}
+ ],
+ "vistas": {"S": {}, "SW": {}, "W": {}, "NW": {}, "N": {}, "NE": {}, "E": {}, "SE": {}},
+ "movimento": ["idle", "walk"],
+ "tracos": [{"id": "chapeu_largo", "description": "O chapéu de aba larga", "parts": ["hat_brim"],
+             "verification": "observable"}]
+}
