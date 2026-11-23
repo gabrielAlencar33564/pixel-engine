@@ -55,6 +55,7 @@ class Ctx:
     ancoras: dict[str, list[Any]] = field(default_factory=dict)
     por_vista: dict[str, dict[str, dict[str, Any]]] = field(default_factory=dict)
     no: str = ""
+    humano: dict[str, Any] = field(default_factory=dict)  # o corpo em montagem: as medidas e o que a roupa pede
 
     def deixa(self, nome: str, pontos: list[Any]) -> None:
         """Deixa a âncora ``<nó>.<nome>`` (as repetições do nó somam os pontos) para os nós seguintes."""

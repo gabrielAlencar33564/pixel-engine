@@ -1,0 +1,43 @@
+{
+  "id": "andar_poses",
+  "clip": "walk",
+  "tipo": "passada_poses",
+  "descricao": "Caminhada por poses-chave das folhas de referência (ADR 0155): contato, descida, passagem e subida; 16 quadros em 960 ms, meia passada de 0,28 m, o pé rola (calcanhar, chapado, ponta), o quadril pelas poses e o corpo com atraso.",
+  "duracao_ms": 960,
+  "passo_ms": 60,
+  "pernas": [["perna_l", 0], ["perna_r", 480]],
+  "pe": {
+    "sai": 0.58, "chapa": 0.07, "calcanhar_sobe": 0.30, "bola_m": 0.10, "calcanhar_m": 0.045,
+    "pousa_mdeg": 15000, "empurra_mdeg": -35000, "sobe_m": 0.075,
+    "avanco": [[0.0, 0.0], [0.18, 0.06], [0.45, 0.42], [0.80, 0.90], [1.0, 1.0]],
+    "altura": [[0.0, 0.0], [0.22, 0.85], [0.42, 1.0], [0.75, 0.45], [1.0, 0.0]],
+    "inclina_meio": [[0.30, -22.0], [0.65, -2.0]],
+    "inclina_pouso_em": 0.88,
+    "interpolacao": "pchip"
+  },
+  "quadril": {"chaves_m": [[0.0, 0.036], [0.16, 0.066], [0.50, 0.014], [0.76, 0.0], [1.0, 0.036]], "alcance": 0.985},
+  "curvas": {
+    "desce": {"sobre": "passo", "chaves": [[0.0, 0.3], [0.16, 1.0], [0.5, -0.2], [0.76, -0.6], [1.0, 0.3]]},
+    "desce_atraso": {"sobre": "passo", "chaves": [[0.0, 0.0], [0.24, 1.0], [0.58, -0.1], [0.84, -0.6], [1.0, 0.0]]}
+  },
+  "canais": {
+    "pelve.base": {"tr": [{"termos": [{"metros": 0.018, "onda": "sin", "fase": 0.06}]}, 0, "-queda"],
+                   "rot": {"termos": [{"amp": 1, "par": "hip_yaw_mdeg", "padrao": 6000, "onda": "cos", "fase": 0}]}},
+    "pelve.lado": {"rot": {"termos": [{"amp": -2200, "onda": "sin", "fase": 0.04}]}},
+    "coluna.lado": {"rot": {"termos": [{"amp": 1400, "onda": "sin", "fase": 0.08}]}},
+    "coluna.giro": {"rot": {"termos": [{"amp": -1.8, "par": "hip_yaw_mdeg", "padrao": 6000, "onda": "cos",
+                                        "fase": 0.03}]}},
+    "coluna.frente": {"rot": {"termos": [{"k": -5000}, {"amp": -1800, "curva": "desce"}]}},
+    "pescoco.frente": {"rot": {"termos": [{"amp": 1200, "curva": "desce_atraso"}]}},
+    "cabeca.giro": {"rot": {"termos": [{"amp": 0.8, "par": "hip_yaw_mdeg", "padrao": 6000, "onda": "cos", "fase": 0}]}},
+    "cabeca.frente": {"rot": {"termos": [{"k": 3600}, {"amp": -900, "curva": "desce_atraso"}]}},
+    "braco_r.frente": {"rot": {"termos": [{"k": -7000}, {"amp": 23000, "onda": "cos", "fase": 0.045}]}},
+    "braco_l.frente": {"rot": {"termos": [{"k": -7000}, {"amp": -23000, "onda": "cos", "fase": 0.045}]}},
+    "braco_r.cotovelo": {"rot": {"termos": [{"k": 4000}, {"amp": 26000, "onda": "cos", "fase": 0.045, "corte": "pos",
+                                                         "pot": 1.4}]}},
+    "braco_l.cotovelo": {"rot": {"termos": [{"k": 4000}, {"amp": 26000, "onda": "cos", "fase": 0.045, "corte": "neg",
+                                                         "pot": 1.4}]}},
+    "braco_r.mao": {"rot": {"termos": [{"amp": -9000, "onda": "sin", "fase": 0.10}]}},
+    "braco_l.mao": {"rot": {"termos": [{"amp": 9000, "onda": "sin", "fase": 0.10}]}}
+  }
+}

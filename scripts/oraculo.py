@@ -38,6 +38,7 @@ CAMINHOS = ["src", "presets", "schemas", "pyproject.toml", "README.md", "LICENSE
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "oraculo"
 # os argumentos que a peça antiga pedia para os modos que não vieram (o tronco chapado e o de volume por máscara): o
 # antigo os recebe, com o modo sólido ligado, e os ignora
+NOVAS = {"saia", "lenco"}  # as peças que nasceram na engine nova: o oráculo não as tem
 SO_NO_ANTIGO = {"tronco_em_pe": {"sombra": "plank_deep", "marca": "plank_deep", "pe": "plank_deep", "solido": True}}
 DIRECOES = ("S", "SW", "W", "NW", "N", "NE", "E", "SE")
 
@@ -142,6 +143,25 @@ def antigo(destino: Path, casos: list[dict[str, Any]], estilo: dict[str, Any] | 
             for nome, vistas in saida.items()}
 
 
+def humano_antigo(comp: dict[str, Any]) -> dict[str, Any]:
+    """O humano no formato antigo: o rig do modelo e o andar pela receita das poses."""
+    velho = composicao_antiga(comp)
+    mov = [{"clip": "walk", "receita": "andar_poses"} if m == "walk" else m for m in comp["movimento"]]
+    return {**velho, "rig": "humanoid_v2", "movimento": mov}
+
+
+def gravar_humanos(destino: Path, sha: str) -> None:
+    """Os humanos sintéticos de ``humanos/``: o parado e o andar em cada vista, quadro a quadro."""
+    casos = []
+    for arq in sorted((FIXTURES / "humanos").glob("*.json")):
+        comp = json.loads(arq.read_text(encoding="utf-8"))
+        casos.append({"nome": arq.name.removesuffix(".r1.json"), "composicao": humano_antigo(comp),
+                      "vistas": list(comp["vistas"]), "clipes": {"idle": "parado", "walk": "andar_poses"}})
+    saida = antigo(destino, casos, estilo_base_antigo())
+    _salvar(FIXTURES / "humanos.esperado.json", {"pixel_engine": sha, "casos": saida})
+    print(f"humanos: {sum(len(v) for v in saida.values())} quadros gravados")
+
+
 def _salvar(alvo: Path, dado: dict[str, Any]) -> None:
     alvo.write_text(json.dumps(dado, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
@@ -167,9 +187,14 @@ def estilo_base_antigo() -> dict[str, Any]:
     return estilo_antigo({**novo, "materials": mats})
 
 
+def _antiga_da_peca(pid: str, args: dict[str, Any]) -> dict[str, Any]:
+    comp = de_uma_peca(pid, args).model_dump(mode="json")
+    return humano_antigo(comp) if comp["tipo"] == "humanoide" else composicao_antiga(comp)
+
+
 def gravar_kit(destino: Path, sha: str) -> None:
-    casos = [{"nome": f"{pid}/{nome}", "composicao": composicao_antiga(de_uma_peca(pid, args).model_dump(mode="json")),
-              "vistas": ["S"]} for pid, p in sorted(PECAS.items()) if p.tipo == "prop" for nome, args in p.variacoes]
+    casos = [{"nome": f"{pid}/{nome}", "composicao": _antiga_da_peca(pid, args), "vistas": ["S"]}
+             for pid, p in sorted(PECAS.items()) if pid not in NOVAS for nome, args in p.variacoes]
     saida = antigo(destino, casos, estilo_base_antigo())
     _salvar(FIXTURES / "kit.esperado.json", {"pixel_engine": sha, "casos": saida})
     print(f"kit: {len(saida)} variações gravadas")
@@ -192,6 +217,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--versao", action="store_true", help="exporta e mostra o commit e a versão do motor antigo")
     ap.add_argument("--kit", action="store_true", help="grava o esperado das variações do kit")
     ap.add_argument("--composicoes", action="store_true", help="grava o esperado das composições sintéticas")
+    ap.add_argument("--humanos", action="store_true", help="grava o esperado dos humanos sintéticos (parado e andar)")
     ap.add_argument("casos", nargs="*", type=Path, help="os casos de IR para gravar o esperado")
     args = ap.parse_args(argv)
     sha = commit()
@@ -206,6 +232,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         gravar_kit(destino, sha)
     if args.composicoes:
         gravar_composicoes(destino, sha)
+    if args.humanos:
+        gravar_humanos(destino, sha)
     return 0
 
 

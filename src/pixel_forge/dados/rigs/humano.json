@@ -1,0 +1,360 @@
+{
+ "id": "humano",
+ "descricao": "O rig do humano: os ossos com os nomes de sempre e as juntas de um grau (comprimento 0, eixo próprio). Posições e comprimentos em px, nas medidas do cânone.",
+ "ossos": [
+  {
+   "id": "root",
+   "pai": [],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "z",
+   "limites": [
+    -180,
+    180
+   ]
+  },
+  {
+   "id": "pelvis",
+   "pai": [
+    "root"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "$quadril_z"
+   ],
+   "eixo": "z",
+   "comp": "1",
+   "limites": [
+    -40,
+    40
+   ]
+  },
+  {
+   "id": "pelvis_tilt",
+   "pai": [
+    "pelvis"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "y",
+   "limites": [
+    -15,
+    15
+   ]
+  },
+  {
+   "id": "waist",
+   "pai": [
+    "pelvis_tilt"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "z",
+   "limites": [
+    -40,
+    40
+   ]
+  },
+  {
+   "id": "spine_side",
+   "pai": [
+    "waist"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "y",
+   "limites": [
+    -30,
+    30
+   ]
+  },
+  {
+   "id": "torso",
+   "pai": [
+    "spine_side"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "x",
+   "comp": "$tronco",
+   "limites": [
+    -80,
+    30
+   ]
+  },
+  {
+   "id": "neck",
+   "pai": [
+    "torso"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "$tronco"
+   ],
+   "eixo": "x",
+   "comp": "$pescoco + 0.25*$cabeca",
+   "limites": [
+    -40,
+    50
+   ]
+  },
+  {
+   "id": "head_turn",
+   "pai": [
+    "neck"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "$pescoco + 0.25*$cabeca"
+   ],
+   "eixo": "z",
+   "limites": [
+    -70,
+    70
+   ]
+  },
+  {
+   "id": "head",
+   "pai": [
+    "head_turn"
+   ],
+   "pos": [
+    "0",
+    "0",
+    "0"
+   ],
+   "eixo": "x",
+   "comp": "0.75*$cabeca",
+   "limites": [
+    -35,
+    30
+   ]
+  },
+  {
+   "lados": [
+    {
+     "id": "shoulder_{lado}",
+     "pai": [
+      "torso"
+     ],
+     "pos": [
+      "$lado*$ombro_x",
+      "0",
+      "$tronco"
+     ],
+     "eixo": "y",
+     "limites": {
+      "l": [
+       -170,
+       80
+      ],
+      "r": [
+       -80,
+       170
+      ]
+     },
+     "repouso": "-$lado*$abre_braco_mdeg"
+    },
+    {
+     "id": "upper_arm_{lado}",
+     "pai": [
+      "shoulder_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "0"
+     ],
+     "eixo": "x",
+     "comp": "$braco",
+     "limites": [
+      -50,
+      170
+     ]
+    },
+    {
+     "id": "arm_twist_{lado}",
+     "pai": [
+      "upper_arm_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$braco"
+     ],
+     "eixo": "z",
+     "limites": [
+      -100,
+      100
+     ]
+    },
+    {
+     "id": "forearm_{lado}",
+     "pai": [
+      "arm_twist_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "0"
+     ],
+     "eixo": "x",
+     "comp": "$antebraco",
+     "limites": [
+      0,
+      145
+     ],
+     "repouso": "$dobra_cotovelo_mdeg"
+    },
+    {
+     "id": "hand_{lado}",
+     "pai": [
+      "forearm_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$antebraco"
+     ],
+     "eixo": "x",
+     "comp": "$mao",
+     "limites": [
+      -70,
+      70
+     ]
+    },
+    {
+     "id": "hip_{lado}",
+     "pai": [
+      "pelvis_tilt"
+     ],
+     "pos": [
+      "$lado*$quadril_x",
+      "0",
+      "0"
+     ],
+     "eixo": "y",
+     "limites": {
+      "l": [
+       -45,
+       15
+      ],
+      "r": [
+       -15,
+       45
+      ]
+     },
+     "repouso": "-$lado*$abre_perna_mdeg"
+    },
+    {
+     "id": "thigh_{lado}",
+     "pai": [
+      "hip_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "0"
+     ],
+     "eixo": "x",
+     "comp": "$coxa",
+     "limites": [
+      -30,
+      120
+     ]
+    },
+    {
+     "id": "shin_{lado}",
+     "pai": [
+      "thigh_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$coxa"
+     ],
+     "eixo": "x",
+     "comp": "$canela",
+     "limites": [
+      -140,
+      5
+     ]
+    },
+    {
+     "id": "foot_{lado}",
+     "pai": [
+      "shin_{lado}"
+     ],
+     "pos": [
+      "0",
+      "0",
+      "-$canela"
+     ],
+     "eixo": "x",
+     "comp": "0.6*$pe",
+     "limites": [
+      -45,
+      45
+     ]
+    }
+   ]
+  }
+ ],
+ "papeis": {
+  "raiz": {
+   "giro": "root"
+  },
+  "pelve": {
+   "base": "pelvis",
+   "lado": "pelvis_tilt"
+  },
+  "coluna": {
+   "giro": "waist",
+   "lado": "spine_side",
+   "frente": "torso"
+  },
+  "pescoco": {
+   "frente": "neck"
+  },
+  "cabeca": {
+   "giro": "head_turn",
+   "frente": "head"
+  },
+  "braco_{lado}": {
+   "abre": "shoulder_{lado}",
+   "frente": "upper_arm_{lado}",
+   "giro": "arm_twist_{lado}",
+   "cotovelo": "forearm_{lado}",
+   "mao": "hand_{lado}"
+  },
+  "perna_{lado}": {
+   "abre": "hip_{lado}",
+   "frente": "thigh_{lado}",
+   "joelho": "shin_{lado}",
+   "pe": "foot_{lado}"
+  }
+ },
+ "anexos": {
+  "saia_{lado}": {
+   "frente": "skirt_{lado}"
+  }
+ }
+}

@@ -66,3 +66,17 @@ def test_a_peca_que_o_kit_nao_tem_e_recusada_com_dica(tmp_path: Path, capsys: py
     assert main(["build", str(comp), "--acervo", str(tmp_path), "--json"]) == 2
     erro = json.loads(capsys.readouterr().out)["errors"][0]
     assert erro["code"] == "PECA" and "poste" in erro["hint"]
+
+
+@pytest.mark.parametrize(("categoria", "codigo"), [("arvore_grande", 2), ("objeto", 0)])
+def test_o_porte_fora_da_categoria_e_recusado_com_o_porte_esperado(
+        tmp_path: Path, capsys: pytest.CaptureFixture[str], categoria: str, codigo: int) -> None:
+    """O mourão de 1,1 m não é uma árvore grande: a recusa diz o porte da categoria; como objeto, ele passa."""
+    dado = json.loads(COMP.read_text(encoding="utf-8"))
+    dado["categoria"] = categoria
+    comp = tmp_path / "x.r1.json"
+    comp.write_text(json.dumps(dado), encoding="utf-8")
+    assert main(["build", str(comp), "--acervo", str(tmp_path), "--json"]) == codigo
+    if codigo:
+        erro = json.loads(capsys.readouterr().out)["errors"][0]
+        assert erro["code"] == "PORTE" and "~2,5×" in erro["hint"] and "metros" in erro["hint"]

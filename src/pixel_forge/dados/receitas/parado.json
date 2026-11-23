@@ -1,0 +1,21 @@
+{
+  "id": "parado",
+  "clip": "idle",
+  "tipo": "parado",
+  "descricao": "Em pé, respirando: o quadril desce e volta, o tronco e a cabeça acompanham, os braços atrasam 80 ms.",
+  "duracao_ms": 1200,
+  "chaves_ms": [0, 300, 600, 900, 1200],
+  "suave": "smoothstep",
+  "amostras_ms": [0, 200, 400, 600, 800, 1000],
+  "marcas": {"0": ["breath_in"], "600": ["breath_out"]},
+  "pes": ["perna_l", "perna_r"],
+  "canais": {
+    "pelve.base": {"tr": [0, 0, {"termos": [{"amp": 1, "par": "idle_bob_q8", "onda": "vale"}]}], "rot": 0},
+    "coluna.frente": {"rot": {"termos": [{"amp": 2500, "onda": "vale"}]}},
+    "cabeca.frente": {"rot": {"termos": [{"amp": -2500, "onda": "vale"}]}},
+    "braco_l.frente": {"rot": {"termos": [{"amp": -2500, "onda": "vale", "atraso_ms": 80}]}},
+    "braco_r.frente": {"rot": {"termos": [{"amp": 2500, "onda": "vale", "atraso_ms": 80}]}},
+    "braco_l.cotovelo": {"rot": {"termos": [{"amp": -4000, "onda": "vale", "atraso_ms": 80}]}},
+    "braco_r.cotovelo": {"rot": {"termos": [{"amp": -4000, "onda": "vale", "atraso_ms": 80}]}}
+  }
+}

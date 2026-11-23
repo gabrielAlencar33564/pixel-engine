@@ -143,3 +143,4 @@ class AssetIR(Strict):
     parts: list[PartDef]
     views: dict[Direcao, ViewSpec]
     landmarks: list[LandmarkDef] = Field(default_factory=list)
+    modelo: Id | None = None  # o modelo de rig (os papéis que o movimento cita); o prop não tem

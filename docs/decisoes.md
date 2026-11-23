@@ -58,3 +58,11 @@ substituído). O porquê longo vai no commit.
 - O tronco em pé só tem o modo sólido de revolução: o chapado e o de volume por máscara eram o jeito substituído
   (I3: pedir `solido`, `sombra` ou `marca` é argumento desconhecido, recusado com a lista do que a peça aceita).
 - A folhagem de copa é o `pontilhado`; a peça `pacotes` não existe no kit (seção 5; I3).
+- O humano usa o rig `humano` (o `humanoid_v2` sem os ossos da cambalhota, do giro da coxa e do dedo do pé): o v3 e a
+  cambalhota eram treino de combate (seção 4). O rig declara os papéis; a peça pede o papel, não o nome do osso.
+- O andar é só a passada por poses-chave com IK (`andar_poses`); o andar de pêndulo era o jeito substituído (I3).
+- A saia e o lenço são peças gerais novas, a lição da moleira: a barra da saia segue a coxa (35 %, 90 ms de atraso).
+  Ficam provadas por teste sintético e o controle sem saia (mecanismo 1).
+- O capuz com máscara, a ombreira e as molas de cabelo não vêm: eram treino de personagem e de combate (seção 4).
+- O porte é a altura no mundo (o ponto mais alto no repouso, sem a sombra) contra a faixa da categoria, em humanos de
+  1,65 m; o build recusa com o porte típico na dica. O catálogo de peças não confere: a peça sozinha não tem categoria.

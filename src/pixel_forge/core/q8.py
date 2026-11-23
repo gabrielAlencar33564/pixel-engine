@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from math import isqrt
 
 Q30_SHIFT = 30
 ONE_Q30 = 1 << Q30_SHIFT
@@ -54,3 +55,56 @@ def sin_cos_q30(mdeg: int) -> tuple[int, int]:
     s = (s60 + (1 << (desloca - 1))) >> desloca
     c = (c60 + (1 << (desloca - 1))) >> desloca
     return ((s, c), (c, -s), (-s, -c), (-c, s))[quadrante]
+
+
+def round_half_up_div(n: int, d: int) -> int:
+    """floor(n/d + 1/2) para d > 0, correto para negativos (sem ties-to-even)."""
+    return (2 * n + d) // (2 * d)
+
+
+def normalize_mdeg(a: int) -> int:
+    """O ângulo em (-180000, 180000]."""
+    a %= FULL_TURN_MDEG
+    return a - FULL_TURN_MDEG if a > 180_000 else a
+
+
+def shortest_arc_mdeg(a: int, b: int) -> int:
+    """b - a pelo menor arco; o empate de 180° vale +180000."""
+    d = (b - a) % FULL_TURN_MDEG
+    return d - FULL_TURN_MDEG if d > 180_000 else d
+
+
+def _atan_primeiro_octante(y: int, x: int) -> int:
+    """O ângulo (mdeg) de 0 <= y <= x, x > 0, por bisseção exata em inteiros e o vizinho de menor resíduo."""
+    lo, hi = 0, 45_000
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        s, c = sin_cos_q30(mid)
+        if s * x <= y * c:
+            lo = mid
+        else:
+            hi = mid - 1
+    if lo < 45_000:
+        s0, c0 = sin_cos_q30(lo)
+        s1, c1 = sin_cos_q30(lo + 1)
+        if abs(s1 * x - y * c1) < abs(s0 * x - y * c0):
+            lo += 1
+    return lo
+
+
+def atan2_mdeg(y: int, x: int) -> int:
+    """atan2 determinístico em miligraus, em (-180000, 180000]."""
+    if x == 0 and y == 0:
+        return 0
+    ax, ay = abs(x), abs(y)
+    base = _atan_primeiro_octante(ay, ax) if ay <= ax else 90_000 - _atan_primeiro_octante(ax, ay)
+    if x >= 0:
+        return normalize_mdeg(base if y >= 0 else -base)
+    return normalize_mdeg(180_000 - base if y >= 0 else -(180_000 - base))
+
+
+def acos_mdeg(num: int, den: int) -> int:
+    """acos(num/den) em mdeg, com num/den limitado a [-1, 1]."""
+    num = max(-den, min(den, num)) << 32
+    den <<= 32
+    return atan2_mdeg(isqrt(den * den - num * num), num)

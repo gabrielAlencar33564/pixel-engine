@@ -34,11 +34,12 @@ class Parte:
 
 @dataclass(frozen=True)
 class Junta:
-    """Como o osso gira: o eixo, o comprimento (q8) e os limites do ângulo (miligraus)."""
+    """Como o osso gira: o eixo, o comprimento (q8), os limites do ângulo e o ângulo de repouso (miligraus)."""
 
     eixo: str = "x"
     comprimento: int = 0
     limites: tuple[int, int] = (-180_000, 180_000)
+    repouso: int = 0
 
 
 JUNTA = Junta()
@@ -52,7 +53,7 @@ class AssetBuilder:
 
     def bone(self, id: str, parent: str | None, t: list[int], junta: Junta = JUNTA) -> None:
         """Um osso de translação ``t`` (q8) a partir do pai."""
-        self.bones.append({"id": id, "parent_id": parent, "rest_translation_q8": t, "rest_rotation_mdeg": 0,
+        self.bones.append({"id": id, "parent_id": parent, "rest_translation_q8": t, "rest_rotation_mdeg": junta.repouso,
                            "rotation_axis": junta.eixo, "length_q8": junta.comprimento,
                            "angle_limits_mdeg": list(junta.limites)})
 

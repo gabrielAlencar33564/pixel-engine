@@ -82,6 +82,87 @@
     "rgba_sha256": "7042596ec554f58e05f6462f7f8d77d0bc57fe8a5ebb64635fa17cbee80251e6"
    }
   },
+  "bolsa/de pano": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "739ef41dac3960336a911fae74fd6524ee67738bed02d242a20fe5c1301afef0"
+   }
+  },
+  "bolsa/de couro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "316c262af357c1d6778e265e56341c198f1fbe0eb16ead312df3d3a261e01a61"
+   }
+  },
+  "bolsa/escura": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "7278bb9c05945fc204921d117c72c23186cbd2955edf989772f71fcc9e33cd93"
+   }
+  },
+  "cabelo_preso/escuro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "0881dafbb04c41e1a21deba2aaa0fc3afb08146cd4c831f9834676e785f7cee5"
+   }
+  },
+  "cabelo_preso/pano": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "e86b972c1b7bdf1ab0748b54297a815808da781db93046a42f81d9d3c2e64a0b"
+   }
+  },
+  "cabelo_preso/palha": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "321c9ae54d18bbb6bfbc29011b96a33fbcaf19538399f5ff1d19301ddb6dd369"
+   }
+  },
+  "calca/folgada": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "d88628705405ecdf2f4c99413b91bbfc7e75a4384a62a4449d65b01903df8f0c"
+   }
+  },
+  "calca/larga": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "88297b5747181d3f601120f08311d43635a271e4f06d2a6147cd523c83a10083"
+   }
+  },
+  "calca/presa": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "599fd8c49bb06801ec1efd9fdb1a1b6ddedc43cc23d96e8c6bab31418376edb2"
+   }
+  },
   "cercado/curto": {
    "S": {
     "tamanho": [
@@ -109,6 +190,33 @@
     "rgba_sha256": "b20ab39e63e29e5912dd0da2c3de5e590ed4e4bcd55cdf684b490430e7c6aed7"
    }
   },
+  "chapeu/de feltro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "12d960942efe7fbc51d2bfbcfd874eeef8e2e00a94d1f76d082a6e784cbb71df"
+   }
+  },
+  "chapeu/aba curta": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "0edf19724df724a15a25e51d090b6d1739323363178f207f8dec22cdf3e0b872"
+   }
+  },
+  "chapeu/de palha": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "e18b6dd51e70b6bf89b357fb5e137a2b68bff109e2c6ad2e7e6f922a200c27cd"
+   }
+  },
   "corda/esticada": {
    "S": {
     "tamanho": [
@@ -134,6 +242,33 @@
      31
     ],
     "rgba_sha256": "a33d3d3cc8eee20e1ac7c058fdfa0c628f2ee5a2eec2e1558a911efee963dc27"
+   }
+  },
+  "corpo_humano/adulto de madeira": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "24847fc3c1f2bec8cdbc3183ec3e5ea9293295f110be67b17dc3e7f55d4a1ace"
+   }
+  },
+  "corpo_humano/criança": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "6dba2e36cba04c40c251b68f51d1c68683b8abda371b69bdd274521e0e025ec4"
+   }
+  },
+  "corpo_humano/forte, de pele": {
+   "S": {
+    "tamanho": [
+     96,
+     112
+    ],
+    "rgba_sha256": "dc57f46fea1370154ae6481882ea1c9e5b75b2b7c8508f71f123e6585dfdbad9"
    }
   },
   "cortinas/cheias": {
@@ -188,6 +323,33 @@
      21
     ],
     "rgba_sha256": "38f958053c30a315cc8b7f359b11f31dd13781b6d1f6580f0667ec9ef2a7f41a"
+   }
+  },
+  "faixa/palha": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "6fec3a6e1def52a15e3f8f4ca54270ac5d6d820f6d91de55a6804f50804f07ce"
+   }
+  },
+  "faixa/couro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "28589a9ce2e8e2416d7e5a2234d73e259c88619c2811283ab60b0320eba6d117"
+   }
+  },
+  "faixa/ponta de outra cor": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "d510037922014e223b058a8193049829c58996e82bda1a76b549af0c32f8f30e"
    }
   },
   "fios/monte": {
@@ -325,6 +487,33 @@
     "rgba_sha256": "b06b3c31047144515e0f6007cd8b1e4e20d5ae1f6b1efd128e3307ae212d84b4"
    }
   },
+  "jaqueta/curta": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "6e7358abe1393863d9f5234445616881b0d73fd8481aabf530c258e21e12417d"
+   }
+  },
+  "jaqueta/larga": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "787ae8ae42afae0c5879892a961b00f2517c6bef43d87a02b3aabaf284c70395"
+   }
+  },
+  "jaqueta/ao punho": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "06af2c38ad96c17e6f1b80a5ae9ab3ed9b155985c8e3bb1e68da8e712c069245"
+   }
+  },
   "muro_fiadas/baixo": {
    "S": {
     "tamanho": [
@@ -350,6 +539,33 @@
      45
     ],
     "rgba_sha256": "7727fd50884b65c1d9d332af41b223114588ad16563b271323c2267d26bf12be"
+   }
+  },
+  "olhos/escuros": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993"
+   }
+  },
+  "olhos/couro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993"
+   }
+  },
+  "olhos/claros": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "c17d660999aaed99d593369e50dc2560a9a21bb928fd7ba6ffc4c81beb847993"
    }
   },
   "parede_tabuas/parede": {
@@ -485,6 +701,60 @@
      53
     ],
     "rgba_sha256": "2792335b789da4b350ff6a1a3635a8a085f5862e6e74b120dc57f9c37ab410a1"
+   }
+  },
+  "sandalia/palha": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "1474bcd05870473155dc3422e27af8c6c4ce81ff2e043c2d27fe1547107ad589"
+   }
+  },
+  "sandalia/tira de couro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "ccbe4e75e9365683aca6338e939fdebac7fd684cf2a0aa81907b869e788fcd29"
+   }
+  },
+  "sandalia/couro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "d5faed91f40cb666e4fb9a241e98bf99c73a7fb773ad8c489c154a9c485af0d8"
+   }
+  },
+  "tabi/linho": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "4476cfbdda78c4bbecc7f55f9af774741543ad0adb918b84b76c833b8abea314"
+   }
+  },
+  "tabi/escuro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "4c14de4bd0339152cc182f4b1dafc0ba1d55a7379b02afa13a56fc75d2ddde42"
+   }
+  },
+  "tabi/couro": {
+   "S": {
+    "tamanho": [
+     96,
+     96
+    ],
+    "rgba_sha256": "e4d2dca4e827dd75b98c80f7229c6d6694e998b37b205d3a60619aa7b2f00d35"
    }
   },
   "tabuado/piso": {

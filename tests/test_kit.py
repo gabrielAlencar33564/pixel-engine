@@ -21,7 +21,8 @@ from pixel_forge.raster.estilo import estilo_render
 from .oraculo import CASOS
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "kit.esperado.json").read_text(encoding="utf-8"))["casos"]
-VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) for nome, args in p.variacoes]
+NOVAS = {"saia", "lenco"}  # as peças que nasceram na engine nova (a saia e o lenço gerais): sem oráculo, com teste
+VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if pid not in NOVAS for nome, args in p.variacoes]
 
 
 def rgba_da_variacao(peca: str, args: dict[str, Any]) -> tuple[list[int], str]:
@@ -55,3 +56,7 @@ def test_controle_o_argumento_fora_do_schema_e_recusado() -> None:
 def test_controle_a_variacao_mudada_sai_diferente() -> None:
     _, sha = rgba_da_variacao("poste", {"base": ["0", "0", "0"], "altura": "1.1m", "raio": "5cm"})
     assert sha != ESPERADO["poste/fino"]["S"]["rgba_sha256"]
+
+
+def test_toda_peca_tem_oraculo_ou_e_nova() -> None:
+    assert {k.split("/")[0] for k in ESPERADO} | NOVAS == set(PECAS)

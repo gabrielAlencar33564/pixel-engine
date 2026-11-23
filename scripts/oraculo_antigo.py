@@ -47,12 +47,41 @@ def _vistas(caso: dict[str, Any], style: Any) -> dict[str, Any]:
     return out
 
 
+def _clipes(caso: dict[str, Any], style: Any) -> dict[str, Any]:
+    """Os quadros de cada clipe pedido (a receita antiga, nos parâmetros de movimento da gramática), em cada vista."""
+    loader: Any = importlib.import_module("pixel_forge.contracts.loader")
+    render: Any = importlib.import_module("pixel_forge.application.render")
+    ops: Any = importlib.import_module("pixel_forge.pixelops.ops")
+    prev: Any = importlib.import_module("pixel_forge.application.compose_preview")
+    receita: Any = importlib.import_module("pixel_forge.motion.receita")
+    grammar, comp = prev.grammar_for(caso["composicao"])
+    ref = {"id": style.id, "revision": style.revision, "sha256": "0" * 64}
+    asset = prev.preview_asset(grammar, comp, ref, camera=CAMERA)
+    p = {s.name: int(s.default or 0) if s.distribution == "fixed" else (s.lo + s.hi) // 2 for s in grammar.params}
+    mp = grammar.motion(p, 96)
+    fr = render.FrameRenderer(asset, style)
+    tags = {pt.id: set(pt.tags) for pt in asset.parts}
+    aref = {"id": asset.id, "revision": asset.revision, "sha256": "0" * 64}
+    out = {}
+    for clip, nome in caso["clipes"].items():
+        doc = loader.validate_document(receita.gera(nome, asset, aref, mp), "clip")
+        for vista in caso["vistas"]:
+            for i, t in enumerate(doc.sample_times_ms):
+                fb = fr.render(doc, vista, t)[0]
+                ops.run_build_pixelops(fb, style, tags)
+                rgba = fb.to_rgba(render.palette_map(style))
+                out[f"{clip}/{vista}/{i}"] = {"tamanho": [int(rgba.shape[1]), int(rgba.shape[0])],
+                                              "rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest()}
+    return out
+
+
 def main() -> int:
     loader: Any = importlib.import_module("pixel_forge.contracts.loader")
     entrada = json.loads(sys.stdin.buffer.read().decode("utf-8"))
     bruto = entrada.get("style") or json.loads(Path("presets/styles/base.json").read_text(encoding="utf-8"))
     style = loader.validate_document(bruto, "style")
-    sys.stdout.write(json.dumps({c["nome"]: _vistas(c, style) for c in entrada["casos"]}))
+    sys.stdout.write(json.dumps({c["nome"]: _clipes(c, style) if "clipes" in c else _vistas(c, style)
+                                for c in entrada["casos"]}))
     return 0
 
 

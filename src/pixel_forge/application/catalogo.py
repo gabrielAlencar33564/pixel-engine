@@ -11,6 +11,7 @@ import numpy as np
 
 from ..contracts.carregar import validar
 from ..contracts.composicao import Composicao
+from ..core.direcoes import DIRECOES
 from ..design.asset import ir_da_composicao
 from ..design.kit.registro import PECAS
 from ..export.imagem import salvar_png
@@ -23,10 +24,16 @@ AMPLIA = 3
 
 
 def de_uma_peca(peca: str, args: dict[str, Any]) -> Composicao:
-    """Uma composição de um nó só, na vista S (a prancha e o teste da peça)."""
-    tipo = PECAS[peca].tipo
+    """Uma composição de um nó só, na vista S (a prancha e o teste da peça); a roupa, no corpo de madeira."""
+    if PECAS[peca].tipo == "humanoide":
+        nos = [{"id": "corpo", "peca": "corpo_humano", "args": args if peca == "corpo_humano" else {}}]
+        nos += [] if peca == "corpo_humano" else [{"id": "n", "peca": peca, "args": args}]
+        return validar({"id": "kit_peca", "revision": 1, "description": f"A peça {peca} no corpo de madeira",
+                        "reference": "o catálogo do kit", "tipo": "humanoide", "categoria": "humano", "semente": 11,
+                        "nos": nos, "vistas": dict.fromkeys(DIRECOES, {}), "movimento": ["idle"], "tracos": []},
+                       Composicao, f"variação de {peca}")
     return validar({"id": "kit_peca", "revision": 1, "description": f"A peça {peca} sozinha",
-                    "reference": "o catálogo do kit", "tipo": tipo, "categoria": "objeto", "semente": 11,
+                    "reference": "o catálogo do kit", "tipo": "prop", "categoria": "objeto", "semente": 11,
                     "nos": [{"id": "n", "peca": peca, "args": args}], "vistas": {"S": {}}, "movimento": ["static"],
                     "tracos": []}, Composicao, f"variação de {peca}")
 
