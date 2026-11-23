@@ -44,8 +44,9 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
         for d in ir.views:
             for it in its:
                 k = f"{clip}/{d}/{it.index}"
-                feito = no_canvas_antigo(quadro_da_pose(ir, est, it.pose, d).to_rgba(pal),
-                                         quer.get(k, {}).get("tamanho", [0, 0]))
+                if k not in quer:
+                    continue
+                feito = no_canvas_antigo(quadro_da_pose(ir, est, it.pose, d).to_rgba(pal), quer[k]["tamanho"])
                 out[k] = [feito["tamanho"], feito["rgba_sha256"]]
     return out
 

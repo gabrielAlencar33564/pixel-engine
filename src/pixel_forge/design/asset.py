@@ -6,7 +6,7 @@ from ..contracts.carregar import validar
 from ..contracts.composicao import Composicao
 from ..contracts.ir import AssetIR
 from .humano import clipes, ir_do_humano, movimento_do_humano, validar_humano
-from .prop import ir_do_prop, validar_prop
+from .prop import ir_do_prop, movimento_do_prop, validar_prop
 from .quadrupede import clipes as clipes_do_quadrupede
 from .quadrupede import ir_do_quadrupede, movimento_do_quadrupede, validar_quadrupede
 
@@ -30,4 +30,4 @@ def movimento(comp: Composicao) -> tuple[dict[str, str], dict[str, int]]:
         return clipes(comp), movimento_do_humano(comp)
     if comp.tipo == "quadrupede":
         return clipes_do_quadrupede(comp), movimento_do_quadrupede(comp)
-    return {"static": ""}, {}
+    return movimento_do_prop(comp)

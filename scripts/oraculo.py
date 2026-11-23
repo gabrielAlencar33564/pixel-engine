@@ -240,8 +240,13 @@ def gravar_composicoes(destino: Path, sha: str) -> None:
     casos = []
     for arq in sorted((FIXTURES / "composicoes").glob("*.json")):
         comp = json.loads(arq.read_text(encoding="utf-8"))
-        casos.append({"nome": arq.name.removesuffix(".r1.json"), "composicao": composicao_antiga(comp),
-                      "vistas": list(comp["vistas"])})
+        nome = arq.name.removesuffix(".r1.json")
+        casos.append({"nome": nome, "composicao": composicao_antiga(comp), "vistas": list(comp["vistas"])})
+        receitas = {"balanco": "sway", "giro": "spin"}
+        clipes = {receitas[m["receita"]]: m["receita"] for m in comp["movimento"] if isinstance(m, dict)}
+        if clipes:  # o balanço e o giro, quadro a quadro
+            casos.append({"nome": f"{nome}/clipes", "composicao": composicao_antiga(comp),
+                          "vistas": list(comp["vistas"]), "clipes": clipes})
     saida = antigo(destino, casos, estilo_base_antigo())
     _salvar(FIXTURES / "composicoes.esperado.json", {"pixel_engine": sha, "casos": saida})
     print(f"composições: {len(saida)} gravadas")

@@ -78,8 +78,11 @@ def _clipes(caso: dict[str, Any], style: Any) -> dict[str, Any]:
     tags = {pt.id: set(pt.tags) for pt in asset.parts}
     aref = {"id": asset.id, "revision": asset.revision, "sha256": "0" * 64}
     out = {}
+    props: Any = importlib.import_module("pixel_forge.motion.presets_props")
+    do_prop = {"balanco": props.sway_clip, "giro": props.spin_clip}  # o balanço e o giro eram presets, não receitas
     for clip, nome in caso["clipes"].items():
-        doc = loader.validate_document(receita.gera(nome, asset, aref, mp), "clip")
+        gera = do_prop.get(nome) or (lambda a, r, m, nome=nome: receita.gera(nome, a, r, m))
+        doc = loader.validate_document(gera(asset, aref, mp), "clip")
         for vista in caso["vistas"]:
             for i, t in enumerate(doc.sample_times_ms):
                 fb = fr.render(doc, vista, t)[0]

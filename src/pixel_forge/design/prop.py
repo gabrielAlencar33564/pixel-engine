@@ -47,11 +47,31 @@ def _conferir_movimento(comp: Composicao, conhecidas: set[str]) -> None:
         if falta:
             raise Recusa("EXPRESSAO", f"A receita '{m.receita}' usa {', '.join(sorted(falta))}.",
                          "Declare em 'medidas'.", f"/movimento/{j}")
+    giro = _receita(comp, Giro)
+    if giro is not None and (giro.periodo_ms % giro.quadros or 360_000 * giro.voltas // giro.quadros >= 180_000):
+        raise Recusa("GIRO", f"O giro de {giro.voltas} volta(s) em {giro.quadros} quadros e {giro.periodo_ms} ms: o "
+                     "período tem de ser múltiplo dos quadros e o passo menor que 180° (senão o sentido fica ambíguo).",
+                     f"Use quadros que dividam o período e mais de {2 * giro.voltas} quadros.", "/movimento")
     tem = {m.receita for m in receitas}
     for i, no in enumerate(comp.nos):
         if no.osso in PRECISA and PRECISA[no.osso] not in tem:
             raise Recusa("MOVIMENTO", f"Nó '{no.id}': o osso '{no.osso}' pede a receita '{PRECISA[no.osso]}' em "
                          "'movimento'.", "Declare a receita ou use 'raiz'.", f"/nos/{i}/osso")
+
+
+def movimento_do_prop(comp: Composicao) -> tuple[dict[str, str], dict[str, int]]:
+    """Os clipes do prop (o estático, o balanço ``sway`` e o giro ``spin``) e os parâmetros das receitas."""
+    clipes: dict[str, str] = {"static": ""} if "static" in comp.movimento else {}
+    mp: dict[str, int] = {}
+    if (m := _receita(comp, Balanco)) is not None:
+        clipes["sway"] = "balanco"
+        mp |= {"sway_period_ms": m.periodo_ms, "sway_shift_px": m.desloca_px, "sway_wave_px": m.onda_px,
+               "sway_lag_mdeg": m.atraso_mdeg, "sway_sample_ms": m.amostra_ms}
+    if (g := _receita(comp, Giro)) is not None:
+        clipes["spin"] = "giro"
+        mp |= {"spin_period_ms": g.periodo_ms, "spin_frames": g.quadros, "spin_turns": g.voltas,
+               "spin_dir": g.sentido}
+    return clipes, mp
 
 
 def validar_prop(comp: Composicao) -> None:

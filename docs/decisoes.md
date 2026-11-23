@@ -94,3 +94,5 @@ substituído). O porquê longo vai no commit.
 - O `olhar` lê o pacote como o jogo lê; o `conjunto` põe os assets pelo chão, com o humano de 1,65 m de régua.
 - O canvas só mede a sombra no chão das partes que o render projeta (faces, traços e elipses alinhadas): a copa
   pontilhada não projeta, e a árvore voltava 50 px mais larga sem isso.
+- O balanço por deslocamento e o giro do prop vêm junto (o contrato os declara: aceitar e não gerar seria mentir, I8);
+  o balanço da árvore sintética é igual ao antigo quadro a quadro; a recusa do giro mora na validação (a prévia a vê).
