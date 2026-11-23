@@ -7,7 +7,7 @@ só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prov
 
 - **Núcleo** igual ao `pixel-engine` pixel a pixel (oráculo por `git archive`): q8, IR, FK/IK de 2 e de N segmentos,
   a câmera 3/4 oblíqua, a projeção, o raster (z-buffer, tons, sombras, contornos, limpeza) e o pacote `pfe-jogo/1`.
-- **Kit vigente** (38 peças): construção, telhados, carpintaria, vãos, formas, flora (`pontilhado`, galhos, cortinas,
+- **Kit vigente** (37 peças): construção, telhados, carpintaria, vãos, formas, flora (`pontilhado`, galhos, cortinas,
   pena), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição num formato só, com o porte.
 - **Movimento:** o parado e a passada do humano, o parado e o passo do quadrúpede, o balanço e o giro do prop.
 - **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `checar`, `build`, `exportar`,
