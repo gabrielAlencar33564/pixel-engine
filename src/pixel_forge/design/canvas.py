@@ -1,6 +1,7 @@
-"""O canvas pelo tamanho do asset: a caixa da geometria na tela de cada vista, na câmera física de 45° do kit (uma
-folga sobre o 0,35 do oblíquo), e a da sombra que ela projeta no chão (à direita da base, pela luz da câmera), mais a
-margem. O pivô (a origem do mundo) cai onde a geometria manda e fica sempre dentro do canvas."""
+"""O canvas pelo tamanho do asset: a caixa da geometria na tela de cada vista, na câmera física de 45° do kit (o chão
+a 0,71, mais fundo que o 0,6 do oblíquo; o quadro que ainda sair cortado é recusado na checagem), e a da sombra que
+ela projeta no chão (à direita da base, pela luz da câmera), mais a margem. O pivô (a origem do mundo) cai onde a
+geometria manda e fica sempre dentro do canvas."""
 
 from __future__ import annotations
 

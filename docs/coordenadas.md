@@ -23,8 +23,8 @@ u  = pivô_u + x'              v  = pivô_v + y'·0,6 − z·cos 45°
 profundidade = y'·cos 45° + z·sin 45°     (maior = mais perto da câmera)
 ```
 
-O objeto é visto de frente e de cima (o chão e o topo a 0,6; eram 0,35 no `pixel-engine`), com a altura a cos 45°. Na S, a mão esquerda fica à
-direita da tela; na W, a frente aponta para a esquerda da tela; na E, para a direita.
+O objeto é visto de frente e de cima (o chão e o topo a 0,6; eram 0,35 no `pixel-engine`), com a altura a cos 45°.
+Na S, a mão esquerda fica à direita da tela; na W, a frente aponta para a esquerda da tela; na E, para a direita.
 
 ## Arredondamento e ordem
 
