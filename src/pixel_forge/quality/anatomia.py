@@ -2,8 +2,8 @@
 de perfil, na elevação da radiografia. Cada medida vem com a faixa de um corpo real (o cânone de desenho e a
 antropometria, com folga): fora dela, a forma lê errada antes de qualquer pixel, e não há roupa nem pose que a conserte.
 
-As partes são as do ``corpo_humano`` do kit (o crânio, a mandíbula, o queixo, o pescoço, o peito, as esferas dos ombros)
-e, quando a composição as tem, as dos olhos e do cabelo preso.
+As partes são as do ``corpo_humano`` do kit (o crânio, a mandíbula, o queixo, o pescoço, o peito, a cintura, o quadril,
+a linha e as esferas dos ombros) e, quando a composição as tem, as dos olhos e do cabelo preso.
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ from ..raster.grade import Mascara
 
 Mascaras = Mapping[str, Mascara]
 CABECA = ("skull", "jaw", "chin")
+TRONCO = ("chest", "waist", "neck", "trap_l", "trap_r")  # com a linha do ombro, quando o corpo a tem
 
 
 @dataclass(frozen=True)
@@ -86,11 +87,19 @@ def _rosto(c: _Corpo) -> list[Medida]:
     return out
 
 
+def _tronco(c: _Corpo) -> list[Medida]:
+    larguras = _uniao(c.ms, "chest", "waist", "pelvis_block").sum(axis=1)
+    peito, quadril = (int(np.argmax(c.ms[p].sum(axis=1))) for p in ("chest", "pelvis_block"))
+    return [Medida("cintura_sobre_o_peito", larguras[peito:quadril + 1].min() / larguras[peito], (0.70, 1.0),
+                   "a largura mais estreita do tronco, do mais largo do peito ao mais largo do quadril, sobre a do "
+                   "peito; abaixo da faixa, o tronco lê como duas bolas, uma sobre a outra")]
+
+
 def _ombros(c: _Corpo) -> list[Medida]:
     esfera = _uniao(c.ms, "j_shoulder_l", "j_shoulder_r")
     alto, baixo = _fileiras(esfera)
     meio = (alto + baixo) // 2
-    a, b = _colunas(_uniao(c.ms, "chest", "waist", "neck"), meio)
+    a, b = _colunas(_uniao(c.ms, *(p for p in TRONCO if p in c.ms)), meio)
     centro, meia = (a + b) / 2, (b - a + 1) / 2
     fora = [abs(x - centro) for x in np.nonzero(esfera[meio])[0] if abs(x - centro) > meia]
     return [Medida("vao_no_ombro", (min(fora, default=meia) - meia) / c.estatura, (0.0, 0.01),
@@ -131,4 +140,4 @@ def medidas_do_humano(frente: Mascaras, perfil: Mascaras) -> list[dict[str, Any]
     topo, queixo = _fileiras(_uniao(frente, *CABECA))
     chao = _fileiras(_uniao(frente, "foot_l", "foot_r"))[1]
     corpo = _Corpo(frente, topo, queixo, chao - topo + 1)
-    return [m.dado() for m in (*_rosto(corpo), *_perfil(perfil), *_ombros(corpo))]
+    return [m.dado() for m in (*_rosto(corpo), *_perfil(perfil), *_tronco(corpo), *_ombros(corpo))]

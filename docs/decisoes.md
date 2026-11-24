@@ -181,6 +181,33 @@ substituído). O porquê longo vai no commit.
   modelo tira o item da lista, e nenhuma medida nova sai da faixa sem aparecer ali. A medida não vira recusa do
   build enquanto o modelo não é corrigido: recusaria todo humano.
 
+## O humano: o tronco e os ombros (escolha do dono, 2026-11-24)
+
+- A junta do ombro fica 3,5 % da estatura abaixo da base do pescoço (`OMBRO_CAI`). Ficava na mesma altura, e o alto
+  da esfera do ombro batia no queixo; agora fica 3 % da estatura abaixo dele.
+- O corpo ganhou a linha do ombro (`trap_l`, `trap_r`): um fuso da base do pescoço à junta, que fecha o vão de 4 % da
+  estatura entre o tronco e a esfera. Fica no grupo de contorno do braço e sem linha interna, com a ponta a 0,96 do
+  raio da esfera: no grupo do peito, ou com o mesmo raio, as duas peças disputavam o pixel do canto, e o contorno da
+  peça fina (que vai para fora) punha espinhos na silhueta do ombro.
+- O peito e a cintura entram um no outro (`PEITO`, `CINTURA`): o tronco afinava a 0,51 da largura do peito entre
+  as duas bolas, e agora a 0,76. A medida nova `cintura_sobre_o_peito` (de 0,70 a 1,0) entra na radiografia.
+- O pescoço tem 6,6 % da estatura de largura (eram 4,8 %).
+- O braço e o antebraço têm 0,90 do tamanho real (0,167 e 0,131 da estatura). A cabeça de 1/6 tira altura do que
+  fica entre o queixo e o quadril (0,30 da estatura, contra 0,34 no corpo real: 0,89), e com o ombro mais baixo o
+  braço do tamanho real punha a mão 1,4 px abaixo, no meio da coxa. A 0,90 a mão fica na altura de antes. A mão não
+  encolheu.
+- A jaqueta segue o tronco: a ombreira (`jacket_yoke_l`, `jacket_yoke_r`) é a linha do ombro com 0,3 px de folga, no
+  grupo da manga; a manga começa na junta (começava 5 % acima e fazia um gomo sobre o ombro); o peito e a cintura
+  dela entram um no outro. Sem manga, a ombreira é a alça (70 % da linha) e o ombro fica nu.
+- O oráculo do humano compara no tronco do antigo: o teste põe as nove constantes de volta e tira as partes da
+  linha do ombro, e o rig, a roupa, o movimento e o render seguem iguais a ele pixel a pixel. A forma nova é provada
+  pelas medidas da radiografia; o controle é o tronco do antigo, que sai da faixa nas quatro medidas. A lista
+  `DEFEITOS_DO_MODELO` ficou com as quatro da cabeça. Os esperados não foram regerados (I11).
+- O que mudou de visibilidade, conferido nas `escondidas` do viajante e do vestido, antes e depois: de perfil a
+  manga de lá fica inteira atrás do corpo (o gomo dela aparecia acima do ombro de cá); a aba de cima da gola passa
+  a tocar a borda de perfil; no vestido a cintura da jaqueta some sob o peito e a faixa fora da vista S. Olho,
+  chapéu e cabelo não mudaram.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

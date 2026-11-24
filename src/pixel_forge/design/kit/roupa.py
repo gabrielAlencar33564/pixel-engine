@@ -14,9 +14,13 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..construtor import AssetBuilder, Junta, Parte, ellipse, polyline, q, qv
-from .humano import SIDES, taper
+from .humano import R_OMBRO, SIDES, taper, trapezio
 
 Regra = dict[str, str]
+# a jaqueta sobre o tronco: o centro e a meia altura do peito e da cintura dela, em frações do tronco, e onde a manga
+# começa no braço (na junta do ombro: a ombreira fecha o alto, sem a manga fazer um gomo acima dela)
+JAQUETA_PEITO, JAQUETA_CINTURA, MANGA_DE = (0.62, 0.40), (0.26, 0.30), 0.0
+ALCA = 0.7  # sem manga, a ombreira cobre esta fração da linha do ombro
 
 
 def regra(front: str, back: str) -> Regra:
@@ -67,24 +71,29 @@ def _surface_y(e: tuple[float, float, float, float], z: float) -> float:
 
 
 def jaqueta(v: Veste) -> Vista:
-    """A blusa ou jaqueta cruzada, a aba esquerda sobre a direita (a gola em V), com mangas."""
+    """A blusa ou jaqueta cruzada, a aba esquerda sobre a direita (a gola em V), com a ombreira (a linha do ombro, do
+    pescoço à manga, no grupo da manga e sem linha interna) e as mangas; sem manga, a ombreira é a alça, que para
+    antes do ombro nu."""
     c, t, lw = v.c, v.c["tronco"], v.pct("largura_pct", 140)
-    peito = (0.1, c["peito_y"] * 1.12 + 0.35, 0.68 * t, 0.36 * t)
+    peito = (0.1, c["peito_y"] * 1.12 + 0.35, JAQUETA_PEITO[0] * t, JAQUETA_PEITO[1] * t)
     v.part("jacket_chest", ellipse(qv(0, peito[0], peito[2]), qv(c["peito_x"] * 1.1 + 0.4, peito[1], peito[3])),
            ("torso", "jacket"))
-    v.part("jacket_waist", ellipse(qv(0, 0, 0.22 * t), qv(c["cintura_x"] * 1.15 + 0.45, c["peito_y"] * 0.85 + 0.45,
-                                                          0.26 * t)), ("torso", "jacket"))
+    cintura = qv(c["cintura_x"] * 1.15 + 0.45, c["peito_y"] * 0.85 + 0.45, JAQUETA_CINTURA[1] * t)
+    v.part("jacket_waist", ellipse(qv(0, 0, JAQUETA_CINTURA[0] * t), cintura), ("torso", "jacket"))
     for pid, (x0, x1, z1) in (("lapel_l", (-0.9, 1.8, 0.30)), ("lapel_r", (0.9, 0.0, 0.55))):
         pts = [qv(x0, _surface_y(peito, 0.98 * t) + 0.1, 0.98 * t), qv(x1, _surface_y(peito, z1 * t) + 0.25, z1 * t)]
         v.part(pid, polyline(pts, 1), ("torso", "jacket"), v.mat2)
     manga = v.op.get("manga", 2)
     cobre, rules = ["chest", "waist"], []
-    for side, _ in SIDES:
+    for side, sx in SIDES:
         boca = c["r_cotovelo"] * (0.9 + 0.45 * lw) + 0.3
+        ate, grupo = (1.0, f"sleeve_{side}") if manga >= 1 else (ALCA, "jacket")
+        v.b.part(f"jacket_yoke_{side}", v.mat, trapezio(c, sx, 0.3, ate),
+                 Parte(bone="torso", group=grupo, tags=("garment", "no_inner_outline")))
         if manga >= 1:
-            v.part(f"sleeve_{side}", taper((-0.05, 1.04), c["braco"], (c["r_braco"] * 1.25 + 0.3, boca)),
+            v.part(f"sleeve_{side}", taper((MANGA_DE, 1.04), c["braco"], (c["r_braco"] * R_OMBRO + 0.3, boca)),
                    (f"upper_arm_{side}", f"sleeve_{side}"))
-            cobre += [f"upper_arm_{side}", f"j_shoulder_{side}"]
+            cobre += [f"upper_arm_{side}", f"j_shoulder_{side}", f"trap_{side}"]
         if manga >= 2:
             v.part(f"cuff_{side}", taper((0.0, 0.5 if manga == 2 else 0.92), c["antebraco"],
                                          (boca, c["r_punho"] * (0.9 + 0.6 * lw) + 0.3)),

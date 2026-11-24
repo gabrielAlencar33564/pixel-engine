@@ -158,7 +158,7 @@
      "pos": [
       "$lado*$ombro_x",
       "0",
-      "$tronco"
+      "$tronco - $ombro_cai"
      ],
      "eixo": "y",
      "limites": {

@@ -1,6 +1,6 @@
 """O humano: o corpo vestido dá o mesmo pixel que o `pixel-engine` no parado e no andar, nas 8 direções, quadro a
-quadro (na abertura de braço dele: a da engine é menor, e as mãos caem junto do corpo); cada peça de roupa veste o
-corpo; a saia segue a coxa ao andar; e quem anda tem as 8 direções."""
+quadro (no tronco, na abertura de braço, no balanço e no apoio dele: os da engine mudaram de propósito); cada peça de
+roupa veste o corpo; a saia segue a coxa ao andar; e quem anda tem as 8 direções."""
 
 from __future__ import annotations
 
@@ -23,7 +23,14 @@ from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS, apoio_do_antigo, balanco_do_antigo, braco_do_antigo, no_canvas_antigo
+from .oraculo import (
+    CASOS,
+    apoio_do_antigo,
+    balanco_do_antigo,
+    braco_do_antigo,
+    no_canvas_antigo,
+    tronco_do_antigo,
+)
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "humanos.esperado.json").read_text(encoding="utf-8"))["casos"]
 MAOS_SOBRE_OS_OMBROS = 1.5  # no repouso, de frente, as mãos ficam a até 1,5× a largura dos ombros uma da outra
@@ -60,6 +67,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 
 @pytest.mark.slow
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
+    tronco_do_antigo(monkeypatch)
     braco_do_antigo(monkeypatch)
     balanco_do_antigo(monkeypatch)
     apoio_do_antigo(monkeypatch)

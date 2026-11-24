@@ -1,6 +1,8 @@
-"""O corpo humano do cânone: as medidas em frações da estatura (Drillis & Contini; só a cabeça é estilizada, 1/6 em
-vez de 1/7,5, para o rosto ler a 54 px), o rig pelo modelo em dado e as massas do corpo (cabeça, tronco, membros e uma
-esfera em cada junta). Coordenadas: +X = esquerda anatômica, +Y = frente, +Z = altura; px do mundo na régua do kit."""
+"""O corpo humano do cânone: as medidas em frações da estatura (Drillis & Contini), o rig pelo modelo em dado e as
+massas do corpo (cabeça, tronco, membros e uma esfera em cada junta). A cabeça é estilizada (1/6 em vez de 1/7,5,
+para o rosto ler a 54 px), e a altura que ela toma sai do que fica entre o queixo e o quadril, não das pernas: o
+tronco e o braço têm ~0,90 do real. Coordenadas: +X = esquerda anatômica, +Y = frente, +Z = altura; px do mundo na
+régua do kit."""
 
 from __future__ import annotations
 
@@ -12,12 +14,18 @@ from ..construtor import AssetBuilder, Parte, ellipse, q, qv
 from ..escala import PX_POR_M
 from .esqueleto import monta
 
-PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.186, 0.146, 0.108, 0.039, 0.152
+PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.167, 0.131, 0.108, 0.039, 0.152
 OMBRO_X, QUADRIL_X, TORNOZELO_X = 0.105, 0.050, 0.080
 PEITO_X, CINTURA_X, QUADRIL_LARG_X, PEITO_Y = 0.090, 0.075, 0.095, 0.060
 COXA_DA_PERNA = 0.499
 R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.047, 0.034, 0.021, 0.027, 0.023, 0.018,
-                                                                           0.024)
+                                                                           0.032)
+# o ombro: a junta fica OMBRO_CAI abaixo da base do pescoço (o alto do ombro, 3 % da estatura abaixo do queixo), e
+# a esfera dela tem R_OMBRO vezes o raio do braço
+OMBRO_CAI, R_OMBRO = 0.035, 1.25
+# a cintura e o peito: o centro e a meia altura de cada massa, em frações do tronco (uma entra na outra, e o tronco
+# não afina entre elas)
+CINTURA, PEITO = (0.28, 0.30), (0.64, 0.36)
 SIDES = (("l", 1), ("r", -1))
 FRONT_VIEWS = ("S", "SW", "W", "E", "SE")
 CANVAS, PIVOT, TALL_EXTRA = 96, (48, 60), 16
@@ -47,7 +55,7 @@ def medidas(c: Corpo) -> dict[str, float]:
     perna, e, w = quadril_z - tornozelo_z, c.espessura, c.largura
     return {
         "estatura": h, "cabeca": cabeca, "cabeca_larg": 0.70 * cabeca, "cabeca_fundo": 0.82 * cabeca,
-        "queixo_z": queixo, "ombro_z": queixo - PESCOCO * h, "ombro_x": OMBRO_X * h * (0.85 + 0.15 * w),
+        "queixo_z": queixo, "ombro_cai": OMBRO_CAI * h, "ombro_x": OMBRO_X * h * (0.85 + 0.15 * w),
         "quadril_z": quadril_z, "quadril_x": QUADRIL_X * h * (0.85 + 0.15 * w), "tornozelo_z": tornozelo_z,
         "tronco": queixo - PESCOCO * h - quadril_z, "pescoco": PESCOCO * h, "braco": BRACO * h,
         "antebraco": ANTEBRACO * h, "mao": MAO * h, "coxa": perna * COXA_DA_PERNA,
@@ -63,6 +71,18 @@ def taper(span: tuple[float, float], length: float, raios: tuple[float, float]) 
     """O segmento em fuso ao longo de −z do osso, de ``span[0]`` a ``span[1]`` (frações do comprimento)."""
     return {"type": "tapered_polyline", "points_q8": [qv(0, 0, -span[0] * length), qv(0, 0, -span[1] * length)],
             "radii_q8": [max(32, q(raios[0])), max(32, q(raios[1]))]}
+
+
+def trapezio(c: dict[str, float], sx: int, folga: float = 0.0, ate: float = 1.0) -> dict[str, Any]:
+    """A linha do ombro de um lado: o fuso da base do pescoço à junta do ombro, que fica ``ombro_cai`` abaixo dela.
+    A ponta tem um nada menos que o raio da esfera do ombro (é a esfera que dá o canto, sem degrau). ``folga`` é a
+    da roupa que veste por cima, e ``ate`` a fração da linha que ela cobre (a alça para antes do ombro)."""
+    t, rp = c["tronco"], c["r_pescoco"]
+    de, junta = (sx * 0.3 * rp, 0.0, t - 0.2 * rp), (sx * c["ombro_x"], 0.0, t - c["ombro_cai"])
+    ponta = [a + ate * (b - a) for a, b in zip(de, junta, strict=True)]
+    r0, r1 = 0.9 * rp, 0.96 * R_OMBRO * c["r_braco"]
+    return {"type": "tapered_polyline", "points_q8": [qv(*de), qv(*ponta)],
+            "radii_q8": [q(r0 + folga), q(r0 + ate * (r1 - r0) + folga)]}
 
 
 def neck_len(c: dict[str, float]) -> float:
@@ -82,10 +102,13 @@ def _tronco(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
     b.part("pelvis_block", pele, ellipse(qv(0, -0.2, 0.9), qv(c["quadril_larg_x"], c["peito_y"] * 0.85,
                                                              0.11 * c["estatura"] * 0.5)),
            Parte(bone="pelvis_tilt", group="pelvis"))
-    b.part("waist", pele, ellipse(qv(0, 0, 0.30 * t), qv(c["cintura_x"], c["peito_y"] * 0.75, 0.16 * t)),
+    b.part("waist", pele, ellipse(qv(0, 0, CINTURA[0] * t), qv(c["cintura_x"], c["peito_y"] * 0.75, CINTURA[1] * t)),
            Parte(bone="torso", group="waist"))
-    b.part("chest", pele, ellipse(qv(0, 0.1, 0.70 * t), qv(c["peito_x"], c["peito_y"], 0.32 * t)),
+    b.part("chest", pele, ellipse(qv(0, 0.1, PEITO[0] * t), qv(c["peito_x"], c["peito_y"], PEITO[1] * t)),
            Parte(bone="torso", group="chest"))
+    for side, sx in SIDES:  # no grupo do braço e sem linha interna: o ombro lê como uma forma só, do pescoço ao braço
+        b.part(f"trap_{side}", pele, trapezio(c, sx),
+               Parte(bone="torso", group=f"arm_{side}", tags=("no_inner_outline",)))
     nl = neck_len(c)
     b.part("neck", pele, taper((-0.1, 1.0), -nl, (c["r_pescoco"], c["r_pescoco"] * 0.9)),
            Parte(bone="neck", group="neck"))
@@ -117,7 +140,7 @@ def _membros(b: AssetBuilder, c: dict[str, float], pele: str, side: str) -> None
 
 
 def _juntas(b: AssetBuilder, c: dict[str, float], junta: str, side: str) -> None:
-    for jid, bone, r, grp in ((f"j_shoulder_{side}", f"upper_arm_{side}", c["r_braco"] * 1.25, f"arm_{side}"),
+    for jid, bone, r, grp in ((f"j_shoulder_{side}", f"upper_arm_{side}", c["r_braco"] * R_OMBRO, f"arm_{side}"),
                               (f"j_elbow_{side}", f"forearm_{side}", c["r_cotovelo"] * 1.15, f"arm_{side}"),
                               (f"j_wrist_{side}", f"hand_{side}", c["r_punho"] * 1.0, f"hand_{side}"),
                               (f"j_hip_{side}", f"thigh_{side}", c["r_coxa"] * 0.95, f"leg_{side}"),
@@ -127,7 +150,8 @@ def _juntas(b: AssetBuilder, c: dict[str, float], junta: str, side: str) -> None
 
 
 def corpo(b: AssetBuilder, c: dict[str, float], pele: str, junta: str) -> None:
-    """A sombra de contato, as massas do corpo em ``pele`` e uma esfera em cada junta em ``junta``."""
+    """A sombra de contato, as massas do corpo em ``pele`` (com a linha do ombro de cada lado) e uma esfera em cada
+    junta em ``junta``."""
     b.part("ground_shadow", "sombra", ellipse(qv(0, 0.3, 0), qv(c["quadril_larg_x"] * 1.1, 3.6, 0.3)),
            Parte(tags=("ground_shadow",), priority=-100))
     _tronco(b, c, pele)

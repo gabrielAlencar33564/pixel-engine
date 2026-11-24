@@ -56,7 +56,8 @@ def test_controle_o_traco_so_visual_escondido_passa(tmp_path: Path) -> None:
 
 def test_o_traco_de_silhueta_tem_de_tocar_a_borda(tmp_path: Path) -> None:
     aba = {"id": "aba", "description": "A aba larga", "parts": ["hat_brim"], "verification": "observable"}
-    gola = {"id": "gola", "description": "A gola em V", "parts": ["lapel_l"], "verification": "observable"}
+    # a aba de baixo da gola: a de cima toca a borda de perfil (a frente do peito), e a de baixo fica por dentro
+    gola = {"id": "gola", "description": "A aba de baixo da gola", "parts": ["lapel_r"], "verification": "observable"}
     assert previa(_viajante([{**aba, "reads_in_silhouette": True}]), tmp_path)["tracos"]["aba"]["S"] > 0
     assert previa(_viajante([gola]), tmp_path)["tracos"]["gola"]["S"] > 0  # a gola se vê, mas por dentro do corpo
     with pytest.raises(Recusa) as e:
