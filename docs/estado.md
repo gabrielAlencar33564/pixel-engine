@@ -19,7 +19,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 |---|---|---|
 | Linhas em `src/` | 32 701 | 8 273 |
 | Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~25 s, 233 testes |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~25 s, 235 testes |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
@@ -46,6 +46,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 5. A câmera mais de cima: a profundidade de 0,35 para 0,6 (escolha do dono; a altura segue a cos 45°).
 6. As faces da peça nos degraus da camada do nó (a 0,6, a pedra da parede do abrigo cobria a beira do telhado).
 7. O braço do humano no repouso a 6° (eram 15°): as mãos caem junto do corpo. Na `7b`, as alternativas de 4° e 8°.
+8. O balanço do braço no andar a 16° no ombro e no cotovelo (eram 23° e 26°): de perfil o braço não estica mais para
+   a frente. Na `8b`, as alternativas de 18° e de 12° e 10°.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -54,12 +56,12 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 - O que a rodada 2 apontou sem recusa: a copa do `pontilhado` não faz a linha reta de pasto; a palha não envelhece
   para o cinza; o `olhar` sai sem rótulos (a skill diz a ordem das fileiras); a prévia não avisa parte escondida.
 - A camponesa: a saia larga em 3/4 lê como saco; o andar (igual ao antigo) gira o tronco nas diagonais.
-- O humano, medido em 2026-11-24, ainda tem: no andar em diagonal as mãos a até 25 px uma da outra (o balanço de
-  ±23° do braço); o perfil parado com um braço e uma perna cobrindo os outros; o rosto sob o chapéu e o olho fora da
-  silhueta no perfil; o andar em S e N com o balanço comprimido pela câmera.
+- O humano, medido em 2026-11-24, ainda tem: no andar em diagonal as mãos a até 21 px uma da outra (eram 29; o que
+  sobra é a projeção do balanço na diagonal); o perfil parado com um braço e uma perna cobrindo os outros; o rosto sob
+  o chapéu e o olho fora da silhueta no perfil; o andar em S e N com o balanço comprimido pela câmera.
 
 ## Espera o dono
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do braço a 15°: com o braço a 6° ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do braço antigo: com o repouso a 6° e o balanço a 16° ela ainda não foi reconstruída.

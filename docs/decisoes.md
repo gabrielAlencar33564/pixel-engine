@@ -144,7 +144,7 @@ substituído). O porquê longo vai no commit.
 - A saída do `pfe` é UTF-8 também redirecionada: no Windows ela caía no cp1252, o JSON chegava quebrado a quem o lê e
   a recusa com um caractere de fora dele (`→`) morria num erro de codificação, sem código nem dica (I8).
 
-## O humano: o braço do repouso (pedido do dono, 2026-11-24)
+## O humano: o braço no repouso e no andar (pedido do dono, 2026-11-24)
 
 - O braço abre 6° no repouso (eram os 15° do `pixel-engine`): a câmera achata a altura, os 15° liam ~21° e as mãos
   caíam a 1,9× a largura dos ombros uma da outra; a 6° ficam a 1,4×. É uma constante do corpo (`ABRE_BRACO_MDEG`), não
@@ -152,6 +152,10 @@ substituído). O porquê longo vai no commit.
 - O oráculo do humano (o vestido e as peças do kit) compara na abertura do antigo: o teste põe a constante em 15°, e o
   corpo, o rig, o movimento e o render seguem iguais a ele pixel a pixel. A abertura nova é provada pela medida das
   mãos, com o controle a 15°. Os esperados não foram regerados (I11).
+- No andar, o ombro balança 16° e o cotovelo dobra até 16° a mais (eram 23° e 26°): a câmera achata a altura, os 23°
+  liam ~31°, e de perfil o braço da frente esticava como quem aponta. Os 16° são os 23° vistos pela câmera
+  (tan 23° × cos 45°). As mãos no andar de perfil caem de 55 % para 40 % da altura do corpo. Mudança intencional, com
+  prancha; o oráculo do andar compara com a amplitude do antigo posta na receita, como o braço do repouso.
 
 ## O remoto (pedido do dono, 2026-11-23)
 

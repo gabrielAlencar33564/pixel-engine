@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -16,16 +17,29 @@ from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.estilo import StyleDoc
 from pixel_forge.contracts.ir import AssetIR
 from pixel_forge.design.kit import humano
+from pixel_forge.motion.receita import carregar
 from pixel_forge.raster.estilo import estilo_render
 
 CASOS = Path(__file__).parent / "fixtures" / "oraculo"
 ABRE_BRACO_DO_ANTIGO = 15_000.0  # o `pixel-engine` abre o braço a 15° no repouso
+BALANCO_DO_ANTIGO = (23_000, 26_000)  # e, no andar, balança o ombro 23° e dobra o cotovelo 26° (mdeg)
 
 
 def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     """O braço do humano na abertura do `pixel-engine`: a engine abre menos (mudança intencional), e o oráculo
     compara o resto do humano (o corpo, o rig, o movimento e o render) na abertura dele."""
     monkeypatch.setattr(humano, "ABRE_BRACO_MDEG", ABRE_BRACO_DO_ANTIGO)
+
+
+def balanco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O balanço do braço no andar com a amplitude do `pixel-engine` (o ombro e o cotovelo): a da engine é menor
+    (mudança intencional), e o oráculo compara o resto do andar na amplitude dele."""
+    receita = carregar("andar_poses")
+    canais = copy.deepcopy(receita["canais"])
+    for lado, sinal in (("r", 1), ("l", -1)):
+        canais[f"braco_{lado}.frente"]["rot"]["termos"][1]["amp"] = sinal * BALANCO_DO_ANTIGO[0]
+        canais[f"braco_{lado}.cotovelo"]["rot"]["termos"][1]["amp"] = BALANCO_DO_ANTIGO[1]
+    monkeypatch.setitem(receita, "canais", canais)
 
 
 def no_canvas_antigo(rgba: np.ndarray[Any, np.dtype[np.uint8]], tamanho: list[int]) -> dict[str, Any]:

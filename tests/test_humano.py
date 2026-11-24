@@ -23,10 +23,13 @@ from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS, braco_do_antigo, no_canvas_antigo
+from .oraculo import CASOS, balanco_do_antigo, braco_do_antigo, no_canvas_antigo
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "humanos.esperado.json").read_text(encoding="utf-8"))["casos"]
 MAOS_SOBRE_OS_OMBROS = 1.5  # no repouso, de frente, as mãos ficam a até 1,5× a largura dos ombros uma da outra
+# no andar de perfil as mãos se afastam de 30 % a 45 % da altura do corpo: o braço balança (não fica parado) e não
+# estica para a frente (a câmera achata a altura, e o balanço do antigo lia como um braço apontando)
+MAOS_NO_ANDAR = (0.30, 0.45)
 VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if p.tipo == "humanoide"
              for nome, args in p.variacoes]
 
@@ -57,6 +60,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 @pytest.mark.slow
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
     braco_do_antigo(monkeypatch)
+    balanco_do_antigo(monkeypatch)
     quer = ESPERADO["vestido"]
     feito = _hashes(_comp("vestido"), quer)
     diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["rgba_sha256"]])
@@ -83,6 +87,25 @@ def test_no_repouso_as_maos_caem_junto_do_corpo() -> None:
 def test_controle_o_braco_do_antigo_deixa_as_maos_longe(monkeypatch: pytest.MonkeyPatch) -> None:
     braco_do_antigo(monkeypatch)
     assert _maos_sobre_os_ombros() > MAOS_SOBRE_OS_OMBROS
+
+
+def _maos_no_andar_de_perfil() -> float:
+    """O maior afastamento entre as mãos no andar de perfil (W), sobre a altura do corpo na tela (do pé à cabeça)."""
+    comp = _comp("vestido")
+    ir, est = ir_da_composicao(comp), estilo_render(estilo_base())
+    pedidos, mp = movimento(comp)
+    quadros = [quadro_da_pose(ir, est, it.pose, "W") for it in instantes(ir, "walk", pedidos["walk"], mp)[0]]
+    altura = quadros[0].landmarks["foot_l"][1] - quadros[0].landmarks["head_top"][1]
+    return max(abs(q.landmarks["hand_l"][0] - q.landmarks["hand_r"][0]) for q in quadros) / altura
+
+
+def test_no_andar_de_perfil_o_braco_balanca_sem_apontar() -> None:
+    assert MAOS_NO_ANDAR[0] <= _maos_no_andar_de_perfil() <= MAOS_NO_ANDAR[1]
+
+
+def test_controle_o_balanco_do_antigo_estica_o_braco(monkeypatch: pytest.MonkeyPatch) -> None:
+    balanco_do_antigo(monkeypatch)
+    assert _maos_no_andar_de_perfil() > MAOS_NO_ANDAR[1]
 
 
 def _rotacao_da_saia(comp: Composicao) -> list[int]:
