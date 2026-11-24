@@ -1,7 +1,7 @@
 # Estado da engine corrigida
 
-Plano: `docs/plano.md`. Decisões: `docs/decisoes.md`. Regras: `docs/regras.md`. Oráculo: `pixel-engine` em 3df5fe42,
-só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prova de fora passou na rodada 2.**
+Plano, decisões e regras: `docs/plano.md`, `decisoes.md`, `regras.md`. Oráculo: o clone local `pixel-engine` em 3df5fe42.
+Remoto: `gabrielAlencar33564/pixel-engine`, cuja `main` é esta engine desde 2026-11-23. **N0 a N5 feitos.**
 
 ## O que a engine tem
 

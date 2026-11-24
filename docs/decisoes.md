@@ -136,3 +136,10 @@ substituído). O porquê longo vai no commit.
   camada 10 caía na 0, e a câmera de 0,6 mostrou as pedras da parede por cima da beira do telhado do abrigo. Muda o
   pixel do abrigo e do poço (a água da frente cobre os quadris; os aros do balde ficam por cima do bocal); o kit, o
   marco, o carvalho e a camponesa ficam iguais. A versão não sobe: o id do build já leva os pixels.
+
+## O remoto (pedido do dono, 2026-11-23)
+
+- O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico
+  daqui (force push com lease em 4a23b14), e o histórico antigo saiu dela por pedido do dono. O antigo fica no clone
+  local `pixel-engine` (com os 81 commits que nunca subiram) e na branch `manequim` do GitHub, que não foi tocada. O
+  oráculo segue lendo o clone local; o push daquele clone para a `main` sobrescreveria esta.
