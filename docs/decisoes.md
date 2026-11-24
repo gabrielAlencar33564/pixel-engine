@@ -156,6 +156,10 @@ substituído). O porquê longo vai no commit.
   liam ~31°, e de perfil o braço da frente esticava como quem aponta. Os 16° são os 23° vistos pela câmera
   (tan 23° × cos 45°). As mãos no andar de perfil caem de 55 % para 40 % da altura do corpo. Mudança intencional, com
   prancha; o oráculo do andar compara com a amplitude do antigo posta na receita, como o braço do repouso.
+- No parado os pés ficam desencontrados (`avanco_m` na receita: o esquerdo 5 cm à frente, o direito 5 cm atrás, o
+  lado da frente do primeiro quadro do andar): de perfil um pé cobria o outro, e agora ficam a 3 px. É da receita do
+  parado, não do repouso do rig: o andar parte do repouso e sairia torto. O braço desencontrado (±6°) foi medido e
+  não veio: a mão de lá continua atrás do tronco. Mudança intencional, com prancha; o oráculo tira o avanço.
 
 ## O remoto (pedido do dono, 2026-11-23)
 

@@ -23,13 +23,14 @@ from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS, balanco_do_antigo, braco_do_antigo, no_canvas_antigo
+from .oraculo import CASOS, apoio_do_antigo, balanco_do_antigo, braco_do_antigo, no_canvas_antigo
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "humanos.esperado.json").read_text(encoding="utf-8"))["casos"]
 MAOS_SOBRE_OS_OMBROS = 1.5  # no repouso, de frente, as mãos ficam a até 1,5× a largura dos ombros uma da outra
 # no andar de perfil as mãos se afastam de 30 % a 45 % da altura do corpo: o braço balança (não fica parado) e não
 # estica para a frente (a câmera achata a altura, e o balanço do antigo lia como um braço apontando)
 MAOS_NO_ANDAR = (0.30, 0.45)
+PES_NO_PERFIL = 3  # no parado de perfil os pés ficam a 3 px ou mais um do outro: as duas pernas leem
 VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if p.tipo == "humanoide"
              for nome, args in p.variacoes]
 
@@ -61,6 +62,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
     braco_do_antigo(monkeypatch)
     balanco_do_antigo(monkeypatch)
+    apoio_do_antigo(monkeypatch)
     quer = ESPERADO["vestido"]
     feito = _hashes(_comp("vestido"), quer)
     diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["rgba_sha256"]])
@@ -106,6 +108,24 @@ def test_no_andar_de_perfil_o_braco_balanca_sem_apontar() -> None:
 def test_controle_o_balanco_do_antigo_estica_o_braco(monkeypatch: pytest.MonkeyPatch) -> None:
     balanco_do_antigo(monkeypatch)
     assert _maos_no_andar_de_perfil() > MAOS_NO_ANDAR[1]
+
+
+def _pes_no_parado_de_perfil() -> float:
+    """A distância na tela (px) entre os dois pés no parado de perfil (W)."""
+    comp = _comp("vestido")
+    ir = ir_da_composicao(comp)
+    pedidos, mp = movimento(comp)
+    q = quadro_da_pose(ir, estilo_render(estilo_base()), instantes(ir, "idle", pedidos["idle"], mp)[0][0].pose, "W")
+    return abs(q.landmarks["foot_l"][0] - q.landmarks["foot_r"][0]) / 256
+
+
+def test_no_parado_de_perfil_os_dois_pes_leem() -> None:
+    assert _pes_no_parado_de_perfil() >= PES_NO_PERFIL
+
+
+def test_controle_o_apoio_do_antigo_poe_um_pe_sobre_o_outro(monkeypatch: pytest.MonkeyPatch) -> None:
+    apoio_do_antigo(monkeypatch)
+    assert _pes_no_parado_de_perfil() < 1
 
 
 def _rotacao_da_saia(comp: Composicao) -> list[int]:

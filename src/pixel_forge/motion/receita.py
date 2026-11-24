@@ -18,7 +18,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-from ..rig.fk import Skeleton
+from ..rig.fk import Skeleton, Vec3i
 from ..rig.modelo import Papeis
 from .canais import (
     Channels,
@@ -32,6 +32,7 @@ from .canais import (
 )
 
 DIR = Path(__file__).resolve().parents[1] / "dados" / "receitas"
+METRO_Q8 = 54.0 / 1.65 * 256  # um metro em q8 no corpo padrão (o adulto de 1,65 m tem 54 px)
 
 
 @cache
@@ -141,12 +142,19 @@ def skirt_follow(r: Papeis, mp: dict[str, int]) -> Callable[[Channels], Channels
     return post
 
 
+def _apoio(rec: dict[str, Any], rest: dict[str, Vec3i], k: float) -> dict[str, Vec3i]:
+    """Os alvos dos pés do parado: o repouso, cada pé com o avanço dele (``avanco_m``, na ordem de ``pes``, em metros
+    na escala do corpo). Com os pés desencontrados, as duas pernas leem na vista de perfil."""
+    avancos = rec.get("avanco_m", [0.0] * len(rest))
+    return {f: (x, y + q_(m * METRO_Q8 * k), z) for (f, (x, y, z)), m in zip(rest.items(), avancos, strict=True)}
+
+
 def parado(rec: dict[str, Any], r: Papeis, skel: Skeleton, mp: dict[str, int]) -> dict[str, Any]:
-    """Em pé, os pés no repouso por IK, chaves com suavização (o ``idle``); na perna de N segmentos, o IK põe o alvo
+    """Em pé, os pés no apoio por IK, chaves com suavização (o ``idle``); na perna de N segmentos, o IK põe o alvo
     da cadeia (o jarrete) no repouso e os distais ficam na inclinação de repouso (a pata plana)."""
     duracao, k = rec["duracao_ms"], mp.get("scale_pm", 1000) / 1000
     feet = [r.alvo(r.exige(p, "pe")) for p in rec["pes"]]
-    rest = rest_ankles(skel, feet)
+    rest = _apoio(rec, rest_ankles(skel, feet), k)
     w = ClipWriter(skel)
     guess = bend_guess(skel, feet)
     skirt = skirt_follow(r, mp)

@@ -31,6 +31,12 @@ def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(humano, "ABRE_BRACO_MDEG", ABRE_BRACO_DO_ANTIGO)
 
 
+def apoio_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O parado com os pés lado a lado, como no `pixel-engine`: a engine os desencontra (mudança intencional), e o
+    oráculo compara o resto do parado no apoio dele."""
+    monkeypatch.delitem(carregar("parado"), "avanco_m")
+
+
 def balanco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     """O balanço do braço no andar com a amplitude do `pixel-engine` (o ombro e o cotovelo): a da engine é menor
     (mudança intencional), e o oráculo compara o resto do andar na amplitude dele."""
