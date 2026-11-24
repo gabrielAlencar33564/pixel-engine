@@ -19,7 +19,7 @@ def test_igual_ao_oraculo(nome: str) -> None:
 
 def test_controle_um_px_a_mais_muda_o_pixel() -> None:
     dado = caso("bloco")
-    vertice = dado["ir"]["parts"][0]["geometry"]["vertices"][0]["point_q8"]
-    vertice[2] += 256
+    for v in dado["ir"]["parts"][0]["geometry"]["vertices"]:  # a peça 1 px para o lado (na S, 1 px na tela)
+        v["point_q8"][0] += 256
     feito = rgba_por_vista(dado)
     assert feito["S"][1] != esperado("bloco")["vistas"]["S"]["rgba_sha256"]

@@ -33,7 +33,7 @@ from pixel_forge.contracts.carregar import validar
 from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.kit.registro import PECAS
-from pixel_forge.views.camera import LUZ
+from pixel_forge.views.camera import ELEVACAO_MDEG, LUZ, PROFUNDIDADE_PERMILLE
 
 REPO = Path(os.environ.get("PFE_ORACULO_REPO", r"D:\gabri\Projetos\Gabriel\pixel-engine"))
 CACHE = Path(tempfile.gettempdir()) / "pfe-oraculo"
@@ -45,6 +45,8 @@ FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "oraculo
 NOVAS = {"saia", "lenco"}  # as peças que nasceram na engine nova: o oráculo não as tem
 SO_NO_ANTIGO = {"tronco_em_pe": {"sombra": "plank_deep", "marca": "plank_deep", "pe": "plank_deep", "solido": True}}
 DIRECOES = ("S", "SW", "W", "NW", "N", "NE", "E", "SE")
+# a câmera da engine nova: o antigo a recebe (ele aceitava a profundidade por asset, ADR 0149)
+CAMERA = {"elevation_mdeg": ELEVACAO_MDEG, "depth_permille": PROFUNDIDADE_PERMILLE}
 
 
 def commit() -> str:
@@ -101,7 +103,7 @@ def estilo_antigo(e: dict[str, Any]) -> dict[str, Any]:
 def _vista_antiga(direcao: str, v: dict[str, Any]) -> dict[str, Any]:
     regras = [{"id": f"r{i}", "front": r["front"], "back": r["back"], "when": {}}
               for i, r in enumerate(v.get("occlusion_rules", []))]
-    return {"azimuth_mdeg": DIRECOES.index(direcao) * 45_000, "elevation_mdeg": 45_000, "depth_permille": 350,
+    return {"azimuth_mdeg": DIRECOES.index(direcao) * 45_000, **CAMERA,
             "part_variants": {}, "visibility": v.get("visibility", {}), "depth_bias": v.get("depth_bias", {}),
             "occlusion_rules": regras, "mirror_policy": "forbidden"}
 
@@ -141,7 +143,7 @@ def composicao_antiga(comp: dict[str, Any]) -> dict[str, Any]:
 
 
 def antigo(destino: Path, casos: list[dict[str, Any]], estilo: dict[str, Any] | None) -> dict[str, Any]:
-    entrada = {"casos": casos, "style": estilo}
+    entrada = {"casos": casos, "style": estilo, "camera": CAMERA}
     saida: dict[str, Any] = json.loads(rodar(destino, Path(__file__).with_name("oraculo_antigo.py"),
                                              json.dumps(entrada).encode()))
     return {nome: {v: {k: q[k] for k in ("tamanho", "rgba_sha256", "sem_chao_sha256")} for v, q in vistas.items()}

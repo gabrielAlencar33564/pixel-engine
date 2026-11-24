@@ -6,14 +6,16 @@
     48,
     40
    ],
-   "rgba_sha256": "287110c3529e88886ee98b210ae5cfd0e702bc04182fe948fae37dcdc9c945f1"
+   "rgba_sha256": "c97bc937f929a6172041bb7d6d6d0a2ae06acf77a29ce35ebad9ec4a2284f595",
+   "sem_chao_sha256": "c97bc937f929a6172041bb7d6d6d0a2ae06acf77a29ce35ebad9ec4a2284f595"
   },
   "SE": {
    "tamanho": [
     48,
     40
    ],
-   "rgba_sha256": "ef76048f84204f1dd33601e523b7a4f072c415cce64c3d42835a0a74ef2c6ea5"
+   "rgba_sha256": "09f96a5ec97cc07f268f6fca94035ed41b2d085a6f5f55398edb67919ba70644",
+   "sem_chao_sha256": "09f96a5ec97cc07f268f6fca94035ed41b2d085a6f5f55398edb67919ba70644"
   }
  }
 }

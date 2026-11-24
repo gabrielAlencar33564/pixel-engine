@@ -6,21 +6,24 @@
     48,
     40
    ],
-   "rgba_sha256": "68bdeab982531a6299958747e506763cb2f760b7065551a6cb355e1543b14eee"
+   "rgba_sha256": "b17e24420b2947982c2e074e9b5a87881f7114eb3038967c47d1ab9b19d4d1c5",
+   "sem_chao_sha256": "b17e24420b2947982c2e074e9b5a87881f7114eb3038967c47d1ab9b19d4d1c5"
   },
   "E": {
    "tamanho": [
     48,
     40
    ],
-   "rgba_sha256": "08190d0fa0480f108a6a5f941a171e8adbe636e449d7b50d8560cffa9e801b1b"
+   "rgba_sha256": "6bddae63ec301d6208f48bc66fe5e9a48fbcfcf221b3fc0ab799866f71b66aff",
+   "sem_chao_sha256": "6bddae63ec301d6208f48bc66fe5e9a48fbcfcf221b3fc0ab799866f71b66aff"
   },
   "N": {
    "tamanho": [
     48,
     40
    ],
-   "rgba_sha256": "7979e82feb3fbb457fd29a7a5b362bef2136cd7ba2ac904cfe5bd60138a7315d"
+   "rgba_sha256": "290daf63c2aa3aabf37eec36382128c70d6e6b89f7110c479dae0f5debe820fe",
+   "sem_chao_sha256": "290daf63c2aa3aabf37eec36382128c70d6e6b89f7110c479dae0f5debe820fe"
   }
  }
 }

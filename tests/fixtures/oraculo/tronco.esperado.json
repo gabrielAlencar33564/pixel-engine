@@ -6,14 +6,16 @@
     32,
     56
    ],
-   "rgba_sha256": "b96cd159e27d45e6b7ea4b760ac0fea9872d8c2c864d78f6cb337148cf8930c0"
+   "rgba_sha256": "08002a597ea15ab62ec0135d7cbd00308b16488b052b4bd2b3497e0dbffc1a4e",
+   "sem_chao_sha256": "08002a597ea15ab62ec0135d7cbd00308b16488b052b4bd2b3497e0dbffc1a4e"
   },
   "E": {
    "tamanho": [
     32,
     56
    ],
-   "rgba_sha256": "8f85a07fb0a17a0e820ba907af892984bd526a4e4075e7b1eefe742dd732e607"
+   "rgba_sha256": "82fc6640526b183275a791e30a68eaa9b2a938c0637db0ffe5c517cf9f4490c3",
+   "sem_chao_sha256": "82fc6640526b183275a791e30a68eaa9b2a938c0637db0ffe5c517cf9f4490c3"
   }
  }
 }

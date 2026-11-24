@@ -1,9 +1,9 @@
 """A câmera do sprite: o 3/4 oblíquo em ponto fixo, a única do motor.
 
-A altura aparece a cos(45°) e a profundidade a 0,35 na tela. Para o azimute ``a`` da direção::
+A altura aparece a cos(45°) e a profundidade a 0,6 na tela. Para o azimute ``a`` da direção::
 
     x' = x cos a - y sin a          y' = x sin a + y cos a
-    u  = pivô_u + x'                v  = pivô_v + y'·0,35 - z cos 45°
+    u  = pivô_u + x'                v  = pivô_v + y'·0,6 - z cos 45°
     profundidade = y' cos 45° + z sin 45°      (maior = mais perto da câmera)
 
 A origem do corpo cai no centro do pixel do pivô; a tela sai em q8 do canvas. A luz é da câmera, como ela: vem de
@@ -19,7 +19,7 @@ from ..core.q8 import Q30_SHIFT, pos_to_q8, sin_cos_q30
 from ..rig.fk import Mat3, Vec3i, mat_t_vec
 
 ELEVACAO_MDEG = 45_000
-PROFUNDIDADE_PERMILLE = 350
+PROFUNDIDADE_PERMILLE = 600  # 0,35 no pixel-engine (ADR 0149); 0,6 pela escolha do dono em 2026-11-23
 LUZ = (-1, -1, 1)
 
 
