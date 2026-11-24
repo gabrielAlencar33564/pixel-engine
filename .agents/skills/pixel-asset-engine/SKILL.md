@@ -60,14 +60,19 @@ Um JSON `<id>.r<n>.json` (o `<id>` em minúsculas, `_` e dígitos). Campos:
 
 **Um nó:** `{"id", "peca", "args"}` e, se precisar: `repete` (`{"sobre": "lados", "n": 2}` dá `$lado` −1 e 1;
 `"linha"` dá `$i` e `$t`; `"anel"` dá `$cos` e `$sen`), `grupo` (o contorno: partes do mesmo grupo não se contornam
-entre si), `pilha` e `camada` (na mesma pilha, o nó de camada maior cobre o de camada menor que ele toca; as faces
-internas de uma peça ficam entre a camada dela e a seguinte; para nada se cobrir, use pilhas diferentes), `osso`
+entre si), `pilha` e `camada` (na mesma pilha, o nó de camada maior cobre o de camada menor que ele toca: o telhado
+numa camada acima da parede cobre o alto dela onde o beiral desce na tela; as faces internas de uma peça ficam entre a
+camada dela e a seguinte; para nada se cobrir, use pilhas diferentes), `osso`
 (`raiz`; com balanço, `tronco` ou `cadeia`; com giro, `giro`). Um argumento pode citar a âncora de um nó de antes: `"cachos": "galhos.pontas"`.
 
 **Limites:** `description` e os textos dos traços até 400 caracteres, `reference` até 2000, até 64 nós, e o sprite até
 512 px de lado (o canvas inclui a sombra no chão, à direita). Passar de um limite é recusa com a medida e a dica.
 
 **Coordenadas:** +X à esquerda do asset, +Y para a frente (a câmera do S), +Z para cima; a origem é o pé do asset.
+
+**A câmera** é uma só, o 3/4 oblíquo: a altura aparece a cos 45° e o chão e o topo a 0,6 (o que está à frente desce na
+tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à direita. O contrato está em
+`docs/coordenadas.md`.
 
 **O humano:** o primeiro nó é `corpo_humano`; a roupa vem depois, cada peça um nó. **O quadrúpede:** um nó
 `corpo_canino`, com as marcas e as orelhas como argumentos.
@@ -104,14 +109,17 @@ O acervo é `~/.pixel-forge/acervo` (ou `--acervo`, ou `PFE_ACERVO`). Grave a co
 4. `pfe build <composição> --json`: os quadros no acervo; devolve o `build`.
 5. `pfe exportar <build> --json` e `pfe exportar <build> --verificar --json`: o pacote do jogo (`pfe-jogo/1`, atlas e
    JSON) e a releitura dele contra o build.
-6. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números.
+6. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números (uma fileira por clipe e direção,
+   na ordem de `clipes` e, dentro do clipe, das direções em ordem alfabética: E, N, NE, NW, S, SE, SW, W).
 
 Toda recusa vem como `{"ok": false, "errors": [{"code", "message", "hint", "path"}]}`, com o caminho na composição:
 siga a dica e corrija. A recusa `MOTOR` é defeito da engine, não seu: pare e registre.
 
 ## 6. Completar e corrigir
 
-A revisão é imutável: o build recusa (`IDENTIDADE`) a mesma revisão com outro desenho. Para completar ou corrigir,
+A revisão é imutável: o build recusa (`IDENTIDADE`) a mesma revisão com outro desenho. O build também: o id dele leva
+a composição, o estilo, a versão do motor e os pixels, então o mesmo id é sempre o mesmo desenho; se o motor mudar o
+pixel, o mesmo pedido dá outro build, e o pacote antigo segue valendo para o build antigo. Para completar ou corrigir,
 edite a composição e rode `pfe atualizar <composição> --json`: ela vira a revisão seguinte no acervo; siga o caminho
 com o arquivo que ele devolve.
 
