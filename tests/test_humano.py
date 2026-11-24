@@ -1,5 +1,6 @@
 """O humano: o corpo vestido dá o mesmo pixel que o `pixel-engine` no parado e no andar, nas 8 direções, quadro a
-quadro; cada peça de roupa veste o corpo; a saia segue a coxa ao andar; e quem anda tem as 8 direções."""
+quadro (na abertura de braço dele: a da engine é menor, e as mãos caem junto do corpo); cada peça de roupa veste o
+corpo; a saia segue a coxa ao andar; e quem anda tem as 8 direções."""
 
 from __future__ import annotations
 
@@ -17,13 +18,15 @@ from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.core.recusa import Recusa
 from pixel_forge.design.asset import ir_da_composicao, movimento
+from pixel_forge.design.kit.humano import Corpo, medidas
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS, no_canvas_antigo
+from .oraculo import CASOS, braco_do_antigo, no_canvas_antigo
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "humanos.esperado.json").read_text(encoding="utf-8"))["casos"]
+MAOS_SOBRE_OS_OMBROS = 1.5  # no repouso, de frente, as mãos ficam a até 1,5× a largura dos ombros uma da outra
 VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if p.tipo == "humanoide"
              for nome, args in p.variacoes]
 
@@ -52,7 +55,8 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 
 
 @pytest.mark.slow
-def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo() -> None:
+def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
+    braco_do_antigo(monkeypatch)
     quer = ESPERADO["vestido"]
     feito = _hashes(_comp("vestido"), quer)
     diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["rgba_sha256"]])
@@ -64,6 +68,21 @@ def test_cada_peca_veste_o_corpo(peca: str, nome: str, args: dict[str, Any]) -> 
     ir = ir_da_composicao(de_uma_peca(peca, args))
     q = quadro_de_repouso(ir, estilo_render(estilo_base()), "S")
     assert q.clipping_px == 0 and len(ir.views) == 8, (peca, nome)
+
+
+def _maos_sobre_os_ombros() -> float:
+    """A distância entre as mãos do corpo em repouso, de frente, sobre a largura dos ombros."""
+    q = quadro_de_repouso(ir_da_composicao(de_uma_peca("corpo_humano", {})), estilo_render(estilo_base()), "S")
+    return abs(q.landmarks["hand_l"][0] - q.landmarks["hand_r"][0]) / 256 / (2 * medidas(Corpo())["ombro_x"])
+
+
+def test_no_repouso_as_maos_caem_junto_do_corpo() -> None:
+    assert _maos_sobre_os_ombros() <= MAOS_SOBRE_OS_OMBROS
+
+
+def test_controle_o_braco_do_antigo_deixa_as_maos_longe(monkeypatch: pytest.MonkeyPatch) -> None:
+    braco_do_antigo(monkeypatch)
+    assert _maos_sobre_os_ombros() > MAOS_SOBRE_OS_OMBROS
 
 
 def _rotacao_da_saia(comp: Composicao) -> list[int]:

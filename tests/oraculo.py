@@ -8,15 +8,24 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pytest
 
 from pixel_forge.application.estilo import estilo_base
 from pixel_forge.application.quadros import quadro_de_repouso
 from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.estilo import StyleDoc
 from pixel_forge.contracts.ir import AssetIR
+from pixel_forge.design.kit import humano
 from pixel_forge.raster.estilo import estilo_render
 
 CASOS = Path(__file__).parent / "fixtures" / "oraculo"
+ABRE_BRACO_DO_ANTIGO = 15_000.0  # o `pixel-engine` abre o braço a 15° no repouso
+
+
+def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O braço do humano na abertura do `pixel-engine`: a engine abre menos (mudança intencional), e o oráculo
+    compara o resto do humano (o corpo, o rig, o movimento e o render) na abertura dele."""
+    monkeypatch.setattr(humano, "ABRE_BRACO_MDEG", ABRE_BRACO_DO_ANTIGO)
 
 
 def no_canvas_antigo(rgba: np.ndarray[Any, np.dtype[np.uint8]], tamanho: list[int]) -> dict[str, Any]:

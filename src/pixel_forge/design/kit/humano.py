@@ -22,6 +22,9 @@ SIDES = (("l", 1), ("r", -1))
 FRONT_VIEWS = ("S", "SW", "W", "E", "SE")
 CANVAS, PIVOT, TALL_EXTRA = 96, (48, 60), 16
 TALL_PX = 1.72 * 54 / 1.65  # acima de ~1,70 m o canvas cresce para cima
+# a abertura do braço no repouso: a 15° (o pixel-engine) a câmera, que achata a altura, mostrava ~21° e as mãos caíam
+# longe do corpo; a 6° elas caem junto do quadril
+ABRE_BRACO_MDEG = 6_000.0
 
 
 @dataclass(frozen=True)
@@ -67,10 +70,10 @@ def neck_len(c: dict[str, float]) -> float:
 
 
 def esqueleto(b: AssetBuilder, c: dict[str, float]) -> None:
-    """Os ossos do modelo ``humano`` nas medidas do corpo: os pés na largura do quadril, os braços afastados ~15° e os
-    cotovelos dobrados ~12° no repouso."""
+    """Os ossos do modelo ``humano`` nas medidas do corpo: os pés na largura do quadril, os braços afastados
+    :data:`ABRE_BRACO_MDEG` e os cotovelos dobrados ~12° no repouso."""
     abre = round(math.degrees(math.atan2(c["tornozelo_x"] - c["quadril_x"], c["quadril_z"] - c["tornozelo_z"])) * 1000)
-    monta(b, "humano", {**c, "abre_perna_mdeg": float(abre), "abre_braco_mdeg": 15_000.0,
+    monta(b, "humano", {**c, "abre_perna_mdeg": float(abre), "abre_braco_mdeg": ABRE_BRACO_MDEG,
                         "dobra_cotovelo_mdeg": 12_000.0})
 
 

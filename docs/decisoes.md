@@ -144,6 +144,15 @@ substituído). O porquê longo vai no commit.
 - A saída do `pfe` é UTF-8 também redirecionada: no Windows ela caía no cp1252, o JSON chegava quebrado a quem o lê e
   a recusa com um caractere de fora dele (`→`) morria num erro de codificação, sem código nem dica (I8).
 
+## O humano: o braço do repouso (pedido do dono, 2026-11-24)
+
+- O braço abre 6° no repouso (eram os 15° do `pixel-engine`): a câmera achata a altura, os 15° liam ~21° e as mãos
+  caíam a 1,9× a largura dos ombros uma da outra; a 6° ficam a 1,4×. É uma constante do corpo (`ABRE_BRACO_MDEG`), não
+  um argumento: o jeito antigo não existe mais na engine (regra 3). Mudança intencional, com prancha.
+- O oráculo do humano (o vestido e as peças do kit) compara na abertura do antigo: o teste põe a constante em 15°, e o
+  corpo, o rig, o movimento e o render seguem iguais a ele pixel a pixel. A abertura nova é provada pela medida das
+  mãos, com o controle a 15°. Os esperados não foram regerados (I11).
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico
