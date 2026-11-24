@@ -11,11 +11,12 @@
     atualizar <composição>     o desenho mudado como a revisão seguinte no acervo
 
 Toda resposta com ``--json`` é um objeto curto: ``{"ok": true, "result": {...}}`` ou
-``{"ok": false, "errors": [{"code", "message", "hint", "path"}]}``. Toda recusa traz código e dica."""
+``{"ok": false, "errors": [{"code", "message", "hint", "path"}]}``. Toda recusa traz código e dica. A saída é UTF-8."""
 
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import sys
 from collections.abc import Callable, Sequence
@@ -42,9 +43,9 @@ def _comp(a: argparse.Namespace) -> Composicao:
 def _build(a: argparse.Namespace) -> dict[str, Any]:
     comp = _comp(a)
     pasta = acervo.pasta_do_acervo(a.acervo)
-    registrada = acervo.registrar(comp, pasta)
+    acervo.conferir(comp, pasta)
     b = construir(comp, pasta)
-    return {"build": str(b.pasta), "build_id": b.build_id, "composicao": str(registrada),
+    return {"build": str(b.pasta), "build_id": b.build_id, "composicao": str(acervo.registrar(comp, pasta)),
             "quadros": sum(len(c["frames"]) for c in b.manifesto["clips"])}
 
 
@@ -110,7 +111,16 @@ def _parser() -> argparse.ArgumentParser:
     return ap
 
 
+def _saida_utf8() -> None:
+    """A saída em UTF-8 também redirecionada: no Windows ela cairia na página de código (cp1252), e o JSON chegaria
+    quebrado a quem o lê, ou nem sairia com um caractere de fora dela."""
+    for saida in (sys.stdout, sys.stderr):
+        if isinstance(saida, io.TextIOWrapper):
+            saida.reconfigure(encoding="utf-8")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    _saida_utf8()
     a = _parser().parse_args(argv)
     fn: Comando = a.fn
     try:

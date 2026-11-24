@@ -137,6 +137,13 @@ substituído). O porquê longo vai no commit.
   pixel do abrigo e do poço (a água da frente cobre os quadris; os aros do balde ficam por cima do bocal); o kit, o
   marco, o carvalho e a camponesa ficam iguais. A versão não sobe: o id do build já leva os pixels.
 
+## O CLI depois da análise (2026-11-24)
+
+- O `build` confere a identidade, constrói e só então registra a composição: a que ele recusava (o porte, o quadro
+  cortado) ficava no acervo, e a correção na mesma revisão saía recusada por `IDENTIDADE` (I8; I5).
+- A saída do `pfe` é UTF-8 também redirecionada: no Windows ela caía no cp1252, o JSON chegava quebrado a quem o lê e
+  a recusa com um caractere de fora dele (`→`) morria num erro de codificação, sem código nem dica (I8).
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

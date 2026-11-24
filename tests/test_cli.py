@@ -4,7 +4,9 @@ o mesmo id de build é sempre o mesmo desenho; o estático sai em menos de 1 min
 
 from __future__ import annotations
 
+import io
 import json
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -74,6 +76,26 @@ def test_a_identidade_e_imutavel_e_a_mudanca_e_a_revisao_seguinte(tmp_path: Path
     _, a = pfe(capsys, "atualizar", str(mudada), "--acervo", acervo)
     assert Path(a["result"]["composicao"]).name == "mourao.r2.json"
     assert pfe(capsys, "atualizar", str(mudada), "--acervo", acervo)[1]["errors"][0]["code"] == "SEM_MUDANCA"
+
+
+def test_o_build_recusado_nao_registra_a_composicao(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    acervo = tmp_path / "acervo"
+    errada = _copia(tmp_path, MOURAO, categoria="arvore_grande")
+    assert pfe(capsys, "build", str(errada), "--acervo", str(acervo))[1]["errors"][0]["code"] == "PORTE"
+    assert not (acervo / "composicoes").exists()
+    codigo, r = pfe(capsys, "build", str(MOURAO), "--acervo", str(acervo))  # a mesma r1, corrigida
+    assert codigo == 0 and Path(r["result"]["composicao"]).is_file()
+
+
+def test_a_saida_e_utf8_mesmo_redirecionada(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    cru = io.BytesIO()
+    monkeypatch.setattr(sys, "stdout", io.TextIOWrapper(cru, encoding="cp1252"))  # a saída redirecionada no Windows
+    assert main(["checar", str(_copia(tmp_path, MOURAO, tipo="prop →")), "--json"]) == 2
+    sys.stdout.flush()
+    erro = json.loads(cru.getvalue().decode("utf-8"))["errors"][0]
+    assert erro["code"] == "DOC_INVALIDO" and "→" in erro["message"]
+    with pytest.raises(UnicodeEncodeError):  # o controle: no cp1252 de antes esta recusa nem saía
+        erro["message"].encode("cp1252")
 
 
 def test_o_mesmo_id_de_build_e_sempre_o_mesmo_desenho(tmp_path: Path, capsys: pytest.CaptureFixture[str],

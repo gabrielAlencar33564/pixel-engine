@@ -28,16 +28,22 @@ def _gravar(alvo: Path, comp: Composicao) -> None:
                     encoding="utf-8")
 
 
-def registrar(comp: Composicao, acervo: Path) -> Path:
-    """A composição no acervo; a revisão que já existe com outro desenho é recusada."""
+def conferir(comp: Composicao, acervo: Path) -> Path:
+    """O lugar da composição no acervo, sem gravar; a revisão que já existe com outro desenho é recusada."""
     alvo = _arquivo(acervo, comp.id, comp.revision)
-    if alvo.is_file():
-        if ler(alvo, Composicao) != comp:
-            raise Recusa("IDENTIDADE", f"'{comp.id}' r{comp.revision} já existe no acervo com outro desenho.",
-                         "A identidade não muda: grave a mudança como a revisão seguinte com `pfe atualizar "
-                         "<composição>`.", "/revision")
-        return alvo
-    _gravar(alvo, comp)
+    if alvo.is_file() and ler(alvo, Composicao) != comp:
+        raise Recusa("IDENTIDADE", f"'{comp.id}' r{comp.revision} já existe no acervo com outro desenho.",
+                     "A identidade não muda: grave a mudança como a revisão seguinte com `pfe atualizar "
+                     "<composição>`.", "/revision")
+    return alvo
+
+
+def registrar(comp: Composicao, acervo: Path) -> Path:
+    """A composição no acervo, com a identidade conferida. O build registra depois de construir: a composição que ele
+    recusa não ocupa a revisão."""
+    alvo = conferir(comp, acervo)
+    if not alvo.is_file():
+        _gravar(alvo, comp)
     return alvo
 
 
