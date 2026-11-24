@@ -19,7 +19,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 |---|---|---|
 | Linhas em `src/` | 32 701 | 8 273 |
 | Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~25 s, 237 testes |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~25 s, 242 testes |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |

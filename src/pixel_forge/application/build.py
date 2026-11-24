@@ -18,7 +18,7 @@ from ..design.porte import conferir_porte
 from ..export.atlas import Rgba
 from ..export.imagem import salvar_png
 from ..motion.gerar import gerar_clipe
-from ..quality.quadro import conferir_quadro
+from ..quality.quadro import conferir_quadro, conferir_tracos
 from ..raster.estilo import EstiloRender, estilo_render
 from ..raster.renderer import Quadro
 from ..rig.fk import Skeleton
@@ -89,8 +89,8 @@ class Renderizado:
 
 
 def renderizar(comp: Composicao) -> Renderizado:
-    """Todos os quadros que o build grava, com as mesmas recusas (o porte, o quadro cortado, as cores): o ``checar``
-    e o ``build`` passam por aqui (I8)."""
+    """Todos os quadros que o build grava, com as mesmas recusas (o porte, o quadro cortado, as cores, o traço que
+    não lê): o ``checar`` e o ``build`` passam por aqui (I8)."""
     ir, style = ir_da_composicao(comp), estilo_base()
     conferir_porte(comp.categoria, ir)
     est = estilo_render(style)
@@ -103,6 +103,7 @@ def renderizar(comp: Composicao) -> Renderizado:
             for it, q in zip(its, quadros, strict=True):
                 conferir_quadro(q, style, f"{clip}/{direcao}/{it.index}")
             seqs.append(Sequencia(clip, direcao, loop, its, quadros))
+    conferir_tracos(comp.tracos, {d: [q for s in seqs if s.direcao == d for q in s.quadros] for d in ir.views})
     return Renderizado(ir, est, seqs)
 
 

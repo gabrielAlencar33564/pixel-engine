@@ -161,6 +161,15 @@ substituído). O porquê longo vai no commit.
   parado, não do repouso do rig: o andar parte do repouso e sairia torto. O braço desencontrado (±6°) foi medido e
   não veio: a mão de lá continua atrás do tronco. Mudança intencional, com prancha; o oráculo tira o avanço.
 
+## A conferência do que se vê (pedido do dono, 2026-11-24)
+
+- O quadro guarda os pixels de que cada parte é dona, já com a oclusão, e quantos deles tocam a borda da figura. A
+  prévia diz, por vista, as partes que a vista desenha e nenhum pixel mostra (`escondidas`) e os pixels de cada traço
+  (`tracos`): a análise do asset deixa de depender só de olhar a prancha (I8).
+- O traço `observable` sem pixel em nenhuma vista é recusado (`TRACO_ESCONDIDO`), e o de `reads_in_silhouette` que
+  nunca toca a borda também (`TRACO_SEM_SILHUETA`), na prévia e no build pelo mesmo caminho. Os dois campos existiam
+  no formato e nenhum código os lia: o traço só conferia se a parte existia (I8: aceitar e não conferir é mentir).
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

@@ -17,7 +17,7 @@ from ..views.camera import LUZ
 from ..views.primitivas import Scene2D
 from .contorno import contorno_externo, contorno_interno
 from .estilo import EstiloRender
-from .grade import MARGIN
+from .grade import MARGIN, Mascara, shift
 from .limpeza import MANTER, limpar_isolados
 from .luz import lambert_permille, pela_normal
 from .montagem import Buf16, Camadas, compor, sombra_de_cima, tabelas
@@ -35,6 +35,8 @@ class Quadro:
     clipping_px: int = 0
     overflow_px: tuple[int, int, int, int] = (0, 0, 0, 0)  # quanto passa de cada borda (esq, cima, dir, baixo)
     part_table: list[str] = field(default_factory=list)
+    visiveis: dict[str, int] = field(default_factory=dict)  # os pixels de que cada parte é dona, já com a oclusão
+    na_silhueta: dict[str, int] = field(default_factory=dict)  # deles, os que tocam o vazio (a borda da figura)
 
     def to_rgba(self, palette: dict[int, tuple[int, int, int, int]]) -> npt.NDArray[np.uint8]:
         lut = np.zeros((65536, 4), dtype=np.uint8)
@@ -43,6 +45,18 @@ class Quadro:
         rgba: npt.NDArray[np.uint8] = lut[self.index]
         rgba[..., 3] = np.where(self.alpha == 255, rgba[..., 3], 0)
         return rgba
+
+
+def _contar(cam: Camadas, onde: Mascara) -> dict[str, int]:
+    """Os pixels de ``onde`` de que cada parte é dona (só as que têm algum)."""
+    n = np.bincount(cam.part[onde], minlength=len(cam.num) + 1)
+    return {p: int(n[k]) for p, k in cam.num.items() if n[k]}
+
+
+def _borda(figura: Mascara) -> Mascara:
+    """Os pixels da figura com um vizinho vazio (em cima, embaixo ou dos lados)."""
+    cheio: Mascara = shift(figura, 1, 0) & shift(figura, -1, 0) & shift(figura, 0, 1) & shift(figura, 0, -1)
+    return figura & ~cheio
 
 
 def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D, bufs: tuple[Buf16, npt.NDArray[np.uint8]],
@@ -64,6 +78,8 @@ def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D, bufs: tuple[Buf16,
     for p, c in cam.cmds.items():
         lut[cam.num[p]] = bool(MANTER & set(c.tags))
     limpar_isolados(est, q.index, q.alpha, material[crop], lut[cam.part[crop]])
+    figura = cam.part != 0
+    q.visiveis, q.na_silhueta = _contar(cam, inside & figura), _contar(cam, inside & _borda(figura))
     return q
 
 
