@@ -215,12 +215,13 @@ def order_commands(cmds: list[DrawCommand], rules: list[tuple[str, str]], biases
     return out
 
 
-def project_view(asset: AssetIR, pose: Pose, direction: Direcao) -> Scene2D:
+def project_view(asset: AssetIR, pose: Pose, direction: Direcao, lente: tuple[int, int] | None = None) -> Scene2D:
+    """A cena da vista na câmera do jogo ou, com a ``lente``, na da radiografia (sem a sombra no chão)."""
     view = asset.views.get(direction)
     if view is None:
         raise Recusa("VISTA_AUSENTE", f"O asset não declara a vista {direction}.",
                      f"As vistas dele são {', '.join(asset.views)}.")
-    cam = Camera(AZIMUTE_MDEG[direction], asset.canvas.pivot_px)
+    cam = Camera(AZIMUTE_MDEG[direction], asset.canvas.pivot_px, lente)
     offset = pose.render_offset_pos()
     cmds = [_comando(part, view.geometria.get(part.id, part.geometry),
                      _Peca(cam, pose, pose.world[part.bone_id], offset))
@@ -231,4 +232,4 @@ def project_view(asset: AssetIR, pose: Pose, direction: Direcao) -> Scene2D:
     prio = {p.id: p.draw_priority for p in asset.parts}
     ordered = order_commands(cmds, rules, q8bias, prio, direction)
     return Scene2D(direction, AZIMUTE_MDEG[direction], ordered, (cam.pu, cam.pv), dict(view.depth_bias),
-                   tuple(rules), pontos)
+                   tuple(rules), pontos, lente is None)

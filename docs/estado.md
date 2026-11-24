@@ -10,8 +10,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 - **Kit vigente** (37 peças): construção, telhados, carpintaria, vãos, formas, flora (`pontilhado`, galhos, cortinas,
   pena), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição num formato só, com o porte.
 - **Movimento:** o parado e a passada do humano, o parado e o passo do quadrúpede, o balanço e o giro do prop.
-- **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `checar`, `build`, `exportar`,
-  `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de pedido e 4 exemplos.
+- **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `radiografia`, `checar`, `build`,
+  `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de pedido e 4 exemplos.
 
 ## Números contra a linha de base
 
@@ -19,7 +19,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 |---|---|---|
 | Linhas em `src/` | 32 701 | 8 273 |
 | Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~25 s, 242 testes |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~25 s, 258 testes |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
@@ -55,12 +55,16 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 
 - A corrida, o galope, a ação por acessório e a bateria canina (sentar, deitar, latir, uivar): nenhum pedido os usa.
 - O que a rodada 2 apontou sem recusa: a copa do `pontilhado` não faz a linha reta de pasto; a palha não envelhece
-  para o cinza; o `olhar` sai sem rótulos (a skill diz a ordem das fileiras); a prévia não avisa parte escondida.
+  para o cinza; o `olhar` sai sem rótulos (a skill diz a ordem das fileiras). A prévia já avisa a parte escondida.
 - A camponesa: a saia larga em 3/4 lê como saco; o andar (igual ao antigo) gira o tronco nas diagonais.
-- O humano, medido em 2026-11-24, ainda tem: no andar em diagonal as mãos a até 21 px uma da outra (eram 29; o que
-  sobra é a projeção do balanço na diagonal); o perfil parado ainda estreito (12 px, um braço cobrindo o outro: pede
-  uma pose por vista ou o membro de lá mais escuro); o rosto sob o chapéu e o olho fora da silhueta no perfil; o
-  andar em S e N com o balanço comprimido pela câmera.
+- **O modelo do humano está errado na anatomia** (`pfe radiografia`, 2026-11-24): os olhos a 82 % da altura da
+  cabeça (o real é ~50 %: ficam na testa, na faixa da aba do chapéu); o rosto com 0,63 da largura do crânio (lê como
+  uma lâmpada); a mandíbula como o ponto mais à frente do perfil (não há nariz); o cabelo preso alongando a cabeça
+  em 25 % para trás; um vão de 4 % da estatura (7 cm) entre o tronco e a esfera do ombro, cujo alto fica na altura
+  do queixo; o pescoço com 4,8 % da estatura. A roupa veste por cima e herda tudo. As mudanças 7 a 9 ajustaram a
+  pose sobre este modelo; a 7 expôs a esfera do ombro, que virou o canto da silhueta.
+- O humano na tela: no andar em diagonal as mãos a até 21 px uma da outra; o perfil parado estreito (12 px, um
+  braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
 
 ## Espera o dono
 

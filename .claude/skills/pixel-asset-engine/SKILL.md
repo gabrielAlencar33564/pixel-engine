@@ -53,7 +53,7 @@ Um JSON `<id>.r<n>.json` (o `<id>` em minúsculas, `_` e dígitos). Campos:
 | `vistas` | o prop parado: `{"S": {}}` (2 ou 4 cardinais só se o pedido disser); quem anda: as 8 direções `S SW W NW N NE E SE` |
 | `movimento` | o prop: `["static"]` (balanço `{"receita": "balanco", ...}` ou giro `{"receita": "giro", ...}` se o pedido disser); o humano e o quadrúpede: `["idle", "walk"]` |
 | `landmarks` | pontos do jogo no prop (`"sort_front": ["0", "0", "0"]`) |
-| `tracos` | o que tem de ler no sprite: `id`, `description`, `parts` (ids de partes), `verification` (`observable`) |
+| `tracos` | o que tem de ler no sprite: `id`, `description`, `parts` (ids de partes), `verification` (`observable`: recusado se nenhuma vista mostra um pixel dele) e, se quiser, `reads_in_silhouette` (tem de tocar a borda da figura) |
 
 **Expressões:** números com unidade (`1.2m`, `30cm`, `8mm`, `3px`, `120%`, `15deg`), `$medida`, `+ - * /`, `min`,
 `max`, `round` e parênteses. O tamanho sai dos metros reais: o humano de 1,65 m tem ~44 px na tela.
@@ -102,14 +102,21 @@ ficha dele): `tests/fixtures/exemplos/banco.r1.json` (estático de vista única)
 O acervo é `~/.pixel-forge/acervo` (ou `--acervo`, ou `PFE_ACERVO`). Grave a composição em `<acervo>/composicoes/`.
 
 1. `pfe previa <composição> --json`: o repouso de cada vista com as mesmas recusas do build, a prancha
-   (`previas/<id>.r<n>.png`, recorte real ampliado até 4×) e os números (vistas, canvas, altura, porte e os ids das
-   `partes`, que os traços citam). Leia os números, depois a prancha; ajuste a composição e repita.
-2. `pfe conjunto <composição> ... --json`: os assets lado a lado pelo chão, com o humano de 1,65 m de régua.
-3. `pfe checar <composição> --json`: todos os quadros do build conferidos (os clipes de quem anda), sem gravar.
-4. `pfe build <composição> --json`: os quadros no acervo; devolve o `build`.
-5. `pfe exportar <build> --json` e `pfe exportar <build> --verificar --json`: o pacote do jogo (`pfe-jogo/1`, atlas e
+   (`previas/<id>.r<n>.png`, recorte real ampliado até 4×) e os números: vistas, canvas, altura, porte, os ids das
+   `partes` (que os traços citam), as `escondidas` (por vista, as partes que a vista desenha e nenhum pixel mostra) e
+   os pixels de cada traço em cada vista (`tracos`). Leia os números, depois a prancha; ajuste a composição e
+   repita. A parte escondida que devia aparecer (o olho sob a aba, a mão de lá) é defeito: não siga com ela.
+2. `pfe radiografia <composição> --json`: o modelo ampliado até 4× pela geometria, de frente, de perfil e de costas
+   em elevação (sem a câmera do jogo) e, na fileira de baixo, na câmera do jogo (`radiografias/<id>.r<n>.png`). É
+   onde a forma se analisa: no tamanho do jogo um rosto tem 5 px, e o defeito da forma se confunde com a perda da
+   redução. Do humano vêm as `medidas` do corpo, cada uma com a faixa do corpo real e o que ela quer dizer: a que
+   está fora da faixa é defeito do modelo (do motor), não da composição; diga, não disfarce com roupa nem com pose.
+3. `pfe conjunto <composição> ... --json`: os assets lado a lado pelo chão, com o humano de 1,65 m de régua.
+4. `pfe checar <composição> --json`: todos os quadros do build conferidos (os clipes de quem anda), sem gravar.
+5. `pfe build <composição> --json`: os quadros no acervo; devolve o `build`.
+6. `pfe exportar <build> --json` e `pfe exportar <build> --verificar --json`: o pacote do jogo (`pfe-jogo/1`, atlas e
    JSON) e a releitura dele contra o build.
-6. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números (uma fileira por clipe e direção,
+7. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números (uma fileira por clipe e direção,
    na ordem de `clipes` e, dentro do clipe, das direções em ordem alfabética: E, N, NE, NW, S, SE, SW, W).
 
 Toda recusa vem como `{"ok": false, "errors": [{"code", "message", "hint", "path"}]}`, com o caminho na composição:

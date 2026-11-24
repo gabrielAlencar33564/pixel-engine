@@ -6,7 +6,9 @@ A altura aparece a cos(45°) e a profundidade a 0,6 na tela. Para o azimute ``a`
     u  = pivô_u + x'                v  = pivô_v + y'·0,6 - z cos 45°
     profundidade = y' cos 45° + z sin 45°      (maior = mais perto da câmera)
 
-A origem do corpo cai no centro do pixel do pivô; a tela sai em q8 do canvas. A luz é da câmera, como ela: vem de
+A origem do corpo cai no centro do pixel do pivô; a tela sai em q8 do canvas. A ``lente`` (a elevação em mdeg e a
+profundidade em ‰) só troca esses dois números na radiografia do modelo; o asset do jogo sai sempre na câmera
+daqui. A luz é da câmera, como ela: vem de
 cima e da esquerda (``LUZ``, em direita, baixo e para a câmera), em todo asset e toda vista. A sombra de um ponto a
 ``z`` px do chão cai ``SOMBRA_POR_ALTURA``·z px à direita da base dele na tela.
 """
@@ -37,10 +39,11 @@ _HALF = 1 << (Q30_SHIFT - 1)
 
 
 class Camera:
-    def __init__(self, azimuth_mdeg: int, pivot_px: list[int]) -> None:
+    def __init__(self, azimuth_mdeg: int, pivot_px: list[int], lente: tuple[int, int] | None = None) -> None:
+        elevacao, profundidade = lente or (ELEVACAO_MDEG, PROFUNDIDADE_PERMILLE)
         self.sa, self.ca = sin_cos_q30(azimuth_mdeg)
-        self.se, self.ce = sin_cos_q30(ELEVACAO_MDEG)
-        self.sd = (PROFUNDIDADE_PERMILLE << Q30_SHIFT) // 1000
+        self.se, self.ce = sin_cos_q30(elevacao)
+        self.sd = (profundidade << Q30_SHIFT) // 1000
         self.pu = pivot_px[0] * 256 + 128
         self.pv = pivot_px[1] * 256 + 128
         self.eu: Vec3i = (self.ca, -self.sa, 0)

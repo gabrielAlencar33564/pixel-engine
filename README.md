@@ -35,7 +35,8 @@ Sem o uv: `pip install .` num ambiente virtual.
 Os assets ficam no acervo, `~/.pixel-forge/acervo` (ou `--acervo`, ou a variável `PFE_ACERVO`). O caminho de um asset:
 
 ```bash
-uv run pfe previa  composicoes/poco.r1.json --json   # o repouso de cada vista, as recusas e a prancha
+uv run pfe previa  composicoes/poco.r1.json --json   # o repouso de cada vista, as recusas, o que não se vê e a prancha
+uv run pfe radiografia composicoes/poco.r1.json --json   # o modelo ampliado, sem a câmera, e as medidas do corpo
 uv run pfe checar  composicoes/poco.r1.json --json   # todos os quadros conferidos, sem gravar
 uv run pfe build   composicoes/poco.r1.json --json   # os quadros no acervo; devolve o build
 uv run pfe exportar <build> --json                   # o pacote do jogo (pfe-jogo/1: atlas e JSON)

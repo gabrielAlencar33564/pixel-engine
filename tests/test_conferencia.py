@@ -21,10 +21,11 @@ OLHOS = {"id": "olhos", "description": "Os dois olhos no rosto", "parts": ["eye_
 
 
 def _viajante(tracos: list[dict[str, Any]], sem: str = "") -> Composicao:
-    """O viajante com os traços dados e, com ``sem``, sem a peça desse nome (o chapéu que cobre os olhos)."""
+    """O viajante parado com os traços dados e, com ``sem``, sem a peça desse nome (o chapéu que cobre os olhos)."""
     dado = json.loads(VIAJANTE.read_text(encoding="utf-8"))
     dado["nos"] = [n for n in dado["nos"] if n["peca"] != sem]
     dado["tracos"] = tracos
+    dado["movimento"] = ["idle"]  # o parado basta para a oclusão, e o build fica curto
     return validar(dado, Composicao, "teste")
 
 

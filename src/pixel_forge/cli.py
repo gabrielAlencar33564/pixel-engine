@@ -5,6 +5,7 @@
     build <composição>         os quadros no acervo (a composição entra em composicoes/, identidade imutável)
     exportar <build>           o pacote do jogo (pfe-jogo/1); --verificar relê e confere; --publicar pede a revisão
     olhar <build>              a prancha de todos os quadros do pacote e os números
+    radiografia <composição>   o modelo ampliado, de frente, de perfil e de costas, e as medidas do corpo
     catalogo                   as peças do kit: para que servem, os argumentos e a prancha
     conjunto <composições...>  os assets lado a lado, na mesma escala, com o humano de régua
     revisar <build>            o estado da revisão; o dono registra com --veredito, --nota e --por
@@ -28,6 +29,7 @@ from .application.build import construir
 from .application.catalogo import catalogo
 from .application.exportar import exportar, verificar
 from .application.olhar import olhar
+from .application.radiografia import radiografia
 from .contracts.carregar import ler
 from .contracts.composicao import Composicao
 from .core.recusa import Recusa
@@ -81,6 +83,8 @@ COMANDOS: dict[str, tuple[str, Comando, tuple[str, ...]]] = {
     "build": ("os quadros da composição, no acervo", _build, ("composicao", "--acervo")),
     "exportar": ("o pacote do jogo (pfe-jogo/1) de um build", _exportar, ("build", "--verificar", "--publicar")),
     "olhar": ("a prancha de todos os quadros do pacote e os números", lambda a: olhar(Path(a.build)), ("build",)),
+    "radiografia": ("o modelo ampliado, de frente, de perfil e de costas, e as medidas do corpo",
+                    lambda a: radiografia(_comp(a), acervo.pasta_do_acervo(a.acervo)), ("composicao", "--acervo")),
     "catalogo": ("as peças do kit: para que servem, os argumentos e a prancha", _catalogo, ("--acervo",)),
     "conjunto": ("os assets lado a lado, na mesma escala, com o humano de régua",
                  lambda a: previa.conjunto([ler(Path(c), Composicao) for c in a.composicoes],

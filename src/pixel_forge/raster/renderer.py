@@ -47,6 +47,12 @@ class Quadro:
         return rgba
 
 
+def mascaras(scene: Scene2D, est: EstiloRender, width: int, height: int) -> dict[str, Mascara]:
+    """A máscara inteira de cada parte no canvas, sem a oclusão: a forma de cada uma, para medir."""
+    cam = compor(scene, est.materials, width, height)
+    return {p: m[MARGIN:MARGIN + height, MARGIN:MARGIN + width] for p, m in cam.full.items()}
+
+
 def _contar(cam: Camadas, onde: Mascara) -> dict[str, int]:
     """Os pixels de ``onde`` de que cada parte é dona (só as que têm algum)."""
     n = np.bincount(cam.part[onde], minlength=len(cam.num) + 1)
@@ -95,5 +101,6 @@ def render(scene: Scene2D, est: EstiloRender, width: int, height: int) -> Quadro
     inner = contorno_interno(cam, t, index)
     alpha = np.where(cam.part != 0, 255, 0).astype(np.uint8)
     contorno_externo(est, cam, t, (index, alpha, fill), inner)
-    sombra_no_chao(est, cam, scene, index, alpha)
+    if scene.chao:
+        sombra_no_chao(est, cam, scene, index, alpha)
     return _recorte(est, cam, scene, (index, alpha), t.material[cam.part])

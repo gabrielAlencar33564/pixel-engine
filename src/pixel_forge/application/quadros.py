@@ -15,5 +15,8 @@ def quadro_da_pose(asset: AssetIR, est: EstiloRender, pose: Pose, direcao: Direc
     return render(project_view(asset, pose, direcao), est, asset.canvas.width, asset.canvas.height)
 
 
-def quadro_de_repouso(asset: AssetIR, est: EstiloRender, direcao: Direcao) -> Quadro:
-    return quadro_da_pose(asset, est, rest_pose(Skeleton(asset.bones)), direcao)
+def quadro_de_repouso(asset: AssetIR, est: EstiloRender, direcao: Direcao,
+                      lente: tuple[int, int] | None = None) -> Quadro:
+    """O repouso na câmera do jogo ou, com a ``lente``, na da radiografia."""
+    cena = project_view(asset, rest_pose(Skeleton(asset.bones)), direcao, lente)
+    return render(cena, est, asset.canvas.width, asset.canvas.height)

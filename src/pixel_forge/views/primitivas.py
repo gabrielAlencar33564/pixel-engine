@@ -136,3 +136,4 @@ class Scene2D:
     depth_bias_q8: dict[str, int]
     front_back: tuple[tuple[str, str], ...]
     landmarks: dict[str, Ponto3]  # os pontos do jogo, em q8 de tela (u, v) e a profundidade
+    chao: bool = True  # a cena tem chão (a sombra projetada nele); a elevação da radiografia não tem

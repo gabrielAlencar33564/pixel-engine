@@ -170,6 +170,17 @@ substituído). O porquê longo vai no commit.
   nunca toca a borda também (`TRACO_SEM_SILHUETA`), na prévia e no build pelo mesmo caminho. Os dois campos existiam
   no formato e nenhum código os lia: o traço só conferia se a parte existia (I8: aceitar e não conferir é mentir).
 
+- A radiografia (`pfe radiografia`) amplia o asset pela geometria (a IR com toda medida até 4× maior, não o pixel) e
+  o mostra em elevação, sem a câmera do jogo, e na câmera do jogo. A lente da elevação é só de diagnóstico: a câmera
+  do asset segue uma constante, e nenhum quadro do build passa pela lente (a sombra no chão não sai nela).
+- As medidas do corpo humano saem da máscara inteira de cada parte na radiografia, cada uma com a faixa de um corpo
+  real. As faixas são do cânone de desenho e da antropometria, com folga, postas por quem escreveu a medida e não
+  conferidas numa fonte: o dono as ajusta. A régua é provada num corpo sintético de proporções reais, com um
+  controle por defeito.
+- As medidas do corpo do kit fora da faixa são uma lista fixa no teste (`DEFEITOS_DO_MODELO`): a correção do
+  modelo tira o item da lista, e nenhuma medida nova sai da faixa sem aparecer ali. A medida não vira recusa do
+  build enquanto o modelo não é corrigido: recusaria todo humano.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico
