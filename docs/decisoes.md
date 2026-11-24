@@ -123,3 +123,11 @@ substituído). O porquê longo vai no commit.
 
 - A prova passou. A dica do `TRACO` passou a listar as partes do asset (mandava rodar a prévia, que recusava o mesmo
   traço), e o catálogo diz as partes de cada peça: depois da prova, sem rodada nova (a correção não muda pixel).
+
+## Depois da prova: a câmera mais de cima (pedido do dono, 2026-11-23)
+
+- A profundidade da câmera sobe de 0,35 para 0,6 (o dono escolheu entre 0,35, 0,5 e 0,6 numa prancha da prova); a
+  altura continua a cos 45°. O oráculo passa a câmera ao `pixel-engine`, que aceitava a profundidade por asset (ADR
+  0149): o núcleo segue igual a ele pixel a pixel, os dois a 0,6. A versão do motor sobe para 0.2.0.
+- O id do build leva os pixels: com a câmera nova e a versão velha, o build regravou a prova de 0,35 com o mesmo id
+  (dois desenhos, um nome). Os builds de 0,35 foram restaurados nos ids deles; os de 0,6 têm ids novos.

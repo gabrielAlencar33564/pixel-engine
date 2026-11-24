@@ -1,5 +1,6 @@
 """O build: a composição vira a IR e os quadros de cada clipe e direção, no estilo do jogo, gravados no acervo por
-conteúdo (o id do build é o hash da composição, do estilo e da versão do motor: o mesmo pedido dá o mesmo build)."""
+conteúdo (o id do build é o hash da composição, do estilo, da versão do motor e dos pixels: o mesmo pedido dá o mesmo
+build, e o mesmo id é sempre o mesmo desenho)."""
 
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ from ..contracts.composicao import Composicao
 from ..contracts.ir import AssetIR
 from ..design.asset import ir_da_composicao, movimento
 from ..design.porte import conferir_porte
+from ..export.atlas import Rgba
 from ..export.imagem import salvar_png
 from ..motion.gerar import gerar_clipe
 from ..quality.quadro import conferir_quadro
@@ -104,26 +106,33 @@ def renderizar(comp: Composicao) -> Renderizado:
     return Renderizado(ir, est, seqs)
 
 
-def _gravar(pasta: Path, r: Renderizado, s: Sequencia, i: int) -> dict[str, Any]:
+def _entrada(r: Renderizado, s: Sequencia, i: int, rgba: Rgba) -> dict[str, Any]:
+    """O quadro no manifesto (o caminho relativo à pasta do build)."""
     it, q = s.instantes[i], s.quadros[i]
-    rgba = q.to_rgba({p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in r.est.doc.palette})
-    rel = f"frames/{s.clip}/{s.direcao.lower()}/{it.index:03d}.png"
-    salvar_png(pasta / rel, rgba)
-    return {"index": it.index, "path": rel, "duration_ms": it.duration_ms, "pivot_px": list(r.ir.canvas.pivot_px),
-            "events": [], "landmarks": {k: [u >> 8, v >> 8] for k, (u, v) in sorted(q.landmarks.items())},
+    return {"index": it.index, "path": f"frames/{s.clip}/{s.direcao.lower()}/{it.index:03d}.png",
+            "duration_ms": it.duration_ms, "pivot_px": list(r.ir.canvas.pivot_px), "events": [],
+            "landmarks": {k: [u >> 8, v >> 8] for k, (u, v) in sorted(q.landmarks.items())},
             "rgba_sha256": hashlib.sha256(rgba.tobytes()).hexdigest()}
 
 
 def construir(comp: Composicao, acervo: Path) -> Build:
-    """Os quadros de cada clipe em cada direção, conferidos e gravados em ``builds/`` do acervo."""
+    """Os quadros de cada clipe em cada direção, conferidos e gravados em ``builds/`` do acervo. O id leva os pixels:
+    o mesmo id é sempre o mesmo desenho, mesmo que o motor mude o pixel sem mudar de versão."""
     engine = versao_do_motor()
     r = renderizar(comp)
+    pal = {p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in r.est.doc.palette}
+    rgbas = [[q.to_rgba(pal) for q in s.quadros] for s in r.sequencias]
+    frames = [[_entrada(r, s, i, rgba) for i, rgba in enumerate(qs)] for s, qs in zip(r.sequencias, rgbas, strict=True)]
     build_id = hash_canonico({"engine": engine, "composicao": comp.model_dump(mode="json"),
-                              "style": r.est.doc.model_dump(mode="json")})
+                              "style": r.est.doc.model_dump(mode="json"),
+                              "pixels": [f["rgba_sha256"] for fs in frames for f in fs]})
     pasta = acervo / "builds" / f"{r.ir.id}.r{r.ir.revision}.{build_id[:12]}"
+    for fs, qs in zip(frames, rgbas, strict=True):
+        for f, rgba in zip(fs, qs, strict=True):
+            salvar_png(pasta / f["path"], rgba)
     clips = [{"clip": s.clip, "direction": s.direcao, "loop": s.loop,
-              "root_deltas_q8": [it.root_delta_q8 for it in s.instantes],
-              "frames": [_gravar(pasta, r, s, i) for i in range(len(s.quadros))]} for s in r.sequencias]
+              "root_deltas_q8": [it.root_delta_q8 for it in s.instantes], "frames": fs}
+             for s, fs in zip(r.sequencias, frames, strict=True)]
     manifesto = {"build_id": build_id, "engine": engine, "asset": {"id": r.ir.id, "revision": r.ir.revision},
                  "clips": clips}
     (pasta / "manifest.json").write_text(json.dumps(manifesto, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

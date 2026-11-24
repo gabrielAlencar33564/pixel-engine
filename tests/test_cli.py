@@ -1,6 +1,6 @@
 """O caminho curto de um asset pelo `pfe`, no acervo e sem projeto: prévia, checar, build, exportar, verificar, olhar,
 revisar e publicar; a prévia recusa o que o build recusa (I8); a identidade é imutável e a mudança é a revisão seguinte;
-o estático sai em menos de 1 min de máquina."""
+o mesmo id de build é sempre o mesmo desenho; o estático sai em menos de 1 min de máquina."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from typing import Any
 import pytest
 
 from pixel_forge.cli import main
+from pixel_forge.views import camera
 
 from .oraculo import CASOS
 
@@ -73,6 +74,16 @@ def test_a_identidade_e_imutavel_e_a_mudanca_e_a_revisao_seguinte(tmp_path: Path
     _, a = pfe(capsys, "atualizar", str(mudada), "--acervo", acervo)
     assert Path(a["result"]["composicao"]).name == "mourao.r2.json"
     assert pfe(capsys, "atualizar", str(mudada), "--acervo", acervo)[1]["errors"][0]["code"] == "SEM_MUDANCA"
+
+
+def test_o_mesmo_id_de_build_e_sempre_o_mesmo_desenho(tmp_path: Path, capsys: pytest.CaptureFixture[str],
+                                                      monkeypatch: pytest.MonkeyPatch) -> None:
+    acervo = str(tmp_path / "acervo")
+    antes = pfe(capsys, "build", str(MOURAO), "--acervo", acervo)[1]["result"]["build"]
+    assert pfe(capsys, "build", str(MOURAO), "--acervo", acervo)[1]["result"]["build"] == antes
+    monkeypatch.setattr(camera, "PROFUNDIDADE_PERMILLE", 350)  # o motor desenha diferente sem mudar de versão
+    depois = pfe(capsys, "build", str(MOURAO), "--acervo", acervo)[1]["result"]["build"]
+    assert depois != antes and Path(antes).is_dir() and Path(depois).is_dir()
 
 
 def test_o_conjunto_poe_a_regua_e_as_alturas(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
