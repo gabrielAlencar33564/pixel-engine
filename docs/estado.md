@@ -6,7 +6,7 @@ só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prov
 ## O que a engine tem
 
 - **Núcleo** igual ao `pixel-engine` pixel a pixel (oráculo por `git archive`): q8, IR, FK/IK de 2 e de N segmentos,
-  a câmera 3/4 oblíqua, a projeção, o raster (z-buffer, tons, sombras, contornos, limpeza) e o pacote `pfe-jogo/1`.
+  a câmera 3/4 oblíqua (profundidade 0,6, os dois), a projeção, o raster e o pacote `pfe-jogo/1`. Motor 0.2.0.
 - **Kit vigente** (37 peças): construção, telhados, carpintaria, vãos, formas, flora (`pontilhado`, galhos, cortinas,
   pena), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição num formato só, com o porte.
 - **Movimento:** o parado e a passada do humano, o parado e o passo do quadrúpede, o balanço e o giro do prop.
@@ -33,8 +33,9 @@ só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prov
 - **Rodada 2 (passou):** os 3 exports verificados; o carvalho com `pontilhado`; vistas 1, 1 e 8; uma recusa (`TRACO`,
   com dica); nada piorado para passar; estático bem abaixo de 1 min de máquina. A dica do traço apontava para a prévia
   que a recusava: agora lista as partes, e o catálogo diz as partes de cada peça.
-- Pranchas da rodada 2 em `~/.pixel-forge/acervo/olhar/` (`carvalho_roble.r1...`, `poco_pedra.r1...`,
-  `camponesa.r1...`) e `previas/camponesa.r1.png`.
+- **Câmera a 0,6 (2026-11-23):** os três reconstruídos e verificados: `carvalho_roble.r1.56813c99a932`,
+  `poco_pedra.r1.4158705605bf`, `camponesa.r1.98f3c0ef2a49` (os de 0,35 ficam nos ids da rodada 2). Pranchas em
+  `~/.pixel-forge/acervo/olhar/` e, da camponesa por clipe, em `pranchas/revisao/`.
 
 ## Mudanças intencionais de pixel (pranchas em `~/.pixel-forge/acervo/pranchas/mudancas/`, antes em cima)
 
@@ -42,7 +43,8 @@ só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prov
 2. A sombra de contato reescalada também nas vistas E, N e W (fica 3:1 na tela em toda vista).
 3. O canvas inclui a sombra que o asset projeta no chão (o antigo a cortava calado); a luz é da câmera.
 4. A pegada do quadrúpede gira com o corpo (a antiga, de lado, saía 2× mais longa e cortada).
-Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós da pilha.
+5. A câmera mais de cima: a profundidade de 0,35 para 0,6 (escolha do dono; a altura segue a cos 45°).
+Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
 
@@ -53,5 +55,5 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós da
 
 ## Espera o dono
 
-A revisão artística das pranchas da prova e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
+A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`).
