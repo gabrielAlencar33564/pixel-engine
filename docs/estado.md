@@ -33,9 +33,9 @@ só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prov
 - **Rodada 2 (passou):** os 3 exports verificados; o carvalho com `pontilhado`; vistas 1, 1 e 8; uma recusa (`TRACO`,
   com dica); nada piorado para passar; estático bem abaixo de 1 min de máquina. A dica do traço apontava para a prévia
   que a recusava: agora lista as partes, e o catálogo diz as partes de cada peça.
-- **Câmera a 0,6 (2026-11-23):** os três reconstruídos e verificados: `carvalho_roble.r1.56813c99a932`,
-  `poco_pedra.r1.4158705605bf`, `camponesa.r1.98f3c0ef2a49` (os de 0,35 ficam nos ids da rodada 2). Pranchas em
-  `~/.pixel-forge/acervo/olhar/` e, da camponesa por clipe, em `pranchas/revisao/`.
+- **Câmera a 0,6 (2026-11-23):** reconstruídos e verificados: `carvalho_roble.r1.56813c99a932`,
+  `poco_pedra.r1.88cd1cdde9ff`, `camponesa.r1.98f3c0ef2a49` e, das fixtures, `abrigo.r1.a1d0577ebd7a` e
+  `marco.r1.41ef53825299` (os de 0,35 ficam nos ids da rodada 2). Pranchas em `~/.pixel-forge/acervo/olhar/`.
 
 ## Mudanças intencionais de pixel (pranchas em `~/.pixel-forge/acervo/pranchas/mudancas/`, antes em cima)
 
@@ -44,6 +44,7 @@ só leitura (I7: `git status` limpo do começo ao fim). **N0 a N5 feitos; a prov
 3. O canvas inclui a sombra que o asset projeta no chão (o antigo a cortava calado); a luz é da câmera.
 4. A pegada do quadrúpede gira com o corpo (a antiga, de lado, saía 2× mais longa e cortada).
 5. A câmera mais de cima: a profundidade de 0,35 para 0,6 (escolha do dono; a altura segue a cos 45°).
+6. As faces da peça nos degraus da camada do nó (a 0,6, a pedra da parede do abrigo cobria a beira do telhado).
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
