@@ -38,4 +38,5 @@ repetem nada dele. O que dá para checar é teste, não linha aqui.
 - Só uma sessão escreve neste repositório por vez.
 - Imagem: leia primeiro os números; a prancha é o recorte no tamanho real, ampliado no máximo 4×.
 - A decisão que o plano não fixa vai em uma linha em `docs/decisoes.md`; o porquê vai no commit.
+- Cada etapa verificada vira um commit pequeno na `main`, sem pedir; o push só quando o dono pedir.
 - O acervo de trabalho e os builds ficam fora do git.
