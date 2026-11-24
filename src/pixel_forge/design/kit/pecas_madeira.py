@@ -29,7 +29,7 @@ def _parede_tabuas(c: Ctx, a: dict[str, Any]) -> None:
         if h > 1.0:
             var = sortear_tabua(c.st, 1 - (x - x0) / max(1.0, x1 - x0), a["desgaste"], 30)
             tabua(c, f"{c.pid}_{k:02d}", Lugar((x + 0.2, a["y"], z0), (0, 0, 1), (1, 0, 0), h, w), var,
-                  Modo(c.camada, luz=True))
+                  Modo(0, luz=True))
         x += larg
         k += 1
 
@@ -39,14 +39,14 @@ def _poste(c: Ctx, a: dict[str, Any]) -> None:
     (x, y, z), h, r = a["base"], a["altura"], a["raio"]
     f = y + r
     mat, tags = pela_luz(TABUA, 0)
-    c.poly(c.pid, mat, [(x - r, f, z), (x + r, f, z), (x + r, f, z + h), (x - r, f, z + h)], c.camada, tags)
+    c.poly(c.pid, mat, [(x - r, f, z), (x + r, f, z), (x + r, f, z + h), (x - r, f, z + h)], 0, tags)
     s = x + r * 0.3
     mat, tags = pela_luz(TABUA, -1)
-    c.poly(f"{c.pid}_sh", mat, [(s, f, z), (x + r, f, z), (x + r, f, z + h), (s, f, z + h)], c.camada + 1, tags)
+    c.poly(f"{c.pid}_sh", mat, [(s, f, z), (x + r, f, z), (x + r, f, z + h), (s, f, z + h)], 1, tags)
     if a["topo"]:
         t = z + h
         c.poly(f"{c.pid}_top", "madeira_cortada", [(x - r, y - r, t), (x + r, y - r, t), (x + r, f, t), (x - r, f, t)],
-               c.camada + 1, (*FLAT, LIT))
+               1, (*FLAT, LIT))
 
 
 def _viga(c: Ctx, a: dict[str, Any]) -> None:
@@ -60,9 +60,9 @@ def _viga(c: Ctx, a: dict[str, Any]) -> None:
         return [(cx + (x - cx) * ca - (yy - y) * sa, y + (x - cx) * sa + (yy - y) * ca, z) for x, yy, z in pts]
 
     mat, tags = pela_luz(TABUA, 0)
-    c.poly(c.pid, mat, g([(x0, y, z0), (x1, y, z0), (x1, y, z1), (x0, y, z1)]), c.camada, tags)
+    c.poly(c.pid, mat, g([(x0, y, z0), (x1, y, z0), (x1, y, z1), (x0, y, z1)]), 0, tags)
     if fundo > 0:
-        c.poly(f"{c.pid}_top", mat, g([(x0, y - fundo, z1), (x1, y - fundo, z1), (x1, y, z1), (x0, y, z1)]), c.camada,
+        c.poly(f"{c.pid}_top", mat, g([(x0, y - fundo, z1), (x1, y - fundo, z1), (x1, y, z1), (x0, y, z1)]), 0,
                tags)
 
 
@@ -71,21 +71,21 @@ def _tabuado(c: Ctx, a: dict[str, Any]) -> None:
     (x0, y0, z0), comp, ext, larg = a["canto"], a["comprimento"], a["extensao"], a["largura"]
     if a["deitado"]:
         c.poly(f"{c.pid}_gap", TABUA["deep"], [(x0, y0, z0), (x0 + comp, y0, z0), (x0 + comp, y0 + ext, z0),
-                                                (x0, y0 + ext, z0)], c.camada)
+                                                (x0, y0 + ext, z0)], 0)
         k, y = 0, y0
         while y + 1.0 < y0 + ext:
             w = min(larg, y0 + ext - y) - 0.5
             tabua(c, f"{c.pid}_{k:02d}", Lugar((x0, y + 0.25, z0 + 0.05), (1, 0, 0), (0, 1, 0), comp, w),
-                  sortear_tabua(c.st, a["luz"], a["desgaste"], 30), Modo(c.camada + 1, aresta=False))
+                  sortear_tabua(c.st, a["luz"], a["desgaste"], 30), Modo(1, aresta=False))
             y += larg
             k += 1
         return
     c.poly(f"{c.pid}_gap", TABUA["deep"], [(x0, y0, z0), (x0 + comp, y0, z0), (x0 + comp, y0, z0 + ext),
-                                            (x0, y0, z0 + ext)], c.camada)
+                                            (x0, y0, z0 + ext)], 0)
     for i in range(max(1, round(ext / larg))):
         tabua(c, f"{c.pid}_{i:02d}", Lugar((x0, y0 + 0.05, z0 + i * larg + 0.4), (1, 0, 0), (0, 0, 1), comp,
                                           larg - 0.8),
-              sortear_tabua(c.st, a["luz"], a["desgaste"], a["pregos"]), Modo(c.camada + 1, aresta=False))
+              sortear_tabua(c.st, a["luz"], a["desgaste"], a["pregos"]), Modo(1, aresta=False))
 
 
 def _corda(c: Ctx, a: dict[str, Any]) -> None:
@@ -93,11 +93,11 @@ def _corda(c: Ctx, a: dict[str, Any]) -> None:
     p, r, barriga = a["de"], a["ate"], a["barriga"]
     pts = [(p[0] + (r[0] - p[0]) * t, p[1] + (r[1] - p[1]) * t, p[2] + (r[2] - p[2]) * t - barriga * 4 * t * (1 - t))
            for t in (i / 4 for i in range(5))]
-    c.line(c.pid, a["material"], pts, c.camada)
+    c.line(c.pid, a["material"], pts, 0)
 
 
 def _aro(c: Ctx, a: dict[str, Any]) -> None:
-    c.line(c.pid, "metal", list(a["pontos"]), c.camada)
+    c.line(c.pid, "metal", list(a["pontos"]), 0)
 
 
 PECAS_MADEIRA = [

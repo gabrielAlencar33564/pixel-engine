@@ -50,7 +50,7 @@ def _pedra(ctx: Ctx, pid: str, xs: tuple[float, float], zs: tuple[float, float],
     pts = [(a + ch, y, zb), (c - ch, y, zb), (c, y, zb + ch), (c, y, zt - ch + dz), (c - ch, y, zt + dz),
            (a + ch, y, zt), (a, y, zt - ch), (a, y, zb + ch)]
     mat, tags = pela_luz(ALVENARIA, desvio_da_pedra(ctx.st))
-    ctx.poly(pid, mat, pts, ctx.camada + 1, tags)
+    ctx.poly(pid, mat, pts, 1, tags)
 
 
 class _Muro:
@@ -90,7 +90,7 @@ def _muro(c: Ctx, a: dict[str, Any]) -> None:
     if a["rejunte"]:  # a parede de baixo, que aparece entre as pedras
         pts = [(x0, y, z0), (x1, y, z0), (x1, y, mu.topo(x1)), *([(mu.xc, y, mu.topo(mu.xc))] if a["empena"] else []),
                (x0, y, mu.topo(x0))]
-        c.poly(c.pid, "rejunte", pts, c.camada, (*FLAT, UNLIT))
+        c.poly(c.pid, "rejunte", pts, 0, (*FLAT, UNLIT))
     z, row = z0, 0
     while True:
         z += mu.fiada(z, row)

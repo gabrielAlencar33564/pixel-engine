@@ -13,7 +13,7 @@ from .composicao import conferir_medidas, conferir_nos, medidas, repeticoes, sem
 from .construtor import AssetBuilder, Junta, Parte, ellipse, q, qv
 from .expressao import compilar, valor, variaveis
 from .kit.movimento import Elo, sway_chain
-from .kit.peca import Ctx, ler_args
+from .kit.peca import CAMADAS_DO_NO, Ctx, ler_args
 from .kit.pilha import Pilha
 from .kit.registro import PECAS
 from .vistas import (
@@ -29,11 +29,6 @@ from .vistas import (
 )
 
 PRECISA = {"tronco": "balanco", "cadeia": "balanco", "giro": "giro"}
-
-
-# a camada do nó separa os nós de uma pilha; as faces internas de uma peça (o miolo do bocal, os pregos da tábua) vão
-# em camadas acima da do nó, sem chegar à do nó seguinte
-CAMADAS_DO_NO = 100
 
 
 def _receita[R: (Balanco, Giro)](comp: Composicao, tipo: type[R]) -> R | None:

@@ -22,6 +22,9 @@ from .pilha import Pilha
 
 MAX_ARGS = 12
 MAX_LINHAS = 250
+# a camada do nó separa os nós de uma pilha (camada × 100); as faces de uma peça vão nos degraus dela (0 a 99), sem
+# chegar à do nó seguinte
+CAMADAS_DO_NO = 100
 Tipo = Literal["comprimento", "escalar", "inteiro", "ponto", "pontos", "faixa", "vaos", "bool", "material", "fracoes",
                "tons", "ancora"]
 CLASSES = ("light", "mid", "dark")  # as linhas de um argumento ``tons``: claro, médio e escuro
@@ -39,8 +42,8 @@ class Arg:
 @dataclass
 class Ctx:
     """O que a peça recebe além dos argumentos: o construtor, a semente do nó, o id (prefixo das partes), o grupo de
-    contorno, a pilha da face e a camada; as vistas da composição (com o azimute), a cadeia do balanço e o osso do
-    nó, as âncoras dos nós de antes e o que a peça muda por vista."""
+    contorno, a pilha da face e a camada do nó (as faces somam o degrau delas); as vistas da composição (com o
+    azimute), a cadeia do balanço e o osso do nó, as âncoras dos nós de antes e o que a peça muda por vista."""
 
     b: AssetBuilder
     st: Stream
@@ -64,15 +67,22 @@ class Ctx:
     def ancora(self, ref: str) -> list[Any]:
         return list(self.ancoras.get(ref, [])) if ref else []
 
-    def poly(self, pid: str, mat: str, pts: list[Vec], camada: int, tags: tuple[str, ...] = FLAT) -> None:
-        """Uma face chapada pelos pontos (na raiz), empilhada na pilha da face."""
+    def poly(self, pid: str, mat: str, pts: list[Vec], degrau: int, tags: tuple[str, ...] = FLAT) -> None:
+        """Uma face chapada pelos pontos (na raiz), empilhada na pilha da face no ``degrau`` da peça."""
         self.b.part(pid, mat, bound_polygon(pts), Parte(group=self.grupo, tags=tags))
-        self.pilha.add(pid, camada, pts)
+        self.empilha(pid, degrau, pts)
 
-    def line(self, pid: str, mat: str, pts: list[Vec], camada: int, width: int = 1) -> None:
-        """Um traço de ``width`` px pelos pontos (detalhe, sem contorno), empilhado na pilha da face."""
+    def line(self, pid: str, mat: str, pts: list[Vec], degrau: int, width: int = 1) -> None:
+        """Um traço de ``width`` px pelos pontos (detalhe, sem contorno), empilhado no ``degrau`` da peça."""
         self.b.part(pid, mat, polyline([qv(*p) for p in pts], width), Parte(group=self.grupo, tags=LINE))
-        self.pilha.add(pid, camada, pts)
+        self.empilha(pid, degrau, pts)
+
+    def empilha(self, pid: str, degrau: int, pts: list[Vec]) -> None:
+        """A parte na pilha da face, na camada do nó mais o ``degrau`` (0 a 99): a peça só diz a ordem das faces
+        dela, e nenhuma face sai da faixa do nó (a palha na camada 0 absoluta caía sob a parede do nó de baixo)."""
+        if not 0 <= degrau < CAMADAS_DO_NO:
+            raise ValueError(f"A parte '{pid}' pede o degrau {degrau}; a peça tem os degraus 0 a {CAMADAS_DO_NO - 1}.")
+        self.pilha.add(pid, self.camada + degrau, pts)
 
     def osso(self, z: float) -> tuple[str, float]:
         """(osso, z local) da massa na altura ``z``: o elo da cadeia que contém ``z``, o tronco ou a raiz."""

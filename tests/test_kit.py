@@ -1,5 +1,6 @@
 """O kit: cada variação da prancha de cada peça monta, cabe nos tetos e dá o mesmo pixel que o `pixel-engine` na
-mesma entrada (salvo as mudanças intencionais, listadas); a peça recusa o argumento fora do schema com dica."""
+mesma entrada (salvo as mudanças intencionais, listadas); a peça recusa o argumento fora do schema com dica; as faces
+da peça ficam nos degraus da camada do nó."""
 
 from __future__ import annotations
 
@@ -13,7 +14,11 @@ from pixel_forge.application.catalogo import de_uma_peca
 from pixel_forge.application.estilo import estilo_base
 from pixel_forge.application.quadros import quadro_de_repouso
 from pixel_forge.core.recusa import Recusa
+from pixel_forge.core.rng import Stream
 from pixel_forge.design.asset import ir_da_composicao
+from pixel_forge.design.construtor import AssetBuilder
+from pixel_forge.design.kit.peca import CAMADAS_DO_NO, Ctx
+from pixel_forge.design.kit.pilha import Pilha
 from pixel_forge.design.kit.registro import PECAS, conferida
 from pixel_forge.raster.estilo import estilo_render
 
@@ -51,6 +56,14 @@ def test_controle_o_argumento_fora_do_schema_e_recusado() -> None:
     with pytest.raises(Recusa) as e:
         ir_da_composicao(de_uma_peca("poste", {"base": ["0", "0", "0"], "altura": "1m", "raio": "5cm", "cor": "1"}))
     assert e.value.codigo == "ARGUMENTO" and "catalogo" in e.value.dica
+
+
+def test_a_face_fica_na_faixa_do_no() -> None:
+    c = Ctx(AssetBuilder(), Stream(0), "x", "x", Pilha(), 10 * CAMADAS_DO_NO)
+    c.empilha("x_face", 3, [(0.0, 0.0, 0.0)])
+    assert c.pilha.items[0][1] == 1003
+    with pytest.raises(ValueError, match="degrau"):
+        c.empilha("x_fora", CAMADAS_DO_NO, [(0.0, 0.0, 0.0)])
 
 
 def test_controle_a_variacao_mudada_sai_diferente() -> None:

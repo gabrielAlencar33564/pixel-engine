@@ -131,3 +131,8 @@ substituído). O porquê longo vai no commit.
   0149): o núcleo segue igual a ele pixel a pixel, os dois a 0,6. A versão do motor sobe para 0.2.0.
 - O id do build leva os pixels: com a câmera nova e a versão velha, o build regravou a prova de 0,35 com o mesmo id
   (dois desenhos, um nome). Os builds de 0,35 foram restaurados nos ids deles; os de 0,6 têm ids novos.
+- As faces de uma peça vão nos degraus da camada do nó (`Ctx.empilha` soma a camada; degrau de 0 a 99, fora disso
+  é erro do kit). Os telhados, a porta, a janela, o bocal e o barril empilhavam em camadas absolutas: a palha do nó na
+  camada 10 caía na 0, e a câmera de 0,6 mostrou as pedras da parede por cima da beira do telhado do abrigo. Muda o
+  pixel do abrigo e do poço (a água da frente cobre os quadris; os aros do balde ficam por cima do bocal); o kit, o
+  marco, o carvalho e a camponesa ficam iguais. A versão não sobe: o id do build já leva os pixels.

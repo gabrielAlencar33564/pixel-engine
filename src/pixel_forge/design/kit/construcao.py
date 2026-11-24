@@ -74,10 +74,10 @@ class Lugar:
 
 @dataclass(frozen=True)
 class Modo:
-    """Como a tábua se desenha: a camada, a borda escura longe da luz, o bojo (as bordas compridas curvam para fora no
-    meio, a aduela) e o tom pela normal (com ele, o tom da variação vira desvio)."""
+    """Como a tábua se desenha: o degrau dentro do nó, a borda escura longe da luz, o bojo (as bordas compridas
+    curvam para fora no meio, a aduela) e o tom pela normal (com ele, o tom da variação vira desvio)."""
 
-    camada: int
+    degrau: int
     aresta: bool = True
     bojo: float = 0.0
     luz: bool = False
@@ -97,7 +97,7 @@ def _contorno(lg: Lugar, var: Tabua, bojo: float) -> list[Vec]:
     return pts
 
 
-def _marcas(c: Ctx, pid: str, lg: Lugar, var: Tabua, camada: int) -> int:
+def _marcas(c: Ctx, pid: str, lg: Lugar, var: Tabua, degrau: int) -> int:
     """A rachadura e o nó (sorteados) e os pregos nas pontas; devolve quantas partes desenhou."""
     o, u, v, comp, larg = lg.o, lg.u, lg.v, lg.comp, lg.larg
     n = 0
@@ -105,17 +105,17 @@ def _marcas(c: Ctx, pid: str, lg: Lugar, var: Tabua, camada: int) -> int:
         s0, s1 = c.st.randint(20, 45) / 100, c.st.randint(55, 80) / 100
         w = c.st.randint(35, 65) / 100
         c.line(f"{pid}_rc", TABUA["deep"], [soma(soma(o, u, comp * s0), v, larg * w),
-                                            soma(soma(o, u, comp * s1), v, larg * w)], camada + 1)
+                                            soma(soma(o, u, comp * s1), v, larg * w)], degrau + 1)
         n += 1
     if var.no and comp >= 6:
         s, w = c.st.randint(25, 75) / 100, c.st.randint(30, 70) / 100
         p = soma(soma(o, u, comp * s), v, larg * w)
-        c.line(f"{pid}_no", TABUA["deep"], [p, soma(p, u, 0.6)], camada + 1)
+        c.line(f"{pid}_no", TABUA["deep"], [p, soma(p, u, 0.6)], degrau + 1)
         n += 1
     if var.pregos and larg >= 2.0:
         for j, s in enumerate((1.0, comp - 1.0)):
             p = soma(soma(o, u, s), v, larg / 2)
-            c.line(f"{pid}_pr{j}", "metal", [p, soma(p, u, 0.3)], camada + 2)
+            c.line(f"{pid}_pr{j}", "metal", [p, soma(p, u, 0.3)], degrau + 2)
             n += 1
     return n
 
@@ -126,10 +126,10 @@ def tabua(c: Ctx, pid: str, lg: Lugar, var: Tabua, modo: Modo) -> int:
         mat, tags = pela_luz(TABUA, DESVIO_DO_TOM[var.tom])
     else:
         mat, tags = TABUA[var.tom], FLAT
-    c.poly(pid, mat, _contorno(lg, var, modo.bojo), modo.camada, tags)
+    c.poly(pid, mat, _contorno(lg, var, modo.bojo), modo.degrau, tags)
     n = 1
     if modo.aresta and lg.larg >= 2.0:
         d, e = soma(lg.o, lg.v, lg.larg), soma(soma(lg.o, lg.u, lg.comp), lg.v, lg.larg)
-        c.line(f"{pid}_ar", TABUA["deep"], [soma(d, lg.v, -0.35), soma(e, lg.v, -0.35)], modo.camada + 1)
+        c.line(f"{pid}_ar", TABUA["deep"], [soma(d, lg.v, -0.35), soma(e, lg.v, -0.35)], modo.degrau + 1)
         n += 1
-    return n + _marcas(c, pid, lg, var, modo.camada)
+    return n + _marcas(c, pid, lg, var, modo.degrau)

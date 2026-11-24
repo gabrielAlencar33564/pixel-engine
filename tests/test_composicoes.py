@@ -1,6 +1,8 @@
 """As composições sintéticas (a árvore no balanço com os cachos nas pontas dos galhos, o abrigo de pedra e palha, o
-marco nas 4 vistas) dão o mesmo pixel que o `pixel-engine` na mesma entrada. A mudança intencional: a sombra de contato
-das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo, ela ficava achatada pela metade)."""
+marco nas 4 vistas) dão o mesmo pixel que o `pixel-engine` na mesma entrada. As mudanças intencionais: a sombra de
+contato das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo, ela ficava achatada pela metade); a
+palha do abrigo (nó na camada 10) cobre as pedras da parede (camada 0) onde se tocam (no antigo, a palha ficava na
+camada 0 absoluta, e a câmera de 0,6 mostrava as pedras por cima da beira do telhado)."""
 
 from __future__ import annotations
 
@@ -27,7 +29,9 @@ from .test_humano import _hashes
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "composicoes.esperado.json").read_text(encoding="utf-8"))["casos"]
 SOMBRA_GIRADA = {("marco", "E"), ("marco", "N"), ("marco", "W")}
-VISTAS = [(c, v) for c in sorted(ESPERADO) if "/" not in c for v in ESPERADO[c] if (c, v) not in SOMBRA_GIRADA]
+PALHA_NA_CAMADA_DO_NO = {("abrigo", "S")}
+VISTAS = [(c, v) for c in sorted(ESPERADO) if "/" not in c for v in ESPERADO[c]
+          if (c, v) not in SOMBRA_GIRADA | PALHA_NA_CAMADA_DO_NO]
 
 
 def rgba(nome: str, vista: str) -> np.ndarray[Any, np.dtype[np.uint8]]:
@@ -59,6 +63,23 @@ def test_controle_o_oraculo_acusa_a_sombra_girada_de_antes() -> None:
     feitos = {v: no_canvas_antigo(rgba("marco", v), ESPERADO["marco"][v]["tamanho"])["rgba_sha256"]
               for v in ("E", "N", "W")}
     assert all(feitos[v] != ESPERADO["marco"][v]["rgba_sha256"] for v in feitos)
+
+
+def test_o_no_de_camada_maior_cobre_o_de_camada_menor() -> None:
+    comp = ler(CASOS / "composicoes" / "abrigo.r1.json", Composicao)
+    camada = {no.id: no.camada for no in comp.nos}
+
+    def no(pid: str) -> str | None:
+        return max((n for n in camada if pid == n or pid.startswith(f"{n}_")), key=len, default=None)
+
+    pares = [(no(r.front), no(r.back)) for r in ir_da_composicao(comp).views["S"].occlusion_rules]
+    entre_nos = [(f, t) for f, t in pares if f is not None and t is not None and f != t]
+    assert ("agua_e", "parede") in entre_nos and all(camada[f] >= camada[t] for f, t in entre_nos)
+
+
+def test_controle_o_oraculo_acusa_a_palha_de_antes() -> None:
+    quer = ESPERADO["abrigo"]["S"]
+    assert no_canvas_antigo(rgba("abrigo", "S"), quer["tamanho"])["rgba_sha256"] != quer["rgba_sha256"]
 
 
 def test_composicao_de_fixture_tem_um_arquivo_por_caso() -> None:

@@ -17,7 +17,7 @@ X = Arg
 
 def _poligono(c: Ctx, a: dict[str, Any]) -> None:
     """Uma face chapada pelos pontos, com o tom pela normal; sem ela, o material fica como está (a sombra do beiral)."""
-    c.poly(c.pid, a["material"], list(a["pontos"]), c.camada, (*FLAT, LIT) if a["pela_normal"] else (*FLAT, UNLIT))
+    c.poly(c.pid, a["material"], list(a["pontos"]), 0, (*FLAT, LIT) if a["pela_normal"] else (*FLAT, UNLIT))
 
 
 def _traco(c: Ctx, a: dict[str, Any]) -> None:
@@ -28,7 +28,7 @@ def _traco(c: Ctx, a: dict[str, Any]) -> None:
         c.b.part(c.pid, a["material"], geo, Parte(group=c.grupo, tags=("no_inner_outline",)))
     else:
         c.b.part(c.pid, a["material"], polyline([qv(*p) for p in pts], a["largura"]), Parte(group=c.grupo, tags=LINE))
-    c.pilha.add(c.pid, c.camada, pts)
+    c.empilha(c.pid, 0, pts)
 
 
 def _elipsoide(c: Ctx, a: dict[str, Any]) -> None:
@@ -37,12 +37,12 @@ def _elipsoide(c: Ctx, a: dict[str, Any]) -> None:
     (x, y, z), (rx, ry, rz) = a["centro"], a["raios"]
     tags = ("volume_sphere", "shade_group") if a["volume"] else ()
     c.b.part(c.pid, a["material"], ellipse(qv(x, y, z), qv(rx, ry, rz)), Parte(group=c.grupo, tags=tags))
-    c.pilha.add(c.pid, c.camada, [(x - rx, y + ry, z - rz), (x + rx, y + ry, z + rz)])
+    c.empilha(c.pid, 0, [(x - rx, y + ry, z - rz), (x + rx, y + ry, z + rz)])
 
 
 def _fio(c: Ctx, pid: str, mat: str, pts: list[tuple[float, float, float]]) -> None:
     c.b.part(pid, mat, polyline([qv(*p) for p in pts], 1), Parte(group=c.grupo, tags=LINE))
-    c.pilha.add(pid, c.camada, pts)
+    c.empilha(pid, 0, pts)
 
 
 def _fios(c: Ctx, a: dict[str, Any]) -> None:

@@ -30,7 +30,7 @@ def _aduela(c: Ctx, a: dict[str, Any], i: int) -> None:
     v = ((p1[0] - p0[0]) / corda, (p1[1] - p0[1]) / corda, 0.0)
     o = (p0[0] + v[0] * folga / 2, p0[1] + v[1] * folga / 2, cz)
     tabua(c, f"{c.pid}_{i}", Lugar(o, (0, 0, 1), v, a["altura"], max(1.0, corda - folga)), var,
-          Modo(c.camada, a["aresta"], curva, luz=True))
+          Modo(0, a["aresta"], curva, luz=True))
 
 
 def _aros_e_tampo(c: Ctx, a: dict[str, Any]) -> None:
@@ -54,7 +54,7 @@ def _aros_e_tampo(c: Ctx, a: dict[str, Any]) -> None:
         seam = [qv(cx - r_fim * 0.85, cy + yy, cz + h + 0.05), qv(cx + r_fim * 0.85, cy + yy, cz + h + 0.05)]
         c.b.part(f"{c.pid}_lid_seam_{j}", TABUA["shade"], polyline(seam, 1),
                  Parte(group="lid", tags=("flat", "detail", "no_outline")))
-        c.pilha.add(f"{c.pid}_lid_seam_{j}", 5, [(cx - r_fim, cy + yy, cz + h), (cx + r_fim, cy + yy, cz + h)])
+        c.empilha(f"{c.pid}_lid_seam_{j}", 5, [(cx - r_fim, cy + yy, cz + h), (cx + r_fim, cy + yy, cz + h)])
 
 
 def _aduelas(c: Ctx, a: dict[str, Any]) -> None:
