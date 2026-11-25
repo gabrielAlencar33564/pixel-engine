@@ -474,9 +474,10 @@ O dono pediu variações de tronco, para ele não ser simples e só cilíndrico.
 - O que mudou de visibilidade: nada some; o pé da árvore de exemplo fica 2 px mais largo de cada lado.
 - O que sobra: o `irregular` só se lê em tronco de 40 cm ou mais (abaixo disso a variação é menor que 1 px); a
   curva e a inclinação são só em x (de lado, na vista S); as raízes são retas; o lado da sombra não mostra o
-  veio (a rampa não tem tom abaixo); não há forquilha nem toco cortado (a tampa leva o material da casca). O
-  carvalho do acervo (`r3`) foi construído com o tronco antigo e a casca lisa: o build dele segue valendo, e a
-  mesma composição hoje dá o pé novo (na `20b`).
+  veio (a rampa não tem tom abaixo); não há forquilha nem toco cortado (a tampa leva o material da casca).
+- O carvalho do acervo foi refeito com o tronco novo (`carvalho_roble.r4.89fc47c82e08`, export verificado): o
+  fuste de 63 cm com o pé de 0,5 (os 95 cm da ficha no chão), 5 raízes, um nó e a casca sulcada. Na `20b`, a
+  `r3` em cima e a `r4` embaixo. O build da `r3` é do tronco antigo e segue valendo para ele.
 
 ## O remoto (pedido do dono, 2026-11-23)
 

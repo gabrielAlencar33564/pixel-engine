@@ -95,10 +95,10 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
 - A flora em volumes (mudança 19): as bordas do tufo e da saia são lisas, a copa pendente é um domo com ramos
   caindo, e a sombra do elipsoide no chão é aproximada (em `docs/decisoes.md`). O carvalho do acervo foi
-  refeito no modelo novo (`carvalho_roble.r3.3c42542d9f2a`, na `19`); a `r1` e a `r2` usam as peças que saíram e
-  não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
+  refeito no modelo novo (`carvalho_roble.r3.3c42542d9f2a`, na `19`) e depois com o tronco novo
+  (`carvalho_roble.r4.89fc47c82e08`, na `20b`); a `r1` e a `r2` usam as peças que saíram e não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
 - O tronco (mudança 20): o perfil irregular não se lê abaixo de 40 cm, a curva é só de lado, e não há forquilha
-  nem toco cortado. O build do carvalho `r3` é do tronco antigo.
+  nem toco cortado.
 
 ## Espera o dono
 
