@@ -65,6 +65,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
     câmera de cima, não a anatomia). Os olhos no meio do ovo, o chapéu um pouco para trás. Na `15b`, de perto.
 16. Os membros em formas simples: as juntas rentes, a perna em tubo, o pé curto e baixo, a mão da largura do
     punho, cada membro numa massa. Na `16b`, de perto.
+17. O tronco é um bloco: o quadril no mesmo grupo e na mesma massa do tronco (a linha em volta dele lia como
+    sunga), a cintura e o quadril quase da largura do peito.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -76,8 +78,8 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 - O modelo do humano não tem mais medida fora da faixa na radiografia (mudanças 10 a 12), mas as faixas são
   aproximações e a arte espera o dono. A radiografia não vê o que só aparece na câmera do jogo (a face estreita
   da mudança 12 passava nela): o formato na tela é medido nos testes do humano. O que sobra: o chapéu de aba
-  acima de ~200 % cobre os olhos; da análise de 2026-11-25 sobram a cintura fina para o quadril e a barra da
-  calça solta e da saia fechadas (em `docs/decisoes.md`); as
+  acima de ~200 % cobre os olhos; da análise de 2026-11-25 sobra a barra da calça solta e da saia, que
+  fecha arredondada (em `docs/decisoes.md`); as
   mudanças 7 a 9 ajustaram a pose sobre o modelo antigo e não foram reafinadas no novo.
 - O humano na tela: no andar em diagonal as mãos a até 21 px uma da outra; o perfil parado estreito (12 px, um
   braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
@@ -86,4 +88,4 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 16 ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 17 ela ainda não foi reconstruída.

@@ -20,7 +20,9 @@ PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.167, 0.131, 0.108, 0.
 # o tornozelo fica sob a junta do quadril (a perna desce reta): mais aberto, de frente as canelas passam da largura
 # do tronco, e de perfil a câmera a 45° sobe o pé de lá na tela (a 0,080 ele flutuava no meio da canela)
 OMBRO_X, QUADRIL_X, TORNOZELO_X = 0.105, 0.050, 0.050
-PEITO_X, CINTURA_X, QUADRIL_LARG_X, PEITO_Y = 0.090, 0.075, 0.095, 0.060
+# o tronco é um bloco: a cintura e o quadril quase da largura do peito (com a cintura a 0,075 e o quadril a 0,095,
+# as medidas do corpo real, o tronco afinava e abria como uma ampulheta)
+PEITO_X, CINTURA_X, QUADRIL_LARG_X, PEITO_Y = 0.090, 0.082, 0.088, 0.060
 COXA_DA_PERNA = 0.499
 # a perna é um tubo que afina pouco (a canela real afina até 0,021 da estatura: na tela, um palito de 2 px)
 R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.045, 0.034, 0.025, 0.027, 0.023, 0.018,
@@ -31,9 +33,10 @@ R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.0
 # e a meia altura sobre o comprimento dela): mais fina, na tela é um risco de 1 px. O pé é baixo (a meia altura do
 # calcanhar e a da ponta, sobre a altura do tornozelo). Cada membro sombreia como uma massa só
 R_JUNTAS = (1.0, 1.0, 0.95, 1.0, 1.0)
-DEPOIS_DA_JUNTA, MAO_FORMA, PE_ALTO = (1.0, 1.0), (0.9, 1.2, 0.34), (0.55, 0.40)
+DEPOIS_DA_JUNTA, MAO_FORMA, PE_ALTO = (1.0, 1.0), (0.9, 1.2, 0.38), (0.55, 0.40)
 MASSA_DO_MEMBRO: tuple[str, ...] = ("shade_group",)
-QUADRIL: tuple[str, tuple[str, ...]] = ("pelvis", ())  # o grupo de contorno e as marcas do quadril
+# o quadril é do tronco: o mesmo grupo de contorno e a mesma massa (à parte, a linha em volta dele lia como sunga)
+QUADRIL: tuple[str, tuple[str, ...]] = ("torso", ("shade_group",))
 # o ombro: a junta fica OMBRO_CAI abaixo da base do pescoço (o alto do ombro, 3 % da estatura abaixo do queixo), e
 # a esfera dela tem R_OMBRO vezes o raio do braço
 OMBRO_CAI, R_OMBRO = 0.035, 1.25
@@ -110,15 +113,17 @@ def _raios_do_peito(c: dict[str, float], folga: float) -> tuple[float, float]:
 
 
 def peito(c: dict[str, float], folga: float = 0.0, larg: tuple[float, float] = (1.0, 0.0)) -> dict[str, Any]:
-    """O peito em cunha: um fuso de cada lado, do alto do peito à cintura, fechado em cima e embaixo. A seção é um
-    estádio (a frente e as costas chapadas) e os lados e a frente são retas: não há a bola que lia como busto.
-    ``folga`` é a da roupa na profundidade, e ``larg`` (vezes, mais) a dela na largura."""
+    """O peito em cunha: um fuso de cada lado e um no meio, do alto do peito à cintura, fechados em cima e embaixo.
+    A seção é um estádio (a frente e as costas chapadas) e os lados e a frente são retas: não há a bola que lia
+    como busto. ``folga`` é a da roupa na profundidade, e ``larg`` (vezes, mais) a dela na largura."""
     t = c["tronco"]
     ra, rb = _raios_do_peito(c, folga)
     xa = max(0.2, c["peito_x"] * larg[0] + larg[1] - ra)
     xb = max(0.2, c["cintura_x"] * PEITO_NA_CINTURA * larg[0] + larg[1] - rb)
     za, zb = PEITO_ALTO[0] * t, PEITO_BAIXO[0] * t
-    volta = ((xb, zb, rb), (xa, za, ra), (-xa, za, ra), (-xb, zb, rb), (xb, zb, rb))
+    # a volta pelos dois lados e, no fim, o meio de baixo para cima: sem ele fica um sulco entre os lados, e a sombra
+    # da cabeça cai dentro dele
+    volta = ((xb, zb, rb), (xa, za, ra), (-xa, za, ra), (-xb, zb, rb), (xb, zb, rb), (0.0, zb, rb), (0.0, za, ra))
     return {"type": "tapered_polyline", "points_q8": [qv(x, 0, z) for x, z, _ in volta],
             "radii_q8": [q(r) for _, _, r in volta]}
 

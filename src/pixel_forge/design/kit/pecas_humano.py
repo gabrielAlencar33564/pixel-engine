@@ -64,7 +64,7 @@ PECAS_HUMANO = [
         X("espessura", "escalar", "a grossura dos segmentos sobre o cânone", "100%"),
         X("quadril", "escalar", "a altura da junta do quadril, em fração da estatura", "53%"),
         X("pele", "material", "o material do corpo (gente: pele)", "fibra"),
-        X("juntas", "material", "o material das juntas (rentes ao membro: aparecem as do ombro e do punho)",
+        X("juntas", "material", "o material das juntas (rentes ao membro: aparecem as do ombro e do quadril)",
           "madeira_cortada")),
         _corpo, (("adulto de madeira", {}), ("criança", {"estatura": "1.25m", "cabecas": "5", "quadril": "49%"}),
                  ("forte, de pele", {"estatura": "1.76m", "largura": "120%", "espessura": "115%", "pele": "pele",

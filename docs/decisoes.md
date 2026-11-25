@@ -359,6 +359,24 @@ O dono pediu o resto do corpo pela regra da cabeça em ovo: formas simples, para
 - O que mudou de visibilidade (seis composições): as esferas do cotovelo e do joelho somem em todas as vistas; de
   costas, com a saia, as mãos (mais curtas) ficam atrás do quadril.
 
+## O humano: o tronco é um bloco, com o quadril (decisão do dono, 2026-11-25)
+
+A mesma regra das formas simples, no tronco.
+
+- O quadril (`pelvis_block`) é do tronco: o mesmo grupo de contorno e a mesma massa de sombra (`QUADRIL`). À parte,
+  a linha em volta dele lia como sunga no corpo nu (9 px de linha entre a cintura e o quadril, de frente; agora 0).
+- A cintura e o quadril têm quase a largura do peito (`CINTURA_X` 0,082 e `QUADRIL_LARG_X` 0,088; eram 0,075 e
+  0,095, as do corpo real): o tronco afinava e abria como uma ampulheta. `cintura_sobre_o_peito` foi de 0,81 a
+  0,85. O corpo não tem argumento de sexo: a forma é a mesma para todos, e a roupa (a saia, a faixa) é que marca.
+- A jaqueta e a faixa seguem a cintura e ficam ~0,4 px mais largas. Com os dois lados da cunha do peito mais
+  afastados, abriu-se um sulco no meio dela, e a sombra da cabeça caía dentro (um risco nas costas da jaqueta): a
+  cunha ganhou um fuso no meio.
+- O teste do tronco numa massa cobre o quadril; o controle é o tronco do antigo, que o oráculo repõe com as três
+  constantes. Os esperados não foram regerados (I11).
+- O catálogo dizia que as juntas do punho apareciam: as que aparecem são as do ombro e do quadril (medido).
+- A mão cresce um pouco (a meia altura de 0,34 para 0,38 do comprimento dela): com 0,34, de costas ela sumia
+  atrás do quadril no corpo vestido.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

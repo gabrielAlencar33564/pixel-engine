@@ -160,6 +160,7 @@ def _tronco_numa_massa(comp: Composicao, peito: str, cintura: str) -> tuple[bool
 
 def test_o_peito_e_a_cintura_sao_uma_massa_so_sem_linha_entre_os_dois() -> None:
     assert _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "chest", "waist") == (True, 0)
+    assert _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "waist", "pelvis_block") == (True, 0)  # e o quadril
     assert _tronco_numa_massa(_comp("vestido"), "jacket_chest", "jacket_waist") == (True, 0)
 
 
@@ -167,6 +168,8 @@ def test_controle_o_tronco_do_antigo_tem_a_linha_do_busto(monkeypatch: pytest.Mo
     tronco_do_antigo(monkeypatch)
     uma, linha = _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "chest", "waist")
     assert not uma and linha >= 4  # a linha sob a bola do peito, de um braço ao outro
+    uma, linha = _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "waist", "pelvis_block")
+    assert not uma and linha >= 4  # e a linha em volta do quadril (a sunga)
     assert not _tronco_numa_massa(_comp("vestido"), "jacket_chest", "jacket_waist")[0]
 
 

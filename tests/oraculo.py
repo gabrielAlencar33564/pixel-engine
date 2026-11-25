@@ -32,7 +32,8 @@ BALANCO_DO_ANTIGO = (23_000, 26_000)  # e, no andar, balança o ombro 23° e dob
 # e a cintura como duas bolas (cada uma com a sua sombra e, no corpo, o seu contorno), a jaqueta sobre elas e a manga
 # começando acima da junta; sem a linha do ombro
 TRONCO_DO_ANTIGO = ((humano, "OMBRO_CAI", 0.0), (humano, "R_PESCOCO", 0.024), (humano, "BRACO", 0.186),
-                    (humano, "ANTEBRACO", 0.146), (humano, "CINTURA", (0.30, 0.16)),
+                    (humano, "ANTEBRACO", 0.146), (humano, "CINTURA", (0.30, 0.16)), (humano, "CINTURA_X", 0.075),
+                    (humano, "QUADRIL_LARG_X", 0.095), (humano, "QUADRIL", ("pelvis", ())),
                     (roupa, "JAQUETA_CINTURA", (0.22, 0.26)), (roupa, "MANGA_DE", -0.05))
 LINHA_DO_OMBRO = ("trap_", "jacket_yoke_")  # as partes que o `pixel-engine` não tem
 # os membros do `pixel-engine`, nas medidas do corpo real: a esfera saliente em cada junta, a canela que afina até
