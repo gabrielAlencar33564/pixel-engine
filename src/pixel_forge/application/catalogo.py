@@ -1,17 +1,21 @@
-"""O catálogo do kit: para que serve cada peça, o schema dos argumentos e a prancha das 3 variações, no estilo do jogo.
-Só existe o vigente: a peça substituída não está no registro."""
+"""O catálogo do kit, em dois níveis: o resumo (as famílias, as peças e para que serve cada uma) e, por família, o
+schema dos argumentos, as variações, as partes e a prancha de cada peça, no estilo do jogo. Só existe o vigente: a
+peça substituída não está no registro."""
 
 from __future__ import annotations
 
 import json
+import re
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
 from ..contracts.carregar import validar
 from ..contracts.composicao import Composicao
 from ..core.direcoes import DIRECOES
+from ..core.recusa import Recusa
 from ..design.asset import ir_da_composicao
-from ..design.kit.registro import PECAS
+from ..design.kit.registro import FAMILIAS, PECAS
 from ..export.imagem import salvar_png
 from ..raster.estilo import estilo_render
 from .estilo import estilo_base
@@ -54,17 +58,51 @@ def _prancha(peca: str, destino: Path) -> Path:
     return alvo
 
 
-def catalogo(destino: Path) -> Path:
-    """O ``index.json`` (cada peça com a descrição, os argumentos, as vistas, as âncoras e a prancha) e as pranchas."""
-    pecas = []
-    for pid, p in sorted(PECAS.items()):
-        pecas.append({"id": pid, "tipo": p.tipo, "descricao": p.descricao, "vistas": list(p.vistas),
-                      "ancoras": list(p.ancoras), "variacoes": [{"nome": n, "args": args} for n, args in p.variacoes],
-                      "args": [{"nome": a.nome, "tipo": a.tipo, "descricao": a.descricao, "padrao": a.padrao}
-                               for a in p.args],
-                      "partes": [pt.id for pt in ir_da_composicao(de_uma_peca(pid, p.variacoes[0][1])).parts],
-                      "prancha": _prancha(pid, destino).name})
-    alvo = destino / "index.json"
-    alvo.write_text(json.dumps({"pecas": pecas, "materiais": [m.id for m in estilo_base().materials]},
-                               ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    return alvo
+def em_faixas(ids: Sequence[str]) -> list[str]:
+    """Os ids com as sequências numeradas de 3 ou mais numa faixa só (``copa_00..copa_29``): a lista de partes de
+    uma copa tem dezenas de ids que só mudam no número."""
+    out: list[str] = []
+    i = 0
+    while i < len(ids):
+        j = i
+        m = re.fullmatch(r"(.*?)(\d+)", ids[i])
+        while m and j + 1 < len(ids) and ids[j + 1] == f"{m[1]}{int(m[2]) + j + 1 - i:0{len(m[2])}d}":
+            j += 1
+        out += [f"{ids[i]}..{ids[j]}"] if j - i >= 2 else list(ids[i:j + 1])
+        i = j + 1
+    return out
+
+
+def _registro(pid: str, destino: Path) -> dict[str, Any]:
+    """A peça inteira: a descrição, os argumentos, as variações, as partes, as âncoras e a prancha (gravada)."""
+    p = PECAS[pid]
+    partes = [pt.id for pt in ir_da_composicao(de_uma_peca(pid, p.variacoes[0][1])).parts]
+    return {"id": pid, "tipo": p.tipo, "descricao": p.descricao, "vistas": list(p.vistas),
+            "ancoras": list(p.ancoras), "variacoes": [{"nome": n, "args": args} for n, args in p.variacoes],
+            "args": [{"nome": a.nome, "tipo": a.tipo, "descricao": a.descricao, "padrao": a.padrao} for a in p.args],
+            "partes": em_faixas(partes), "prancha": _prancha(pid, destino).name}
+
+
+def _linhas(itens: Sequence[Any]) -> str:
+    """Uma lista em JSON, um item por linha e sem espaço a mais: quem lê o arquivo paga por caractere."""
+    return "[\n" + ",\n".join(json.dumps(i, ensure_ascii=False, separators=(",", ":")) for i in itens) + "\n]"
+
+
+def catalogo(destino: Path, familias: Sequence[str] = ()) -> dict[str, Any]:
+    """O catálogo em dois níveis: o ``index.json`` (o resumo: cada família com as peças dela, a descrição de cada
+    uma e os materiais do estilo) e um ``<família>.json`` com as peças inteiras e as pranchas, só das famílias
+    pedidas (todas, sem pedido). Quem faz uma planta lê o resumo e a flora, não o kit inteiro."""
+    estranhas = [f for f in familias if f not in FAMILIAS]
+    if estranhas:
+        raise Recusa("FAMILIA", f"O kit não tem a família {', '.join(estranhas)}.",
+                     f"As famílias são {', '.join(FAMILIAS)}; sem nenhuma, o catálogo grava todas.")
+    arquivos = {}
+    for familia in familias or FAMILIAS:
+        alvo = destino / f"{familia}.json"
+        alvo.write_text(_linhas([_registro(pid, destino) for pid in FAMILIAS[familia]]) + "\n", encoding="utf-8")
+        arquivos[familia] = str(alvo)
+    resumo = [{"familia": f, "pecas": {pid: PECAS[pid].descricao for pid in ids}} for f, ids in FAMILIAS.items()]
+    index = destino / "index.json"
+    index.write_text('{"familias":' + _linhas(resumo) + ',\n"materiais":'
+                     + json.dumps([m.id for m in estilo_base().materials]) + "}\n", encoding="utf-8")
+    return {"index": str(index), "familias": arquivos}

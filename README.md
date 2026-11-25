@@ -45,8 +45,8 @@ uv run pfe exportar <build> --verificar --json       # relê o pacote e confere 
 uv run pfe olhar    <build> --json                   # a prancha de todos os quadros e os números
 ```
 
-Também há `catalogo` (as peças do kit, com os argumentos e a prancha de cada uma), `conjunto` (assets lado a lado com o
-humano de régua), `atualizar` (o desenho mudado vira a revisão seguinte: a identidade é imutável) e `revisar` (o dono
+Também há `catalogo` (o resumo das famílias do kit e, das famílias pedidas, os argumentos e a prancha de cada
+peça), `conjunto` (assets lado a lado com o humano de régua), `atualizar` (o desenho mudado vira a revisão seguinte: a identidade é imutável) e `revisar` (o dono
 registra o veredito; só o build aprovado sai com `exportar --publicar`). O formato do pacote está em
 [`docs/contrato-do-jogo.md`](docs/contrato-do-jogo.md).
 

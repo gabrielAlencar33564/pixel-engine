@@ -7,7 +7,7 @@
     critica <build>            a flora medida e comparada com as irmãs, e a prancha de quem revisa; --parecer registra
     olhar <build>              a prancha de todos os quadros do pacote e os números
     radiografia <composição>   o modelo ampliado, de frente, de perfil e de costas, e as medidas do corpo
-    catalogo                   as peças do kit: para que servem, os argumentos e a prancha
+    catalogo [famílias...]     o kit: o resumo das famílias e, das pedidas, os argumentos e a prancha de cada peça
     conjunto <composições...>  os assets lado a lado, na mesma escala, com o humano de régua
     revisar <build>            o estado da revisão; o dono registra com --veredito, --nota e --por
     atualizar <composição>     o desenho mudado como a revisão seguinte no acervo
@@ -67,7 +67,7 @@ def _exportar(a: argparse.Namespace) -> dict[str, Any]:
 def _catalogo(a: argparse.Namespace) -> dict[str, Any]:
     destino = acervo.pasta_do_acervo(a.acervo) / "catalogo"
     destino.mkdir(parents=True, exist_ok=True)
-    return {"index": str(catalogo(destino))}
+    return catalogo(destino, a.familias)
 
 
 def _critica(a: argparse.Namespace) -> dict[str, Any]:
@@ -96,7 +96,8 @@ COMANDOS: dict[str, tuple[str, Comando, tuple[str, ...]]] = {
     "olhar": ("a prancha de todos os quadros do pacote e os números", lambda a: olhar(Path(a.build)), ("build",)),
     "radiografia": ("o modelo ampliado, de frente, de perfil e de costas, e as medidas do corpo",
                     lambda a: radiografia(_comp(a), acervo.pasta_do_acervo(a.acervo)), ("composicao", "--acervo")),
-    "catalogo": ("as peças do kit: para que servem, os argumentos e a prancha", _catalogo, ("--acervo",)),
+    "catalogo": ("o kit: o resumo das famílias e, das pedidas, os argumentos e a prancha de cada peça", _catalogo,
+                 ("familias", "--acervo")),
     "conjunto": ("os assets lado a lado, na mesma escala, com o humano de régua",
                  lambda a: previa.conjunto([ler(Path(c), Composicao) for c in a.composicoes],
                                            acervo.pasta_do_acervo(a.acervo)), ("composicoes", "--acervo")),
@@ -119,6 +120,8 @@ def _parser() -> argparse.ArgumentParser:
                 p.add_argument(arg, action="store_true")
             elif arg == "composicoes":
                 p.add_argument(arg, nargs="+")
+            elif arg == "familias":
+                p.add_argument(arg, nargs="*")
             else:
                 p.add_argument(arg, choices=revisao.VEREDITOS if arg == "--veredito" else None)
         p.add_argument("--json", action="store_true")

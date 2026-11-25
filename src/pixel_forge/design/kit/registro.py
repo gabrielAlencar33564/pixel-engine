@@ -29,7 +29,11 @@ def conferida(p: Peca) -> Peca:
     return p
 
 
-PECAS: dict[str, Peca] = {p.id: conferida(p) for p in (*PECAS_MADEIRA, *PECAS_PEDRA, *PECAS_TELHADO,
-                                                        *PECAS_CARPINTARIA, *PECAS_VAOS, *PECAS_FORMAS, *PECAS_TRONCO,
-                                                        *PECAS_COPA, *PECAS_ERVAS, *PECAS_ROCHA, *PECAS_HUMANO,
-                                                        *PECAS_QUADRUPEDE)}
+# as famílias do kit: quem faz um tipo de asset lê só a dele no catálogo
+_FAMILIAS = {
+    "construcao": (*PECAS_MADEIRA, *PECAS_PEDRA, *PECAS_TELHADO, *PECAS_CARPINTARIA, *PECAS_VAOS),
+    "formas": (*PECAS_FORMAS,), "flora": (*PECAS_TRONCO, *PECAS_COPA, *PECAS_ERVAS), "rocha": (*PECAS_ROCHA,),
+    "humano": (*PECAS_HUMANO,), "quadrupede": (*PECAS_QUADRUPEDE,),
+}
+PECAS: dict[str, Peca] = {p.id: conferida(p) for pecas in _FAMILIAS.values() for p in pecas}
+FAMILIAS: dict[str, tuple[str, ...]] = {f: tuple(sorted(p.id for p in pecas)) for f, pecas in _FAMILIAS.items()}

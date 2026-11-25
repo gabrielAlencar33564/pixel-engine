@@ -22,6 +22,7 @@ from ..raster.estilo import estilo_render
 from ..raster.renderer import Quadro
 from . import critica
 from .build import renderizar
+from .catalogo import em_faixas
 from .estilo import estilo_base
 from .prancha import amplia_para, grade
 from .quadros import quadro_de_repouso
@@ -55,7 +56,8 @@ def previa(comp: Composicao, acervo: Path) -> dict[str, Any]:
     alt = altura_m(ir)
     out = {"prancha": str(alvo), "amplia": amplia, "vistas": list(ir.views),
            "canvas": [ir.canvas.width, ir.canvas.height], "altura_m": round(alt, 2),
-           "porte": f"{alt / ESTATURA_M:.2f}× o humano ({comp.categoria})", "partes": [p.id for p in ir.parts],
+           "porte": f"{alt / ESTATURA_M:.2f}× o humano ({comp.categoria})",
+           "partes": em_faixas([p.id for p in ir.parts]),
            "escondidas": {d: ps for d, ps in escondidas.items() if ps},
            "tracos": leitura_dos_tracos(comp.tracos, por_vista)}
     if critica.e_flora(comp):  # a flora já sai medida: os achados da crítica, sem as irmãs do acervo

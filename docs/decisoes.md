@@ -603,6 +603,10 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   tufos mudaram de lugar); a sexta passou o arbusto. As dez plantas da prova têm pacote exportado e verificado; os
   sete das primeiras rodadas são de builds do motor de então, e refeitos agora dão outro desenho e pedem a crítica
   de novo. A samambaia sai com o aviso de um pedaço solto (um dente da beira serrilhada que se destaca).
+- O que o agente lê (pedido do dono: gastar menos tokens): a skill e as regras estão em inglês (os identificadores
+  ficam como estão: mudá-los quebra as composições do acervo); o catálogo tem dois níveis, o resumo e um arquivo por
+  família (`pfe catalogo flora`: 19 mil caracteres no lugar dos 85 mil do kit inteiro), em JSON sem espaço a mais; a
+  prévia e o catálogo dizem as partes numeradas em faixa (`copa_00..copa_29`).
 - O que sobra: a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
   fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
   folha; o cinzento da paleta puxa para o lilás; a sombra da copa alta sai em manchas (o elipsoide se lança como

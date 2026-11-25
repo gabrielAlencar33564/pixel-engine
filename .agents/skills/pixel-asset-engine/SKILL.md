@@ -31,11 +31,18 @@ swinging skirt).
 
 ## 3. The kit
 
-`pfe catalogo --json` writes `<acervo>/catalogo/index.json` and one sheet per piece (its variations, left to right).
-Each piece has its type (`prop`, `humanoide`, `quadrupede`), what it is for, the arguments (name, type, purpose,
-default; no default = required), the variations with their arguments (the fastest way to see the units), the parts it
-generates in the first variation (the ids that traits cite), the anchors it leaves, and the style's material list.
-Choose pieces by description and sheet. Only what is current exists: a piece not in the catalogue does not exist.
+The kit is split into families: `construcao`, `formas`, `flora`, `rocha`, `humano`, `quadrupede`. Read only what
+the asset needs: `pfe catalogo <family> ... --json` (for a plant, `pfe catalogo flora`) writes in `<acervo>/catalogo/`:
+
+- `index.json`, the summary: every family with its pieces and what each is for, and the style's material list;
+- `<family>.json`, the full pieces of the requested families: type (`prop`, `humanoide`, `quadrupede`), arguments
+  (name, type, purpose, default; no default = required), variations with their arguments (the fastest way to see the
+  units), the parts generated in the first variation (the ids that traits cite; `copa_00..copa_29` is a numbered
+  range), and the anchors it leaves;
+- one sheet per piece (`<piece>.png`: its variations, left to right).
+
+With no family it writes all of them. Choose pieces by description and sheet. Only what is current exists: a piece
+not in the catalogue does not exist.
 
 ## 4. The composition
 
