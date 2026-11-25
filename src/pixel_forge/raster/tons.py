@@ -12,7 +12,7 @@ from .grade import Janela, Mascara, NaJanela, part_window, shift
 from .montagem import Buf16, Camadas
 from .revolucao import revolution_indices, surface
 from .textura import Floats, Indices, flat_texture_indices
-from .volume import lambert_esfera, volume_indices
+from .volume import LUZ_DA_MASSA, lambert_esfera, volume_indices
 
 # o tom mais escuro da rampa só entra na peça lisa com o canvas mais largo que isto
 DEEP_SHADOW_WIDTH_PX = 32
@@ -58,7 +58,7 @@ def _volume(est: EstiloRender, c: DrawCommand, cam: Camadas, pj: tuple[Janela, M
     else:
         if marca not in massas:
             uniao: Mascara = np.logical_or.reduce([cam.full[p] for p, k in cam.cmds.items() if marca in k.tags])
-            massas[marca] = (uniao, lambert_esfera(uniao, est.side))
+            massas[marca] = (uniao, lambert_esfera(uniao, est.side, LUZ_DA_MASSA))
         massa = massas[marca][0]
         relevo = (massas[marca][1][win], cam.full[c.part_id][win])
     ys, xs = np.nonzero(massa)

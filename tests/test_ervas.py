@@ -35,7 +35,8 @@ def test_a_touceira_e_de_laminas() -> None:
     for nome, args in PECAS["touceira"].variacoes:
         comp = de_uma_peca("touceira", args)
         assert flora.solidez(_quadro(comp).dono != 0) < 0.8, nome
-        assert sum(1 for p in ir_da_composicao(comp).parts if not p.id.endswith("_pena")) == int(args["n"])
+        laminas = [p for p in ir_da_composicao(comp).parts if not p.id.endswith(("_pena", "_miolo"))]
+        assert len(laminas) == int(args["n"])
 
 
 def test_controle_a_moita_em_massa_enche_o_fecho() -> None:
@@ -199,3 +200,18 @@ def test_nenhuma_folha_larga_aponta_para_a_camera() -> None:
 def test_controle_com_o_giro_solto_uma_folha_aponta_para_a_camera(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(pecas_ervas, "FRENTE_LIVRE", 1.0)
     assert min(_mais_perto_da_frente(s) for s in range(12)) < 0.2 * 360 / 8 - 0.5
+
+
+def _miolo_a_mostra(largura: str) -> int:
+    """Os pixels do miolo escuro no pé da touceira."""
+    q = _quadro(de_uma_peca("touceira", {**FOLHAS, "largura": largura, "pena": largura != "0"}))
+    return q.visiveis.get("n_miolo", 0)
+
+
+def test_a_roseta_de_folhas_largas_tem_o_miolo_escuro() -> None:
+    """O pé das folhas largas é o ponto mais escuro da planta: a roseta tem fundo."""
+    assert _miolo_a_mostra("16cm") >= 4
+
+
+def test_controle_a_touceira_de_laminas_finas_nao_tem_miolo() -> None:
+    assert _miolo_a_mostra("0") == 0

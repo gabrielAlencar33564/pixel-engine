@@ -22,6 +22,7 @@ LADO_DA_LUZ = 0.45  # o tom é isto do lado para onde a lâmina abre (a esquerda
 # a largura da folha em cada ponto do arco (fração da largura): estreita no pé, larga antes do meio, ponta fina
 LARGURA_NO_ARCO = (0.3, 0.6, 1.0, 0.9, 0.55, 0.15)
 RAIO_MINIMO = 32  # o menor raio da folha na IR (q8): 1/8 px
+MIOLO_DA_ROSETA = 0.55  # o raio do miolo escuro no pé das folhas largas, em larguras da folha
 FRENTE_LIVRE = 0.3  # a roseta de folhas largas gira até 0,15 fatia para cada lado de deixar a frente livre (e
 # cada folha sai até 0,15 fatia do lugar dela: a mais próxima da frente fica a 0,2 fatia ou mais)
 # de onde se vê a vista S (o chão a 0,6 e a altura a cos 45°): o ponto do lado de lá não ganha salpico
@@ -75,7 +76,8 @@ def _lamina(c: Ctx, pid: str, material: str, arco: list[Vec], largura: float) ->
 def _touceira(c: Ctx, a: dict[str, Any]) -> None:
     """``n`` lâminas em volta do pé, uma a cada fatia da volta: cada uma com o pé sorteado dentro do ``raio``, o
     comprimento na faixa, a abertura de 35 % a 100 % do pedido (a maioria perto dele) e o tom (o claro do lado da
-    luz da vista S, o escuro do outro, com sorteio). Deixa a âncora ``pontas`` (a ponta de cada lâmina)."""
+    luz da vista S, o escuro do outro, com sorteio). A roseta de folhas largas tem o miolo escuro no pé. Deixa a
+    âncora ``pontas`` (a ponta de cada lâmina)."""
     st, n = c.st, a["n"]
     larga = a["largura"] > 0
     giro = st.randint(0, 999) / 1000
@@ -98,6 +100,11 @@ def _touceira(c: Ctx, a: dict[str, Any]) -> None:
         else:
             _lamina(c, f"{c.pid}_{i:02d}", material, arco, a["largura"])
         pontas.append(arco[-1])
+    if larga:  # o miolo da roseta: o pé das folhas largas é o ponto mais escuro da planta
+        raio = a["largura"] * MIOLO_DA_ROSETA
+        x, y, z = a["pe"]
+        c.b.part(f"{c.pid}_miolo", a["escuro"], ellipse(qv(x, y, z + raio), qv(raio, raio, raio)),
+                 Parte(group=c.grupo, tags=LINE))
     c.deixa("pontas", pontas)
 
 

@@ -35,7 +35,7 @@ from pixel_forge.design.kit.pecas_copa import ramos, tufos
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.porte import altura_m
 from pixel_forge.quality import flora
-from pixel_forge.raster import montagem, volume
+from pixel_forge.raster import montagem, tons, volume
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.renderer import mascaras
 from pixel_forge.rig.fk import Skeleton
@@ -640,3 +640,12 @@ def test_a_folha_da_moita_pequena_e_de_um_pixel(monkeypatch: pytest.MonkeyPatch)
     fina = _folhagem_da_moita_pequena(None, monkeypatch)
     grossa = _folhagem_da_moita_pequena(0, monkeypatch)
     assert fina >= 1.08 * grossa
+
+
+def test_a_massa_larga_escurece_de_um_lado_ao_outro(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A luz da massa vem mais de lado que a de uma bola: na moita de dois tufos o da luz é bem mais claro que o
+    outro. O controle é a luz da bola (o brilho se repetia em cada tufo)."""
+    luz, sombra = _duas_massas(("moita", "moita"))
+    monkeypatch.setattr(tons, "LUZ_DA_MASSA", volume.SPH_LIGHT)
+    luz_da_bola, sombra_da_bola = _duas_massas(("moita", "moita"))
+    assert luz / sombra >= 1.2 and luz / sombra >= luz_da_bola / sombra_da_bola + 0.05

@@ -596,6 +596,9 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
     chega ao tom mais claro da rampa (a massa ficava em dois tons, com o claro liso no meio);
   - o choupo: o estilo ganhou a `casca_cinzenta`, com o veio da sulcada na rampa cinzenta (a clara é lisa e, no
     tronco fino, lia como cano). Mudar o estilo muda o id de todo build que se refizer.
+  A quarta revisão passou o choupo e devolveu as outras duas com uma pergunta cada: a luz da massa passou a vir
+  mais de lado que a de uma bola (`LUZ_DA_MASSA`: na moita de vários tufos o mesmo brilho se repetia em cada um), e
+  a roseta de folhas largas ganhou o miolo escuro no pé (o centro era a parte mais clara).
 - O que sobra: a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
   fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
   folha; o cinzento da paleta puxa para o lilás; a sombra da copa alta sai em manchas (o elipsoide se lança como

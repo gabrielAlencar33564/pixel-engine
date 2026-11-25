@@ -11,6 +11,9 @@ from .grade import Mascara, NaJanela
 from .textura import Floats, Indices, quantize, texture_at
 
 SPH_LIGHT = (-0.42, -0.45, 0.79)  # (lado, cima, frente); o sinal do lado vem do estilo
+# a luz da massa inteira vem mais de lado: o claro fica só do lado da luz, e a massa larga (a moita de vários
+# tufos, a copa aberta) escurece de um lado ao outro, em vez de repetir o mesmo brilho em cada tufo
+LUZ_DA_MASSA = (-0.62, -0.5, 0.6)
 SMOOTH_ROWS = 2  # a largura de cada fileira é a média de ±2 fileiras: um degrau de 1 px no contorno não vira emenda
 RELEVO = 0.55  # na massa com relevo, quanto da luz é a da própria peça (o resto é a da massa inteira)
 PENUMBRA = 0.18  # e a luz mínima da massa: o lado da sombra não vira uma mancha do tom mais fundo
@@ -43,8 +46,8 @@ def _u(mask: Mascara) -> Floats:
     return res
 
 
-def lambert_esfera(mask: Mascara, side: int) -> Floats:
-    """A luz (0..1) de cada pixel da máscara como esfera."""
+def lambert_esfera(mask: Mascara, side: int, luz: tuple[float, float, float] = SPH_LIGHT) -> Floats:
+    """A luz (0..1) de cada pixel da máscara como esfera, sob a luz ``luz`` (lado, cima, frente)."""
     s = np.zeros(mask.shape, dtype=np.float64)
     if not mask.any():
         return s
@@ -54,7 +57,7 @@ def lambert_esfera(mask: Mascara, side: int) -> Floats:
     hh = np.maximum(1.0, (bot - top) / 2)[None, :]
     v = np.nan_to_num(np.clip((np.arange(mask.shape[0], dtype=np.float64)[:, None] - cy) / hh, -1.0, 1.0))
     nz = np.sqrt(np.clip(1 - u * u - v * v, 0.0, 1.0))
-    lx, ly, lz = SPH_LIGHT
+    lx, ly, lz = luz
     s = (abs(lx) * side) * u + ly * v + lz * nz
     res: Floats = np.where(mask, np.clip(s, 0.0, 1.0), 0.0)
     return res
