@@ -173,8 +173,8 @@ def test_controle_a_conifera_chapada_lanca_uma_linha() -> None:
     assert m["sombra_px"] < 0.2 * m["figura_px"]
 
 
-def _pontas(fundo: str) -> list[tuple[float, float]]:
-    args = {**PECAS["galhos"].variacoes[0][1], "fundo": fundo, "bifurca": "0"}
+def _pontas(fundo: str, fase: str = "0.5") -> list[tuple[float, float]]:
+    args = {**PECAS["galhos"].variacoes[0][1], "fundo": fundo, "bifurca": "0", "fase": fase}
     ir = ir_da_composicao(de_uma_peca("galhos", args))
     pontas = [p.geometry.points_q8[-1] for p in ir.parts if p.geometry.type == "tapered_polyline"]
     return [(p[0] / 256, p[1] / 256) for p in pontas]
@@ -186,6 +186,19 @@ def test_os_galhos_abrem_em_volta_do_tronco() -> None:
     fatias = {int((math.degrees(math.atan2(x, y)) % 360) // (360 / len(pontas))) for x, y in pontas}
     assert len(pontas) == 5 and len(fatias) >= 4
     assert min(y for _, y in pontas) < -5 and max(y for _, y in pontas) > 5
+
+
+def _para_a_camera(pontas: list[tuple[float, float]]) -> int:
+    """As pontas a menos de 20° da frente (o galho que desce na tela por cima do tronco, como uma escora)."""
+    return sum(1 for x, y in pontas if abs(math.degrees(math.atan2(x, y))) < 20)
+
+
+def test_nenhum_galho_aponta_para_a_camera() -> None:
+    assert _para_a_camera(_pontas("1")) == 0
+
+
+def test_controle_com_a_fase_zero_um_galho_aponta_para_a_camera() -> None:
+    assert _para_a_camera(_pontas("1", "0")) == 1
 
 
 def test_controle_os_galhos_num_plano_so_sao_acusados() -> None:

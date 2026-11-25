@@ -18,6 +18,7 @@ COPA_V = ["1.1m", "1.3m", "2.6m"]
 TRECHOS = 6  # os trechos do galho roliço
 ABRE_NO_ALTO = (0.25, 0.75)  # o ponto de controle: a 25 % da abertura já subiu 75 % (sobe a prumo e depois abre)
 SAIDA_DO_FINO = 0.6  # o galho fino sai a 60 % do grosso
+DESVIO_NA_FATIA = 15  # quanto o galho sai do meio da fatia dele (% da fatia, para cada lado)
 RAIO_MINIMO = 32  # o menor raio do galho roliço na IR (q8): 1/8 px
 Vec = tuple[float, float, float]
 
@@ -48,14 +49,14 @@ def _rolico(c: Ctx, pid: str, pts: list[Vec], diametros: tuple[float, float], ma
 
 
 def _galhos(c: Ctx, a: dict[str, Any]) -> None:
-    """``n`` galhos em volta do tronco, um a cada fatia da volta: cada um sobe quase a prumo e só então abre até a
-    ponta, dentro da copa. Com ``bifurca``, um galho fino sai a 60 % dele. Deixa a âncora ``pontas`` (x, y, z)."""
+    """``n`` galhos em volta do tronco, um a cada fatia da volta a partir da frente (``fase``, em fatias: com 0,5 a
+    frente fica livre, e nenhum galho aponta para a câmera): cada um sobe quase a prumo e só então abre até a ponta,
+    dentro da copa. Com ``bifurca``, um galho fino sai a 60 % dele. Deixa a âncora ``pontas`` (x, y, z)."""
     meia_l, meia_a, cz = a["copa"]
     st, n = c.st, a["n"]
-    fase = st.randint(0, 99) / 100
     pontas: list[Vec] = []
     for j in range(n):
-        az = 2 * math.pi * (j + fase + st.randint(-25, 25) / 100) / n
+        az = 2 * math.pi * (j + a["fase"] + st.randint(-DESVIO_NA_FATIA, DESVIO_NA_FATIA) / 100) / n
         alcance = meia_l * a["alcance"] * st.randint(80, 100) / 100
         v = a["ponta_v"][0] + (a["ponta_v"][1] - a["ponta_v"][0]) * st.randint(0, 100) / 100
         p0 = (0.0, 0.0, a["base"])
@@ -92,6 +93,8 @@ PECAS_TRONCO = [
         X("base", "comprimento", "a altura de onde saem (o alto do tronco)"), COPA,
         X("fundo", "escalar", "a meia profundidade da copa, em fração da meia largura", "1"),
         X("n", "inteiro", "galhos"), X("alcance", "escalar", "onde a ponta cai, em fração da meia largura", "0.6"),
+        X("fase", "escalar", "onde cai o primeiro galho, em fatias da volta a partir da frente (0 = um galho para a "
+          "câmera; 0.5 = a frente livre)", "0.5"),
         X("ponta_v", "faixa", "a altura das pontas na copa (de -1 a 1), sorteada na faixa", ["-0.4", "0.2"]),
         X("largura", "faixa", "o diâmetro na saída"), X("ponta", "comprimento", "o diâmetro na ponta"),
         X("bifurca", "escalar", "a chance de um galho fino a 60 % do grosso", "0.5"),

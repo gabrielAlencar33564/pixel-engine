@@ -92,8 +92,9 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 - O humano na tela: no andar em diagonal as mãos a até 21 px uma da outra; o perfil parado estreito (12 px, um
   braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
 - A flora em volumes (mudança 19): as bordas do tufo e da saia são lisas, a copa pendente é um domo com ramos
-  caindo, e a sombra do elipsoide no chão é aproximada (em `docs/decisoes.md`). O carvalho do acervo (`r1` e `r2`)
-  usa as peças que saíram: não se lê mais, e tem de ser refeito no modelo novo (a `19` mostra uma versão dele).
+  caindo, e a sombra do elipsoide no chão é aproximada (em `docs/decisoes.md`). O carvalho do acervo foi
+  refeito no modelo novo (`carvalho_roble.r3.3c42542d9f2a`, na `19`); a `r1` e a `r2` usam as peças que saíram e
+  não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
 
 ## Espera o dono
 

@@ -420,6 +420,9 @@ O dono pediu a análise do modelo de árvore e de vegetação e a refatoração 
 - A peça `galhos` põe galhos roliços em volta do tronco, um a cada fatia da volta, e deixa as pontas em (x, y, z)
   para a copa pôr um tufo em cada uma (o argumento `pontas`). A copa cobre quase todos; sozinhos, são a árvore
   seca. O galho fica no osso da altura de onde sai (abaixo da cadeia do balanço, no tronco).
+- O primeiro galho cai onde a `fase` manda, em fatias da volta a partir da frente (0,5: a frente livre). A fase
+  era sorteada, e no carvalho um galho saiu para a câmera: descia na tela por cima do tronco, como uma escora.
+  O teste conta as pontas a menos de 20° da frente (0); o controle é a fase 0 (1).
 - Os materiais `copa_folhosa`, `copa_folha` e `copa_agulha` têm rampa de 4 tons e a textura de traços curtos,
   que quebra a fronteira entre os tons (a folha). Os materiais chapados de folha ficam no estilo.
 - As quatro peças de flora desenham as 4 vistas (o `tronco_em_pe` também: o pixel dele na S não mudou).
@@ -438,6 +441,10 @@ O dono pediu a análise do modelo de árvore e de vegetação e a refatoração 
 - O que mudou de visibilidade: o tronco aparece só embaixo da copa (20 px no exemplo), e os galhos somem sob ela.
   A skill dá a conta do que sobra do tronco na tela. A sombra da copa entra no canvas (o exemplo foi de 158 × 84
   para 157 × 130).
+- O carvalho da prova foi refeito no modelo novo (`carvalho_roble.r3.3c42542d9f2a`, export verificado, 37 partes
+  contra 190). Os braços saem a 90 cm e sobem rentes ao tronco para dentro da copa: leem como o tronco que se
+  abre no alto (149 px), não como braços à mostra. O braço baixo e aberto da ficha foi medido e não veio: sob a
+  copa, na câmera de cima, ele sai como uma vara fina para fora dela ou desce na tela como escora.
 - O que sobra: a borda do tufo e a da saia são lisas (a copa lê como massa, não como folha solta, e a conífera
   perdeu a silhueta em pontas); a copa pendente é um domo com ramos caindo, não os fios de antes; a sombra no
   chão do elipsoide segue a aproximação de antes (a elipse com metade da altura dele na tela), e com `pende` ela
