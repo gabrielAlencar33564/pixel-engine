@@ -5,7 +5,7 @@
  "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.42", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
  "nos": [
   {"id": "tronco", "peca": "tronco_em_pe", "osso": "tronco", "grupo": "lenho",
-   "args": {"altura": "$copa0 + 20cm", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca"}},
+   "args": {"altura": "$copa0 + 20cm", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca_sulcada"}},
   {"id": "galhos", "peca": "galhos", "osso": "cadeia", "grupo": "lenho",
    "args": {"base": "$copa0 * 0.9", "copa": ["$a", "$c", "$cz"], "n": "5", "largura": ["10cm", "13cm"],
             "ponta": "4cm"}},

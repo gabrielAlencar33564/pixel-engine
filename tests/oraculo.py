@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.util
 import json
 import math
 from dataclasses import replace
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 import numpy as np
@@ -25,6 +27,17 @@ from pixel_forge.motion.receita import carregar
 from pixel_forge.raster.estilo import estilo_render
 
 CASOS = Path(__file__).parent / "fixtures" / "oraculo"
+
+
+def script(nome: str) -> ModuleType:
+    """O módulo ``scripts/<nome>.py`` (os scripts não são um pacote)."""
+    spec = importlib.util.spec_from_file_location(f"script_{nome}", CASOS.parents[2] / "scripts" / f"{nome}.py")
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 ABRE_BRACO_DO_ANTIGO = 15_000.0  # o `pixel-engine` abre o braço a 15° no repouso
 ABERTURA_DO_ANTIGO = 0.080  # e põe cada tornozelo a 0,080 da estatura do meio do corpo
 BALANCO_DO_ANTIGO = (23_000, 26_000)  # e, no andar, balança o ombro 23° e dobra o cotovelo 26° (mdeg)

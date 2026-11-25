@@ -271,3 +271,114 @@ def test_controle_a_peca_que_saiu_e_recusada_com_a_que_ficou(antiga: str, nova: 
     with pytest.raises(Recusa) as e:
         ir_da_composicao(validar({**dado, "tracos": []}, Composicao, "teste"))
     assert e.value.codigo == "PECA" and nova in e.value.dica
+
+
+# --- o tronco com forma de tronco (mudança 20): o controle é o tronco liso, o cone do `pixel-engine`
+
+CILINDRO = {"altura": "2m", "base": "60cm", "topo": "60cm", "casca": "casca"}
+LISO = {"pe": "0", "irregular": "0"}
+
+
+def _fileiras(args: dict[str, Any], parte: str = "n") -> list[tuple[int, int]]:
+    """A primeira e a última coluna do tronco em cada fileira da tela, de cima para baixo (a máscara inteira)."""
+    ir, est = ir_da_composicao(de_uma_peca("tronco_em_pe", args)), estilo_render(estilo_base())
+    m = mascaras(project_view(ir, rest_pose(Skeleton(ir.bones)), "S"), est, ir.canvas.width, ir.canvas.height)[parte]
+    return [(int(c[0]), int(c[-1])) for c in (np.flatnonzero(f) for f in m) if c.size]
+
+
+def _larguras(args: dict[str, Any], de: float, ate: float) -> list[int]:
+    """As larguras das fileiras entre as frações ``de`` e ``ate`` da altura na tela (0 = o alto)."""
+    f = _fileiras(args)
+    return [b - a + 1 for a, b in f[round(de * len(f)):round(ate * len(f))]]
+
+
+def _pe_sobre_o_fuste(args: dict[str, Any]) -> float:
+    return max(_larguras(args, 0.85, 1.0)) / float(np.median(_larguras(args, 0.4, 0.6)))
+
+
+def test_o_pe_do_tronco_abre() -> None:
+    """Por padrão o tronco tem pé: no chão ele é mais largo que o fuste."""
+    assert _pe_sobre_o_fuste({**CILINDRO, "irregular": "0"}) >= 1.2
+
+
+def test_controle_o_tronco_liso_nao_tem_pe() -> None:
+    assert _pe_sobre_o_fuste({**CILINDRO, **LISO}) <= 1.1
+
+
+def _folga_do_fuste(irregular: str) -> int:
+    fuste = _larguras({**CILINDRO, "pe": "0", "irregular": irregular}, 0.2, 0.8)
+    return max(fuste) - min(fuste)
+
+
+def test_o_fuste_engrossa_e_afina() -> None:
+    assert _folga_do_fuste("0.2") >= 3
+
+
+def test_controle_o_fuste_liso_e_reto() -> None:
+    assert _folga_do_fuste("0") <= 1
+
+
+def _eixo(curva: str) -> tuple[float, float, float]:
+    """O meio do tronco na tela a 3/4, a 1/4 e no alto da altura, a partir do meio do pé (px)."""
+    f = _fileiras({**CILINDRO, **LISO, "curva": curva})
+    meio = [(a + b) / 2 for a, b in f]
+    pe = meio[-6]
+    return meio[round(0.3 * len(f))] - pe, meio[round(0.72 * len(f))] - pe, meio[3] - pe
+
+
+def test_o_tronco_ondula_e_volta_ao_prumo() -> None:
+    """Com ``curva``, o eixo vai para um lado embaixo e para o outro em cima, e o alto fica sobre o pé."""
+    em_cima, embaixo, alto = _eixo("15cm")
+    assert em_cima <= -3 and embaixo >= 3 and abs(alto) <= 1.5
+
+
+def test_controle_o_tronco_sem_curva_fica_no_prumo() -> None:
+    assert all(abs(v) <= 1 for v in _eixo("0"))
+
+
+def _velho(**args: str) -> tuple[dict[str, int], int]:
+    """Os pixels à mostra de cada raiz e nó, e quanto a figura passa da largura do tronco no chão."""
+    velho = {**PECAS["tronco_em_pe"].variacoes[2][1], **args}
+    ir, est = ir_da_composicao(de_uma_peca("tronco_em_pe", velho)), estilo_render(estilo_base())
+    q = quadro_de_repouso(ir, est, "S")
+    figura = np.flatnonzero(((q.alpha == 255) & (q.index != est.materials["sombra"].ramp[0])).any(axis=0))
+    tronco = _fileiras(velho)
+    passa = int(figura[-1] - figura[0] + 1) - max(b - a + 1 for a, b in tronco)
+    return {p: n for p, n in q.visiveis.items() if "_raiz_" in p or "_no_" in p}, passa
+
+
+def test_as_raizes_e_os_nos_aparecem() -> None:
+    partes, passa = _velho()
+    raizes = [p for p in partes if "_raiz_" in p]
+    assert len(raizes) >= 4 and sum(1 for p in partes if "_no_" in p) == 2 and passa >= 8
+
+
+def test_controle_sem_raizes_nem_nos_o_tronco_e_so_o_fuste() -> None:
+    assert _velho(raizes="0", nos="0") == ({}, 0)
+
+
+def _veio(casca: str, lisa: str) -> tuple[int, int]:
+    """Os sulcos da casca (os pixels que diferem da casca lisa no mesmo tronco): os pares de sulco um sobre o outro
+    e os pares lado a lado."""
+    quadros = []
+    for material in (casca, lisa):
+        ir = ir_da_composicao(de_uma_peca("tronco_em_pe", {**CILINDRO, **LISO, "casca": material}))
+        quadros.append(quadro_de_repouso(ir, estilo_render(estilo_base()), "S").index)
+    sulco = quadros[0] != quadros[1]
+    return int((sulco[1:] & sulco[:-1]).sum()), int((sulco[:, 1:] & sulco[:, :-1]).sum())
+
+
+def test_a_casca_sulcada_tem_o_veio_em_pe_e_a_anelada_deitado() -> None:
+    """Cada casca é o controle da outra: os sulcos de uma correm ao longo da altura, os da outra em volta."""
+    em_pe, deitado = _veio("casca_sulcada", "casca")
+    assert em_pe >= 40 and em_pe >= 3 * deitado
+    em_pe, deitado = _veio("casca_anelada", "casca_clara")
+    assert deitado >= 12 and deitado >= 3 * em_pe
+
+
+def test_o_tronco_velho_desenha_as_quatro_vistas() -> None:
+    comp = de_uma_peca("tronco_em_pe", PECAS["tronco_em_pe"].variacoes[2][1])
+    quatro = validar({**comp.model_dump(mode="json"), "vistas": dict.fromkeys(("S", "E", "N", "W"), {})}, Composicao,
+                     "teste")
+    ir, est = ir_da_composicao(quatro), estilo_render(estilo_base())
+    assert all(quadro_de_repouso(ir, est, d).clipping_px == 0 for d in ir.views)

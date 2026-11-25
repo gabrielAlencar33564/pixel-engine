@@ -451,6 +451,33 @@ O dono pediu a análise do modelo de árvore e de vegetação e a refatoração 
   sai com furos; a linha reta de pasto continua sem peça. A versão do motor não subiu (o id do build leva os
   pixels), mas a composição que usa as peças que saíram não se lê mais.
 
+## O tronco com forma de tronco (pedido do dono, 2026-11-25)
+
+O dono pediu variações de tronco, para ele não ser simples e só cilíndrico. Pranchas: `20` e `20b`.
+
+- O tronco era um cone: 21 estações de raio linear, com a inclinação e uma casca lisa. Na tela, um retângulo.
+- O `tronco_em_pe` ganhou cinco argumentos. `pe` (0,35 por padrão): o pé abre no chão além da `base` e some à
+  altura de uma largura do tronco, com estações a mais onde ele abre. `irregular` (0,12): o fuste engrossa e afina
+  em duas ondas ao longo da altura, nulas na base e no topo (as duas larguras são as pedidas). `curva`: o eixo
+  ondula em S e volta ao prumo no alto (a copa segue sobre o pé). `raizes`: raízes roliças em volta do pé, a
+  primeira para a frente. `nos`: calombos na casca, do lado da câmera. Tudo no grupo de contorno do tronco.
+- A textura do material ganhou o `grain`: no sólido de revolução, os sulcos deitados em volta dele (`across`, o
+  que havia) ou em pé (`along`, o veio da casca). Vieram dois materiais: `casca_sulcada` (o veio em pé) e
+  `casca_anelada` (clara, com os anéis deitados). As cascas lisas ficam.
+- O oráculo: o tronco liso (`pe` e `irregular` em zero) é o cone do `pixel-engine` e segue igual a ele pixel a
+  pixel nas três variações que a peça tinha (`VARIACOES_DO_ANTIGO`, em `scripts/oraculo.py`). O `--kit` foi
+  rodado de novo e deu os mesmos 90 esperados (o estilo vai ao antigo sem o `grain`); o arquivo não mudou.
+- Os testes (`tests/test_flora.py`), no cilindro de 60 cm, com o tronco liso como controle: o pé tem 1,29 da
+  largura do fuste (o liso, 1,0); o fuste varia 6 px com `irregular` 0,2 (o liso, 0); com `curva` de 15 cm o eixo
+  vai 5 px para cada lado e o alto fica sobre o pé; as raízes e os nós têm pixels à mostra e a figura passa 22 px
+  da largura do tronco; a casca sulcada tem 79 pares de sulco em pé contra 11 deitados, e a anelada 20 contra 2.
+- O que mudou de visibilidade: nada some; o pé da árvore de exemplo fica 2 px mais largo de cada lado.
+- O que sobra: o `irregular` só se lê em tronco de 40 cm ou mais (abaixo disso a variação é menor que 1 px); a
+  curva e a inclinação são só em x (de lado, na vista S); as raízes são retas; o lado da sombra não mostra o
+  veio (a rampa não tem tom abaixo); não há forquilha nem toco cortado (a tampa leva o material da casca). O
+  carvalho do acervo (`r3`) foi construído com o tronco antigo e a casca lisa: o build dele segue valendo, e a
+  mesma composição hoje dá o pé novo (na `20b`).
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

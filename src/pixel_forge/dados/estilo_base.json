@@ -1020,6 +1020,53 @@
     "period_px": 2,
     "seed": 41
    }
+  },
+  {
+   "id": "casca_sulcada",
+   "ramp": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 600,
+    "depth_permille": 330,
+    "grain": "along",
+    "jitter_permille": 60,
+    "kind": "dashes",
+    "length_px": [
+     3,
+     7
+    ],
+    "lift_permille": 0,
+    "period_px": 3,
+    "seed": 43
+   }
+  },
+  {
+   "id": "casca_anelada",
+   "ramp": [
+    21,
+    26,
+    22
+   ],
+   "outline_index": 27,
+   "texture": {
+    "density_permille": 380,
+    "depth_permille": 500,
+    "grain": "across",
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     4
+    ],
+    "lift_permille": 0,
+    "period_px": 4,
+    "seed": 47
+   }
   }
  ],
  "shading": {

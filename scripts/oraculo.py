@@ -45,6 +45,15 @@ FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "oraculo
 # as peças que nasceram na engine nova (a saia, o lenço e a flora em volumes): o oráculo não as tem
 NOVAS = {"saia", "lenco", "copa", "copa_conica", "galhos"}
 SO_NO_ANTIGO = {"tronco_em_pe": {"sombra": "plank_deep", "marca": "plank_deep", "pe": "plank_deep", "solido": True}}
+# o tronco ganhou forma (o pé, o perfil, a curva, as raízes, os nós): o oráculo compara o tronco liso, o cone do
+# antigo, nas três variações que a peça tinha. Na engine, o liso é o pé e o perfil irregular em zero; o antigo não
+# tem os dois argumentos e não os recebe
+SO_NA_NOVA = {"tronco_em_pe": ("pe", "irregular")}
+LISO = {"pe": "0", "irregular": "0"}
+VARIACOES_DO_ANTIGO: dict[str, tuple[tuple[str, dict[str, Any]], ...]] = {"tronco_em_pe": (
+    ("fino", {"altura": "2.4m", "base": "13cm", "topo": "8cm", "casca": "casca_clara", **LISO}),
+    ("grosso", {"altura": "1.6m", "base": "28cm", "topo": "20cm", "casca": "casca", **LISO}),
+    ("inclinado", {"altura": "2m", "base": "20cm", "topo": "14cm", "inclinacao": "10cm", "casca": "casca", **LISO}))}
 DIRECOES = ("S", "SW", "W", "NW", "N", "NE", "E", "SE")
 # a câmera da engine nova: o antigo a recebe (ele aceitava a profundidade por asset, ADR 0149)
 CAMERA = {"elevation_mdeg": ELEVACAO_MDEG, "depth_permille": PROFUNDIDADE_PERMILLE}
@@ -136,7 +145,8 @@ def composicao_antiga(comp: dict[str, Any]) -> dict[str, Any]:
     qualquer peça do kit (as que ele tirou pela regra dos dois usos)."""
     mapa = json.loads((FIXTURES / "materiais.json").read_text(encoding="utf-8"))
     nos = [{**n, "args": {**SO_NO_ANTIGO.get(n["peca"], {}),
-                          **{k: _trocar(v, mapa) for k, v in n.get("args", {}).items()}}} for n in comp["nos"]]
+                          **{k: _trocar(v, mapa) for k, v in n.get("args", {}).items()
+                             if k not in SO_NA_NOVA.get(n["peca"], ())}}} for n in comp["nos"]]
     base = {k: v for k, v in comp.items() if k != "categoria"}
     return {**base, "kind": "composition", "schema_version": "2.0.0", "id": "kit_peca",
             "reference": "docs/references/README.md", "nos": nos,
@@ -218,7 +228,9 @@ def estilo_base_antigo() -> dict[str, Any]:
     mapa = json.loads((FIXTURES / "materiais.json").read_text(encoding="utf-8"))
     novo = json.loads((Path(__file__).resolve().parents[1] / "src" / "pixel_forge" / "dados" / "estilo_base.json")
                       .read_text(encoding="utf-8"))
+    # o veio em pé (``grain``) é da engine nova: o antigo não tem o campo, e nenhum caso do oráculo usa a casca dele
     mats = [{**m, "id": mapa.get(m["id"], m["id"]),
+             **({"texture": {k: v for k, v in m["texture"].items() if k != "grain"}} if m.get("texture") else {}),
              **({"cast_material": mapa[m["cast_material"]]} if m.get("cast_material") else {})}
             for m in novo["materials"]]
     return estilo_antigo({**novo, "materials": mats})
@@ -232,7 +244,8 @@ def _antiga_da_peca(pid: str, args: dict[str, Any]) -> dict[str, Any]:
 
 def gravar_kit(destino: Path, sha: str) -> None:
     casos = [{"nome": f"{pid}/{nome}", "composicao": _antiga_da_peca(pid, args), "vistas": ["S"]}
-             for pid, p in sorted(PECAS.items()) if pid not in NOVAS for nome, args in p.variacoes]
+             for pid, p in sorted(PECAS.items()) if pid not in NOVAS
+             for nome, args in VARIACOES_DO_ANTIGO.get(pid, p.variacoes)]
     saida = antigo(destino, casos, estilo_base_antigo())
     _salvar(FIXTURES / "kit.esperado.json", {"pixel_engine": sha, "casos": saida})
     print(f"kit: {len(saida)} variações gravadas")

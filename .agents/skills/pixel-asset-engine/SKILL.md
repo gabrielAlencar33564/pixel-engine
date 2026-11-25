@@ -81,7 +81,9 @@ sem tronco é a moita; com `pende`, os ramos caem) ou `copa_conica` (a conífera
 cobre o tronco pela frente: do tronco sobra na tela a altura do centro da copa × 0,71 menos
 √((meio fundo × 0,6)² + (meia altura × 0,71)²); para ele aparecer mais, suba a copa ou diminua o `fundo`. A sombra
 da copa cai no chão à direita e entra no canvas. Os `galhos` são opcionais (a copa cobre quase todos; sozinhos, são
-a árvore seca) e deixam as pontas para a copa pôr um tufo em cada uma.
+a árvore seca) e deixam as pontas para a copa pôr um tufo em cada uma. O tronco não é um cilindro: por padrão o pé
+abre no chão e o fuste engrossa e afina; dê a ele o que a espécie tem (a `curva` do tronco novo, as `raizes` e os
+`nos` do velho, a casca `casca_sulcada` com o veio em pé ou `casca_anelada` com os anéis deitados).
 
 **Porte por categoria** (em humanos de 1,65 m):
 

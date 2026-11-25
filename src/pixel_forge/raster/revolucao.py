@@ -101,6 +101,9 @@ def revolution_indices(sf: RevolutionSurface, ce: float, pj: NaJanela, mat: Mate
     cap = sf.cap[win]
     lx, lz = CYL_LIGHT
     s = np.where(cap, CAP_LIGHT, (abs(lx) * side) * sf.nx[win] + lz * sf.nf[win])
-    s = s + texture_at(np.floor(sf.arc[win]), -np.floor(sf.z[win] * ce), mat.texture) * np.where(cap, 0.5, 1.0)
+    arco, alto = np.floor(sf.arc[win]), -np.floor(sf.z[win] * ce)
+    em_pe = mat.texture is not None and mat.texture.grain == "along"
+    veio = texture_at(alto, arco, mat.texture) if em_pe else texture_at(arco, alto, mat.texture)
+    s = s + veio * np.where(cap, 0.5, 1.0)
     res: Indices = np.where(pj.mask, quantize(s, list(mat.ramp), pj.cast), 0).astype(np.uint16)
     return res

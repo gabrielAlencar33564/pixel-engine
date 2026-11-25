@@ -75,6 +75,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
     roliços em volta do tronco (`galhos`), nas 4 vistas, com a sombra da copa no chão. Saíram o pontilhado, a
     pena, as cortinas e os galhos chapados. Na `19`, a árvore de exemplo e o carvalho da prova; na `19b` e na
     `19c`, as peças.
+20. O tronco com forma de tronco: o pé que abre, o fuste que engrossa e afina, a curva, as raízes e os nós, e a
+    casca com veio (`casca_sulcada`, `casca_anelada`). Na `20`, as três variações; na `20b`, nas árvores.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -95,6 +97,8 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   caindo, e a sombra do elipsoide no chão é aproximada (em `docs/decisoes.md`). O carvalho do acervo foi
   refeito no modelo novo (`carvalho_roble.r3.3c42542d9f2a`, na `19`); a `r1` e a `r2` usam as peças que saíram e
   não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
+- O tronco (mudança 20): o perfil irregular não se lê abaixo de 40 cm, a curva é só de lado, e não há forquilha
+  nem toco cortado. O build do carvalho `r3` é do tronco antigo.
 
 ## Espera o dono
 

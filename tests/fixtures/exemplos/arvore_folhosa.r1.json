@@ -6,7 +6,7 @@
  "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.42", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
  "nos": [
   {"id": "tronco", "peca": "tronco_em_pe", "grupo": "tronco",
-   "args": {"altura": "$copa0 + 20cm", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca"}},
+   "args": {"altura": "$copa0 + 20cm", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca_sulcada"}},
   {"id": "copa", "peca": "copa", "grupo": "copa", "args": {"copa": ["$a", "$c", "$cz"]}}
  ],
  "vistas": {"S": {}}, "landmarks": {"sort_front": ["0", "0", "0"]},
