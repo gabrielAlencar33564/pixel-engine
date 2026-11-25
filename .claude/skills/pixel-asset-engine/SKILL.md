@@ -61,7 +61,7 @@ A JSON `<id>.r<n>.json` (`<id>` in lowercase, `_` and digits). Fields:
 | `vistas` | static prop: `{"S": {}}` (2 or 4 cardinals only if requested); walkers: the 8 directions `S SW W NW N NE E SE` |
 | `movimento` | prop: `["static"]` (sway `{"receita": "balanco", ...}` or spin `{"receita": "giro", ...}` if requested); human and quadruped: `["idle", "walk"]`; armed human, also `"attack"` (the sword strike, no loop) |
 | `landmarks` | game points on the prop (`"sort_front": ["0", "0", "0"]`) |
-| `tracos` | what must read in the sprite: `id`, `description`, `parts` (part ids), `verification` (`observable`: refused if no view shows a pixel of it) and optionally `reads_in_silhouette` (must touch the figure's edge) |
+| `tracos` | what must read in the sprite: `id`, `description`, `parts` (part ids: `<node>_NN`; a mass crown also has `<node>_ramo_NN`, the hanging twigs), `verification` (`observable`: refused if no view shows a pixel of it) and optionally `reads_in_silhouette` (must touch the figure's edge; the refusal lists the parts that do) |
 
 **Expressions:** numbers with a unit (`1.2m`, `30cm`, `8mm`, `3px`, `120%`, `15deg`), `$measure`, `+ - * /`, `min`,
 `max`, `round` and parentheses. Size comes from real metres: the 1.65 m human is ~44 px on screen.
@@ -113,13 +113,14 @@ foliage, branches thinner than the trunk they leave), so nothing floats and the 
 | `guarda_sol` | a flat crown on a tall clear trunk |
 | `seco` | trunk and forking branches, no leaves |
 | `moita` | no trunk: one mass on the ground; two when it is 1.6× wider than tall, three from 2.6× |
-| `touceira` | blades from one foot: thin (upright when tall and narrow, arching when low and wide); with `folha: larga`, a rosette of feathered fronds |
+| `touceira` | thin blades, each from its own foot spread over the clump (they stay separate, as grass grows): upright when tall and narrow, fanning when low and wide; with `folha: larga`, a rosette of feathered fronds |
 
 `altura` and `largura` are the real measurements. Every value is a string (`"fuste": "0.3"`). Optional: `folha`
-(`larga`: dark green; `miuda`: light green; `agulha`: dark blue-green), `idade` (`jovem`, `adulta`, `velha`: changes
-trunk, roots and crown), `casca` (a bark material), and, only when the species departs from its habit, `fuste` (the
-share of the height with no crown, 0.05 to 0.8), `esbeltez` (height over trunk diameter, 4 to 40) and `vento` (-1 to
-1: leans the trunk and carries the crown with it). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto`
+(`larga`: dark green, the default; `miuda`: light green, the default in a `touceira`; `agulha`: dark blue-green),
+`idade` (`jovem`, `adulta`, `velha`: changes trunk, roots and crown), `casca` (a bark material), and, only when the
+species departs from its habit, `fuste` (the share of the height with no crown, 0.05 to 0.8; by habit: `excurrente`
+0.22, `decurrente` 0.38, `seco` 0.40, `aberto` 0.42, `pendente` 0.45, `guarda_sol` 0.55), `esbeltez` (height over
+trunk diameter, 4 to 40; 10 to 15 by habit) and `vento` (-1 to 1: leans the trunk and carries the crown with it). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto`
 and `seco` (a wide `moita`: `copa`, `copa_b`, `copa_c`; a `touceira`: `folhas`). Nodes you add in `nos` come after
 and can cite their anchors: a `salpico` on `copa.superficie` (one node per mass) or on `folhas.pontas`. The preview
 returns the derived nodes in `nos`, with lengths in px (1 m = 32.7 px): to change one argument, copy them into `nos`
@@ -150,7 +151,9 @@ made of `elipsoide`, `poligono` or `fios`: the critique flags the egg, the smoot
 A mass crown shows its top and covers the trunk from the front: the trunk left on screen is the crown centre height ×
 0.71 minus √((half depth × 0.6)² + (half height × 0.71)²); to show more of it, raise the crown or reduce `fundo`. The
 crown's shadow falls on the ground to the right and is part of the canvas. **Nothing floats** (refusal `LIGACAO`,
-with the gap and the hint): the trunk starts on the ground; `galhos` are born from the axis of the `tronco_em_pe`
+with the gap and the hint). The rule is about the plant's structure, checked in the 3D geometry, never in the pixels:
+grass blades stand apart, each on its own foot, and a leaf pixel off the crown's edge is the plant's; nothing joins
+them and nothing flags them. The trunk starts on the ground; `galhos` are born from the axis of the `tronco_em_pe`
 declared before them (following its lean and curve) and must be thinner than it there; a crown must wrap the trunk top
 or a branch tip (lobes recede from the edge: take the trunk up to the crown centre); a `touceira` foot sits on the
 ground or on a trunk top. Under a mass crown the `galhos` barely show (they leave their tips for the crown to put a
@@ -219,8 +222,8 @@ agent. `pfe critica <build> --json` (only the build path: the store is the build
 
 - `medidas` and `achados`: each finding has `codigo`, `gravidade`, `medida` and `dica`. A `defeito` (foliage that is
   smooth, mirrored or without a bright side; a silhouette equal to a sibling's) stops the critique from passing: fix
-  the composition and go back to step 1 with `pfe atualizar`. An `aviso` (the vanished trunk, the loose piece) asks for
-  the reviewer's eye. A defect you believe is measured wrong is an engine defect: stop and report it, do not work
+  the composition and go back to step 1 with `pfe atualizar`. An `aviso` (the vanished trunk) asks for the reviewer's
+  eye. A defect you believe is measured wrong is an engine defect: stop and report it, do not work
   around it.
 - `irmas`: the three compositions of the same category in the store (built or not) with the closest silhouette, and
   how close (0 to 1; from `parecida_a_partir_de` up it is a defect). They are read when the critique runs: for a set,

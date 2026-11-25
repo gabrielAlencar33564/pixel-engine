@@ -76,6 +76,8 @@ NUVEM = 0.15  # a meia largura da nuvem de folhas do hábito aberto, em larguras
 # a touceira: as lâminas finas pela largura na tela (de 7 a 18, uma a cada 1,6 px) e o comprimento da mais curta;
 # a folha larga em pena: a largura dela em comprimentos e o arco que a ponta cai
 LAMINAS = (1.6, 0.6)
+PE_DA_TOUCEIRA = 0.3  # o raio do pé das lâminas finas, em larguras da touceira: cada lâmina no seu pé
+ABRE_DA_TOUCEIRA = 0.43  # a abertura que leva as pontas até a largura pedida (os pés e as aberturas são sorteados)
 FRONDE = (0.2, 0.5)
 LAMINA, LAMINA_ESCURA = ("capim", "capim_claro", "capim_escuro"), ("agulha", "agulha_clara", "agulha_escura")
 LIMITES = {"fuste": (0.05, 0.8), "esbeltez": (4.0, 40.0), "vento": (-1.0, 1.0)}
@@ -110,6 +112,11 @@ class _Medidas:
     @property
     def idade(self) -> tuple[float, float, float, float, float, int]:
         return IDADES[self.planta.idade]
+
+    @property
+    def folha(self) -> str:
+        """A folha dita ou a do hábito: a larga; na touceira, a lâmina fina."""
+        return self.planta.folha or ("miuda" if self.planta.habito == "touceira" else "larga")
 
     def lobulos(self, largura: float, mais: int = 0) -> tuple[str, str]:
         """Os lóbulos de uma massa com a ``largura`` (px) na tela e o tamanho de cada um."""
@@ -157,7 +164,7 @@ def _tronco(m: _Medidas, altura: float, inclina: bool = True) -> No:
 def _massa(m: _Medidas) -> list[No]:
     """O tronco até dentro da copa e a copa em massa (o decurrente, o pendente, o guarda-sol e o excurrente de
     folha larga), com os lóbulos pela largura dela na tela."""
-    material, miolo = FOLHAS[m.planta.folha]
+    material, miolo = FOLHAS[m.folha]
     cz, alto = m.h - m.c, m.z0 + (m.h - m.z0) * m.habito.entra
     # a copa alta e estreita tem os lóbulos pela altura dela: pela largura sobrariam poucos, e o miolo apareceria
     tufos, tamanho = m.lobulos(max(m.w, m.h - m.z0), 3 if m.planta.habito == "excurrente" else 0)
@@ -179,7 +186,7 @@ def _conifera(m: _Medidas) -> list[No]:
     return [_tronco(m, (m.z0 + m.h) / 2, inclina=False),
             _no("copa", "copa_conica", "copa", base=_px(m.z0), altura=_px(m.h), raio=_px(m.w / 2),
                 andares=str(andares), pontas=str(pontas), irregular=f"{m.idade[1] * 0.6:g}",
-                material=FOLHAS[m.planta.folha][0])]
+                material=FOLHAS[m.folha][0])]
 
 
 def _galhos(m: _Medidas, de: float, ate: float, copa: list[str], extra: dict[str, Any]) -> No:
@@ -203,7 +210,7 @@ def _aberta(m: _Medidas) -> list[No]:
     return [_tronco(m, alto), galhos,
             _no("copa", "copa_aberta", "copa", pontas="galhos.pontas", raio=_px(m.w * NUVEM),
                 achata="0.4" if m.planta.idade == "velha" else "0.5", irregular=f"{m.idade[1]:g}",
-                material=FOLHAS[m.planta.folha][0])]
+                material=FOLHAS[m.folha][0])]
 
 
 def _seca(m: _Medidas) -> list[No]:
@@ -217,7 +224,7 @@ def _seca(m: _Medidas) -> list[No]:
 def _moita(m: _Medidas) -> list[No]:
     """A moita, sem tronco: uma massa ou, a mais larga, duas ou três encostadas e desencontradas (o mesmo grupo: uma
     luz só), cada uma assentada no chão."""
-    material, miolo = FOLHAS[m.planta.folha]
+    material, miolo = FOLHAS[m.folha]
     massas = MOITAS[1 if m.w < MOITA_DE_DUAS * m.h else 2 if m.w < MOITA_DE_TRES * m.h else 3]
     nos = []
     for ident, (largo, lado, frente, alta, tufos, tamanho) in zip(("copa", "copa_b", "copa_c"), massas, strict=False):
@@ -230,18 +237,20 @@ def _moita(m: _Medidas) -> list[No]:
 
 def _touceira(m: _Medidas) -> list[No]:
     """A touceira: de folha larga, a roseta de folhas em pena que abrem em arco até a largura dela; senão, as
-    lâminas finas (em pé na touceira alta e estreita, abertas na baixa e larga)."""
-    if m.planta.folha == "larga":
+    lâminas finas, cada uma no seu pé (espalhadas pela largura da touceira: o capim não nasce de um ponto só, e as
+    lâminas ficam separadas), quase em pé."""
+    if m.folha == "larga":
         longa = math.hypot(m.h, m.w / 2)
         n = {"jovem": 7, "adulta": 9, "velha": 11}[m.planta.idade]
         return [_no("folhas", "touceira", "folhas", altura=[_px(0.8 * longa), _px(longa)], n=str(n),
                     abre=f"{min(0.95, m.w / 2 / longa):.2f}", cai=f"{FRONDE[1]:g}",
                     largura=_px(max(3.0, longa * FRONDE[0])), pena=True, material="folha", claro="folha_clara",
                     escuro="folha_escura")]
-    comum, claro, escuro = LAMINA_ESCURA if m.planta.folha == "agulha" else LAMINA
-    return [_no("folhas", "touceira", "folhas", altura=[_px(LAMINAS[1] * m.h), _px(1.05 * m.h)],
-                n=str(max(7, min(18, round(m.w / LAMINAS[0])))), abre=f"{min(0.9, m.w / 2 / m.h):.2f}",
-                cai="0.05" if m.h >= 1.4 * m.w else "0.25", raio=_px(0.15 * m.w), material=comum, claro=claro,
+    comum, claro, escuro = LAMINA_ESCURA if m.folha == "agulha" else LAMINA
+    pe = PE_DA_TOUCEIRA * m.w
+    return [_no("folhas", "touceira", "folhas", altura=[_px(LAMINAS[1] * m.h), _px(m.h)],
+                n=str(max(7, min(18, round(m.w / LAMINAS[0])))), abre=f"{min(0.9, ABRE_DA_TOUCEIRA * m.w / m.h):.2f}",
+                cai="0.05" if m.h >= 1.4 * m.w else "0.12", raio=_px(pe), material=comum, claro=claro,
                 escuro=escuro)]
 
 

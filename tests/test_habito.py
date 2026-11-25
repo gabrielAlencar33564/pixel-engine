@@ -23,7 +23,6 @@ from pixel_forge.design.asset import ir_da_composicao
 from pixel_forge.design.escala import PPM
 from pixel_forge.design.habito import expandida
 from pixel_forge.quality import flora
-from pixel_forge.raster import montagem
 
 FIXTURES = Path(__file__).parent / "fixtures"
 EXEMPLO = FIXTURES / "exemplos" / "arvore_folhosa.r1.json"
@@ -132,28 +131,40 @@ def test_a_moita_larga_tem_tres_massas_no_mesmo_grupo() -> None:
 
 
 def test_a_touceira_fina_e_a_de_folha_larga() -> None:
-    fina = _args(_comp("arbusto", habito="touceira", altura="1.2m", largura="50cm", folha="miuda"), "folhas")
-    larga = _args(_comp("arbusto", habito="touceira", altura="55cm", largura="1.4m"), "folhas")
-    assert "largura" not in fina and float(fina["cai"]) < 0.1  # o junco: lâminas finas em pé
+    fina = _args(_comp("arbusto", habito="touceira", altura="1.2m", largura="50cm"), "folhas")
+    larga = _args(_comp("arbusto", habito="touceira", altura="55cm", largura="1.4m", folha="larga"), "folhas")
+    assert "largura" not in fina and float(fina["cai"]) < 0.1  # sem `folha`: as lâminas finas em pé (o junco)
     assert larga["pena"] is True and _px(larga["largura"]) >= 3 and float(larga["abre"]) > 0.7  # a samambaia
 
 
+def _pes_do_capim() -> float:
+    """O vão (px) entre o pé mais à esquerda e o mais à direita das lâminas de um capim derivado de 60 cm."""
+    ir = ir_da_composicao(_comp("objeto", habito="touceira", altura="45cm", largura="60cm"))
+    pes = sorted(p.geometry.points_q8[0][0] / 256 for p in ir.parts if p.geometry.type == "polyline")
+    return pes[-1] - pes[0]
+
+
+def test_as_laminas_do_capim_nascem_cada_uma_no_seu_pe() -> None:
+    """A touceira fina derivada espalha os pés pela largura dela: as lâminas ficam separadas, como no capim, e a
+    crítica não as acusa (o que se liga é a estrutura da árvore, na geometria; o pixel não se junta)."""
+    assert _pes_do_capim() >= 0.3 * 0.6 * PPM
+    medidas = critica.medir(_comp("objeto", habito="touceira", altura="45cm", largura="60cm"))[0]
+    assert flora.achados(medidas, False, {}) == []
+
+
+def test_controle_com_o_pe_num_ponto_as_laminas_se_fundem(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(habito, "PE_DA_TOUCEIRA", 0.15)  # o pé antigo: as lâminas nasciam quase de um ponto só
+    assert _pes_do_capim() < 0.3 * 0.6 * PPM
+
+
 def test_a_conifera_derivada_passa_na_critica_em_qualquer_tamanho() -> None:
-    """A luz da conífera tem direção e a beira recortada não solta pedaço (o abeto dos traços saía com defeito)."""
+    """A luz da conífera tem direção (o abeto dos traços saía com defeito)."""
     for altura, largura in (("6m", "3m"), ("4m", "2.2m"), ("6.5m", "2m")):
         for semente in (77, 5, 41):
             dado = _comp(habito="excurrente", folha="agulha", altura=altura, largura=largura).model_dump(mode="json")
             medidas = critica.medir(validar({**dado, "semente": semente}, Composicao, "teste"))[0]
             assert flora.achados(medidas, True, {}) in ([], [a for a in flora.achados(medidas, True, {})
                                                              if a["codigo"] == "TRONCO_SUMIDO"])
-
-
-def test_controle_sem_ligar_o_recorte_a_conifera_solta_pedacos(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(montagem, "_ligada", lambda m, _dentro, _faixa: m)
-    ilhas = [critica.medir(validar({**_comp(habito="excurrente", folha="agulha", altura="6m",
-                                           largura="3m").model_dump(mode="json"), "semente": s}, Composicao,
-                                   "controle"))[0].ilhas for s in (77, 5, 41)]
-    assert max(ilhas) > 1
 
 
 def test_no_habito_aberto_a_copa_vai_com_o_tronco_inclinado() -> None:
@@ -188,6 +199,7 @@ def test_a_previa_devolve_os_nos_derivados(tmp_path: Path, capsys: pytest.Captur
     assert main(["previa", str(arquivo), "--acervo", str(tmp_path / "acervo"), "--json"]) == 0
     r = json.loads(capsys.readouterr().out)["result"]
     assert [n["peca"] for n in r["nos"]] == ["tronco_em_pe", "copa"] and r["critica"]["achados"] == []
+    assert "copa_miolo" not in r["escondidas"].get("S", [])  # o de dentro da copa fica sempre escondido: não se lista
 
 
 def test_controle_o_traco_fora_da_faixa_e_recusado() -> None:

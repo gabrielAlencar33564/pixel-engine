@@ -75,4 +75,4 @@ def test_o_traco_de_silhueta_tem_de_tocar_a_borda(tmp_path: Path) -> None:
     assert previa(_viajante([gola]), tmp_path)["tracos"]["gola"]["S"] > 0  # a gola se vê, mas por dentro do corpo
     with pytest.raises(Recusa) as e:
         previa(_viajante([{**gola, "reads_in_silhouette": True}]), tmp_path)
-    assert e.value.codigo == "TRACO_SEM_SILHUETA"
+    assert e.value.codigo == "TRACO_SEM_SILHUETA" and "hat_brim" in e.value.dica  # a dica diz quem toca a borda

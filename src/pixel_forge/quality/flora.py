@@ -1,7 +1,9 @@
 """A leitura da flora no sprite: o que se mede na folhagem e no lenho de um quadro, e os achados que as medidas
 acusam. Cada medida responde a um defeito visto no jogo: a massa lisa (o ovo, o cone torneado), a copa espelhada, a
-luz sem direção (cada tufo com a sua bola de luz: o brócolis), a árvore sem tronco à mostra, o pedaço solto e a
-planta igual à irmã do cenário (a mesma silhueta em outro tamanho).
+luz sem direção (cada tufo com a sua bola de luz: o brócolis), a árvore sem tronco à mostra e a planta igual à irmã
+do cenário (a mesma silhueta em outro tamanho). O pixel separado não é defeito: as lâminas do capim nascem cada uma
+do seu pé, e a folha solta na beira da copa é da planta; o que tem de estar ligado é a estrutura da árvore (o galho
+ao tronco, a folhagem ao galho), e isso se confere na geometria (``design/ligacao.py``), não no pixel.
 
 Tudo em máscaras e em luminância, na tela: mede-se o pixel que o jogo mostra, não a intenção da composição."""
 
@@ -198,9 +200,6 @@ def achados(m: Leitura, arvore: bool, irmas: dict[str, float]) -> list[dict[str,
         out.append(_achado("TRONCO_SUMIDO", "aviso", f"o lenho à mostra é {m.lenho_px} px de {m.figura_px} da figura",
                            "A árvore lê como moita no chão. Suba a copa ou diminua o fundo dela; se a espécie tem a "
                            "saia até o chão, diga na ficha."))
-    if m.ilhas > 1:
-        out.append(_achado("PEDACO_SOLTO", "aviso", f"a figura tem {m.ilhas} pedaços", "Um pedaço não toca o "
-                           "resto: confira se é um detalhe querido (a lâmina, a flor) ou uma parte fora do lugar."))
     for irma, s in sorted(irmas.items(), key=lambda kv: -kv[1]):
         if s >= PARECIDA:
             out.append(_achado("PARECIDA_COM_A_IRMA", "defeito", f"a silhueta coincide {s:.0%} com a de '{irma}' (o "

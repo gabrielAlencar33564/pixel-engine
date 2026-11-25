@@ -18,6 +18,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
   revisada por outro agente.
 - **A planta pelos traços:** o campo `planta` (o hábito, a altura, a largura, a folha, a idade) de onde a engine
   deriva o tronco, os galhos e a copa; e a recusa `LIGACAO` do que fica no ar (o galho nasce do eixo do tronco).
+  A ligação é da estrutura, conferida na geometria: o pixel não se junta, e as lâminas do capim ficam separadas.
 
 ## Números contra a linha de base
 

@@ -602,7 +602,7 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   samambaia e devolveu o arbusto pela silhueta (os três tufos faziam um V fundo no meio: era da composição, e os
   tufos mudaram de lugar); a sexta passou o arbusto. As dez plantas da prova têm pacote exportado e verificado; os
   sete das primeiras rodadas são de builds do motor de então, e refeitos agora dão outro desenho e pedem a crítica
-  de novo. A samambaia sai com o aviso de um pedaço solto (um dente da beira serrilhada que se destaca).
+  de novo.
 - A ligação (pedido do dono: nada flutuando, o galho parte de um nó): o `tronco_em_pe` deixa o eixo dele (o x, a
   altura e o raio em cada estação); os `galhos` nascem do eixo do tronco declarado antes, onde ele passa nessa
   altura (antes saíam do prumo, e no tronco inclinado nasciam fora dele), e são recusados sem tronco, acima do alto
@@ -622,15 +622,30 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   `~/.pixel-forge/acervo-prova-habito`): 153 mil tokens contra 188 mil, 69 chamadas de ferramenta contra 86, 54 de
   `pfe` contra 65 (22 prévias contra 32) e 9,9 min contra 12,2. Só 4 das 10 plantas saíram pelos traços; o que a
   medição achou foi corrigido na causa: a conífera derivada caía em `LUZ_SEM_DIRECAO` (a medida vai de 0,03 a 0,19
-  na conífera: o limite desceu a 0,02) e soltava pixels (o recorte da beira guarda só o que toca o miolo da
-  máscara); no hábito aberto as nuvens se fundiam e a copa não ia com o tronco inclinado (as pontas dos galhos
+  na conífera: o limite desceu a 0,02); no hábito aberto as nuvens se fundiam e a copa não ia com o tronco inclinado (as pontas dos galhos
   abrem em volta do alto do tronco; a nuvem tem 0,15 da largura; o vento desvia 18 % da altura); a moita alta
   saía em dois ovos (o número de massas vem da largura sobre a altura, e as massas se sobrepõem); o fuste não
   dizia onde a folhagem começa (o elipsoide desce até o fundo dos lóbulos cair nele); e as plantas de lâmina não
   tinham hábito (a `touceira`). O miolo da copa desceu de 0,6 a 0,5 da copa, e a copa alta e estreita conta os
   lóbulos pela altura (o miolo chapado aparecia em 16 % da copa do decurrente e em 34 % da do excurrente estreito;
-  ficou em 6 % e 17 %). Depois das correções a medição não foi repetida, e as plantas derivadas não passaram por
-  revisor de fora.
+  ficou em 6 % e 17 %).
+- A segunda medição (as mesmas dez plantas, outro agente sem contexto, em `~/.pixel-forge/acervo-prova-habito2`):
+  154 mil tokens, 52 chamadas de ferramenta, 46 de `pfe` (24 prévias), 7,7 min, 8 das 10 pelos traços, nenhum
+  achado da crítica e nenhum `pfe atualizar`. Os tokens não desceram da primeira para a segunda medição; as
+  chamadas e o tempo, sim. As plantas derivadas não passaram por revisor de fora. O que ela achou e foi corrigido:
+  a touceira sem `folha` saía samambaia (sem ela é a lâmina fina); o padrão do fuste por hábito não estava na
+  skill; o miolo da copa entrava nas `escondidas`; a recusa `TRACO_SEM_SILHUETA` não dizia quais partes tocam a
+  borda. Fica aberto: o chorão e o capim florido ainda saíram nó por nó (não há traço para alongar a cortina; a
+  flor pede a lâmina quase reta), a altura medida difere em até 5 % da pedida, a `casca_cinzenta` lê como cano
+  azulado, o `vento` mal se lê nas nuvens do hábito aberto e os frutos do `salpico` caem no contorno.
+- A ligação é da estrutura, não do pixel (correção do dono: "o capim estava correto, as lâminas são separadas
+  porque isso é da genética delas"; o pedido era para a árvore de galho sem ligação e de folhagem solta do galho).
+  Saiu o que juntava pixel: o recorte da beira da folhagem já não guarda só o que toca o miolo da máscara (a folha
+  solta na beira é da planta), e a crítica não tem mais o aviso `PEDACO_SOLTO`. A recusa `LIGACAO` fica como é: a
+  geometria do tronco, do galho e da folhagem no mundo. A touceira derivada de lâmina fina nascia quase de um
+  ponto (o raio do pé era 0,15 da largura, e o junco saía numa barra): o pé tem 0,3 da largura e a abertura leva
+  as pontas até a largura pedida, como no capim composto à mão que o dono aprovou; o controle com o pé antigo
+  acusa. Prancha: `~/.pixel-forge/acervo/pranchas/mudancas/22_laminas_separadas.png`.
 - O que o agente lê (pedido do dono: gastar menos tokens): a skill e as regras estão em inglês (os identificadores
   ficam como estão: mudá-los quebra as composições do acervo); o catálogo tem dois níveis, o resumo e um arquivo por
   família (`pfe catalogo flora`: 19 mil caracteres no lugar dos 85 mil do kit inteiro), em JSON sem espaço a mais; a

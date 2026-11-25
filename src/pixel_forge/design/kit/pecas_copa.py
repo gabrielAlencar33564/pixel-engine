@@ -147,7 +147,7 @@ def _copa(c: Ctx, a: dict[str, Any]) -> None:
     # na copa que chega ao chão (a moita) o miolo assenta nele: os lóbulos recuam da borda, e sem isso ela flutua
     miolo_z = min(cz, meia_a * MIOLO) if cz - meia_a <= NO_CHAO else cz
     c.b.part(f"{c.pid}_miolo", a["miolo"], ellipse(qv(dx, dy, miolo_z), qv(*(e * MIOLO for e in eixos))),
-             Parte(group=c.grupo))
+             Parte(group=c.grupo, tags=("miolo",)))
     f = a["tamanho"] * TUFO_DO_GALHO
     nas_pontas = [((x, y, z), (eixos[0] * f, eixos[1] * f, eixos[2] * f)) for x, y, z in c.ancora(a["pontas"])]
     volumes = tufos(c.st, a)

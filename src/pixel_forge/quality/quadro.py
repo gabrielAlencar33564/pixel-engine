@@ -12,6 +12,8 @@ from ..contracts.estilo import StyleDoc
 from ..core.recusa import Recusa
 from ..raster.renderer import Quadro
 
+NA_DICA = 16  # as partes que a dica de uma recusa lista
+
 
 def conferir_quadro(q: Quadro, style: StyleDoc, nome: str) -> None:
     if q.clipping_px:
@@ -42,6 +44,9 @@ def conferir_tracos(tracos: Sequence[Traco], quadros: Mapping[str, Sequence[Quad
                          f"/tracos/{i}")
         if t.reads_in_silhouette and not any(q.na_silhueta.get(p, 0) for qs in quadros.values() for q in qs
                                              for p in t.parts):
+            na_borda = sorted({p for qs in quadros.values() for q in qs for p in q.na_silhueta})
             raise Recusa("TRACO_SEM_SILHUETA", f"O traço '{t.id}' devia ler na silhueta, mas as partes dele "
                          f"({partes}) não tocam a borda da figura em nenhuma vista.", "Faça a forma sair do "
-                         "contorno do corpo, ou tire 'reads_in_silhouette' do traço.", f"/tracos/{i}")
+                         "contorno do corpo, ou tire 'reads_in_silhouette' do traço. Partes na borda: "
+                         f"{', '.join(na_borda[:NA_DICA])}{' ...' if len(na_borda) > NA_DICA else ''}.",
+                         f"/tracos/{i}")

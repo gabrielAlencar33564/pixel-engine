@@ -47,8 +47,8 @@ def previa(comp: Composicao, acervo: Path) -> dict[str, Any]:
     conferir_tracos(comp.tracos, por_vista)
     imagens = [q.to_rgba(pal) for q in quadros.values()]
     # as partes que a vista desenha (a peça não as escondeu) e que não ganham pixel: outra as cobre. O volume de
-    # uma massa de folhagem não conta: o lado de lá da copa fica sempre escondido
-    soltas = [p.id for p in ir.parts if not any(t.startswith("massa_") for t in p.tags)]
+    # uma massa de folhagem e o miolo dela não contam: o lado de lá e o de dentro da copa ficam sempre escondidos
+    soltas = [p.id for p in ir.parts if not any(t.startswith("massa_") or t == "miolo" for t in p.tags)]
     escondidas = {d: [p for p in soltas if p not in ir.views[d].visibility and p not in q.visiveis]
                   for d, q in quadros.items()}
     amplia = amplia_para(ir.canvas.height)
