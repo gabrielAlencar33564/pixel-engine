@@ -41,6 +41,11 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
   `poco_pedra.r1.88cd1cdde9ff`, `camponesa.r1.98f3c0ef2a49` e, das fixtures, `abrigo.r1.a1d0577ebd7a` e
   `marco.r1.41ef53825299` (os de 0,35 ficam nos ids da rodada 2). Pranchas no acervo: `olhar/` e `pranchas/revisao/`.
 
+- **Flora variada (2026-11-25):** um agente sem contexto fez dez plantas de uma cena pela skill, e outros três, um
+  por rodada, as revisaram pela crítica. Passaram 2, 4 e 7 das 10; cada rodada devolveu defeitos de motor, corrigidos
+  na causa (em `docs/decisoes.md`). Os 7 pacotes e as 3 plantas em `corrigir` (a samambaia, o arbusto baixo e claro,
+  o choupo) estão em `~/.pixel-forge/acervo-prova-flora`, com os pareceres em `criticas/` e `revisao/`.
+
 ## Mudanças intencionais de pixel (pranchas em `~/.pixel-forge/acervo/pranchas/mudancas/`, antes em cima)
 
 1. A paleta por função e os verdes de folhosa (os materiais de cena saíram do estilo).
@@ -105,8 +110,10 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   (`carvalho_roble.r4.89fc47c82e08`, na `20b`); a `r1` e a `r2` usam as peças que saíram e não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
 - O tronco (mudança 20): o perfil irregular não se lê abaixo de 40 cm, a curva é só de lado, e não há forquilha
   nem toco cortado.
-- A flora variada (mudança 21): o tom das lâminas vale só para a vista S; o capim baixo tem 6 a 13 px; não há
-  casca cinzenta com veio; a crítica não mede o brócolis (fica na pergunta de quem revisa) e compara só a silhueta. As plantas antigas do acervo não foram refeitas: as de `copa` dão outro desenho
+- A flora variada (mudança 21): a samambaia pequena não lê (a fronde em pena de 15 a 25 px pede outro desenho); a
+  `copa` baixa e larga lê como almofada lisa; o tom das lâminas vale só para a vista S e, com poucas lâminas
+  largas, corta a planta ao meio; não há casca cinzenta com veio; a sombra da copa alta sai partida; a crítica não
+  mede o brócolis (fica na pergunta de quem revisa) e compara só a silhueta. As plantas antigas do acervo não foram refeitas: as de `copa` dão outro desenho
   e as de `copa_conica` com `saia` não se leem mais (em `docs/decisoes.md`).
 
 ## Espera o dono

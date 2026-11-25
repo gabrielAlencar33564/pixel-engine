@@ -579,8 +579,15 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   folha em pena tem o corpo roliço e as penas passando dele (o zigue-zague sozinho lia como rabisco); o claro das
   lâminas fica do lado da luz da vista S (era sorteado, e caía contra a luz); o lóbulo recua no máximo 0,28 (o
   que recuava mais abria a copa e mostrava o miolo chapado).
+- A terceira rodada (outro agente) passou 7 das 10: o carvalho, o abeto, o pinheiro torto, o chorão, a roseira, a
+  tabua e o capim florido saíram em pacote, exportados e verificados (prévia, arte pendente). Três ficaram em
+  `corrigir`, e o export delas é recusado: a samambaia (com poucas folhas largas, o claro pelo lado parte a planta
+  em duas manchas, e a folha em pena de 15 a 25 px não se lê uma a uma: pede outro desenho da fronde pequena), o
+  arbusto baixo e claro (a `copa` baixa e larga lê como almofada lisa com o claro no meio) e o choupo (a casca
+  clara é lisa e lê como cano; a sombra da copa alta sai em duas manchas). A ficha da roseira e a do arbusto não
+  foram reescritas quando a construção mudou: o revisor foi avisado.
 - O que sobra: a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
-  fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
+  fica do lado errado) e, com poucas lâminas largas, vira um corte seco entre o claro e o escuro; o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
   folha; não há casca cinzenta com veio (a clara é lisa e lê como metal); a semelhança compara só a silhueta (duas
   plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se
   leem mais, e as de `copa` dão outro desenho.
