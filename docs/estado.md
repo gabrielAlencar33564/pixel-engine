@@ -43,8 +43,10 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 
 - **Flora variada (2026-11-25):** um agente sem contexto fez dez plantas de uma cena pela skill, e outros três, um
   por rodada, as revisaram pela crítica. Passaram 2, 4 e 7 das 10; cada rodada devolveu defeitos de motor, corrigidos
-  na causa (em `docs/decisoes.md`). Os 7 pacotes e as 3 plantas em `corrigir` (a samambaia, o arbusto baixo e claro,
-  o choupo) estão em `~/.pixel-forge/acervo-prova-flora`, com os pareceres em `criticas/` e `revisao/`.
+  na causa (em `docs/decisoes.md`). As três que ficaram (a samambaia, o arbusto baixo e claro, o choupo) passaram
+  em mais três rodadas, depois de outras correções de motor. Os 10 pacotes estão em
+  `~/.pixel-forge/acervo-prova-flora`, com os pareceres em `criticas/` e `revisao/`; os 7 primeiros são de builds
+  do motor de então (refeitos agora, dão outro desenho e pedem a crítica de novo).
 
 ## Mudanças intencionais de pixel (pranchas em `~/.pixel-forge/acervo/pranchas/mudancas/`, antes em cima)
 
