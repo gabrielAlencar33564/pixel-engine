@@ -95,12 +95,13 @@ PECAS_HUMANO = [
     _roupa("lenco", "Lenço na cabeça: cobre o alto e a nuca, deixa o rosto, com o nó e as pontas atrás", (DETALHE,), {},
            (("vermelho", {"material": "pano_vermelho"}), ("de linho", {"material": "linho"}),
             ("pontas escuras", {"material": "pano_azul", "detalhe": "pano_azul_escuro"}))),
-    _roupa("olhos", "Dois olhos de um pixel no rosto (somem de costas, e a aba larga do chapéu os cobre)", (), {},
+    _roupa("olhos", "Dois olhos de um pixel na cabeça (somem de costas, e a aba larga do chapéu os cobre)", (), {},
            (("escuros", {"material": "olho"}), ("couro", {"material": "couro"}), ("claros", {"material": "linho"}))),
     _roupa("cabelo_preso", "Cabelo puxado para trás com o coque no alto", (), {},
            (("escuro", {"material": "couro"}), ("pano", {"material": "pano_azul"}), ("palha", {"material": "fibra"}))),
-    _roupa("chapeu", "Chapéu mole de aba larga, a copa baixa e a aba caída", (
-           DETALHE, X("largura", "escalar", "a aba sobre a largura da cabeça (acima de 150 % cobre os olhos)", "180%")),
+    _roupa("chapeu", "Chapéu mole de aba larga, a copa baixa, assentado um pouco para trás", (
+           DETALHE, X("largura", "escalar", "a aba sobre a largura da cabeça (de ~190 % em diante cobre os olhos)",
+                      "180%")),
            {"largura": "largura_pct"},
            (("de feltro", {"material": "couro"}), ("aba curta", {"material": "pano_azul", "largura": "140%"}),
             ("de palha", {"material": "fibra", "largura": "210%"}))),

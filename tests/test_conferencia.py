@@ -21,7 +21,7 @@ VIAJANTE = Path(__file__).parent / "fixtures" / "exemplos" / "viajante.r1.json"
 OLHOS = {"id": "olhos", "description": "Os dois olhos no rosto", "parts": ["eye_l", "eye_r"]}
 
 
-ABA_LARGA = "180%"  # a aba do viajante tem 150 % da cabeça e deixa os olhos à mostra; a de 180 % os cobre
+ABA_LARGA = "220%"  # a aba do viajante tem 150 % da cabeça e deixa os olhos à mostra; a de 220 % os cobre
 
 
 def _viajante(tracos: list[dict[str, Any]], sem: str = "", aba: str = ABA_LARGA) -> Composicao:

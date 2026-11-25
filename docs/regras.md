@@ -18,6 +18,9 @@ repetem nada dele. O que dá para checar é teste, não linha aqui.
 - Criação, não reuso: um asset novo nasce da ficha dele, não de um exemplo esticado.
 - O tamanho vem dos metros reais na escala do mundo, nunca do canvas.
 - A solução se mede no pixel final do sprite e no custo, não num render 3D sofisticado.
+- O personagem é uma figura para a câmera de cima, com poucos pixels: formas simples, que a IA prevê no pixel (a
+  cabeça é um ovo), e não a anatomia real. O corpo real dá as proporções gerais; o detalhe que não se vê no sprite
+  (o nariz, o queixo, o crânio) não se modela: só distorce.
 
 ## Limites e correções
 

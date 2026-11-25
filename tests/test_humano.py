@@ -21,7 +21,7 @@ from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.core.recusa import Recusa
 from pixel_forge.design.asset import ir_da_composicao, movimento
-from pixel_forge.design.kit import humano
+from pixel_forge.design.kit import roupa
 from pixel_forge.design.kit.humano import Corpo, medidas
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
@@ -199,50 +199,59 @@ def test_controle_os_olhos_do_antigo_tem_a_mascara_em_volta(monkeypatch: pytest.
 def test_o_lenco_deixa_o_rosto_e_o_no_fica_na_nuca() -> None:
     ir, est = ir_da_composicao(_na_cabeca("lenco")), estilo_render(estilo_base())
     frente, costas = (quadro_de_repouso(ir, est, d).visiveis for d in ("S", "N"))
-    assert {"eye_l", "eye_r", "scarf", "jaw"} <= frente.keys() and "scarf_knot" not in frente
+    assert {"eye_l", "eye_r", "scarf", "skull"} <= frente.keys() and "scarf_knot" not in frente
     assert "scarf_knot" in costas and "eye_l" not in costas
 
 
-def _a_cabeca_na_tela() -> tuple[int, int, int]:
-    """Na câmera do jogo: (a fileira mais larga do crânio de frente, a da face, quantas fileiras o nariz desce
-    abaixo do olho de perfil)."""
-    ir, est = ir_da_composicao(_na_cabeca()), estilo_render(estilo_base())
+def _oval(m: Mascara) -> bool:
+    """A largura das fileiras sobe até a mais larga e desce: uma forma só, sem cintura nem ressalto."""
+    larguras = [int(n) for n in m.sum(axis=1) if n]
+    pico = larguras.index(max(larguras))
+    sobe, desce = larguras[:pico + 1], larguras[pico:]
+    return sobe == sorted(sobe) and desce == sorted(desce, reverse=True)
+
+
+def _a_cabeca_e_um_ovo() -> bool:
+    """A cabeça é uma parte só e, na câmera do jogo, oval de frente e de perfil."""
+    ir, est = ir_da_composicao(de_uma_peca("corpo_humano", {})), estilo_render(estilo_base())
     frente, perfil = (mascaras(project_view(ir, rest_pose(Skeleton(ir.bones)), d), est, ir.canvas.width,
                                ir.canvas.height) for d in ("S", "W"))
-    olho, nariz = (int(np.nonzero(perfil[p].any(axis=1))[0].max()) for p in ("eye_l", "nose"))
-    return int(frente["skull"].sum(axis=1).max()), int(frente["jaw"].sum(axis=1).max()), nariz - olho
+    return [p.id for p in ir.parts if p.outline_group == "head"] == ["skull"] and _oval(frente["skull"]) \
+        and _oval(perfil["skull"])
 
 
-def test_na_tela_a_face_tem_a_largura_do_cranio_e_o_nariz_fica_sob_o_olho() -> None:
-    cranio, face, nariz = _a_cabeca_na_tela()
-    assert face == cranio and nariz >= 1
+def test_a_cabeca_e_um_ovo() -> None:
+    assert _a_cabeca_e_um_ovo()
 
 
-@pytest.mark.parametrize(("parte", "de_antes"), [("FACE", (0.04, 0.08, 0.31, 0.30, 0.33)),
-                                                 ("NARIZ", (0.40, 0.17, 0.07, 0.08, 0.09))])
-def test_controle_a_face_estreita_e_o_nariz_alto_sao_acusados(parte: str, de_antes: tuple[float, ...],
-                                                              monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(humano, parte, de_antes)  # a bola com o rosto de apêndice; o nariz na fileira do olho
-    cranio, face, nariz = _a_cabeca_na_tela()
-    assert face < cranio if parte == "FACE" else nariz < 1
+def test_controle_a_cabeca_do_antigo_tem_tres_massas(monkeypatch: pytest.MonkeyPatch) -> None:
+    cabeca_do_antigo(monkeypatch)
+    assert not _a_cabeca_e_um_ovo()
 
 
-def _estaturas_sem_nariz_de_perfil() -> list[int]:
-    """As estaturas (em cm, de 1,20 a 1,96 m) em que o nariz não tem nenhum pixel de perfil."""
-    est, sem = estilo_render(estilo_base()), []
+def _ressalto_do_olho_de_perfil() -> int:
+    """Os pixels da figura à frente da cabeça nas fileiras do olho, de perfil, somados de 1,20 a 1,96 m de estatura
+    (o contorno do olho, quando sai da borda)."""
+    est, fora = estilo_render(estilo_base()), 0
     for cm in range(120, 200, 4):
-        ir = ir_da_composicao(de_uma_peca("corpo_humano", {"estatura": f"{cm / 100:.2f}m"}))
-        sem += [] if quadro_de_repouso(ir, est, "W").visiveis.get("nose") else [cm]
-    return sem
+        dado = json.loads((CASOS / "humanos" / "vestido.r1.json").read_text(encoding="utf-8"))
+        dado["nos"] = [{"id": "corpo", "peca": "corpo_humano", "args": {"estatura": f"{cm / 100:.2f}m"}},
+                       {"id": "olhos", "peca": "olhos", "args": {"material": "olho"}}]
+        ir = ir_da_composicao(validar({**dado, "tracos": []}, Composicao, "teste"))
+        ms = mascaras(project_view(ir, rest_pose(Skeleton(ir.bones)), "W"), est, ir.canvas.width, ir.canvas.height)
+        figura = quadro_de_repouso(ir, est, "W").alpha == 255
+        for y in np.nonzero(ms["eye_l"].any(axis=1))[0]:
+            fora += int(figura[y, :int(np.nonzero(ms["skull"][y])[0].min())].sum())
+    return fora
 
 
-def test_o_nariz_aparece_de_perfil_em_toda_estatura() -> None:
-    assert _estaturas_sem_nariz_de_perfil() == []
+def test_de_perfil_o_olho_nao_sai_da_borda_da_cabeca() -> None:
+    assert _ressalto_do_olho_de_perfil() == 0
 
 
-def test_controle_o_nariz_rente_a_face_some_em_algumas_estaturas(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(humano, "NARIZ", (0.34, 0.08, 0.07, 0.12, 0.07))  # o centro dentro da face
-    assert _estaturas_sem_nariz_de_perfil() != []
+def test_controle_o_olho_com_contorno_sai_da_borda(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(roupa, "MARCAS_DO_OLHO", (*roupa.SEM_LINHA, "eye"))  # a peça fina leva o contorno para fora
+    assert _ressalto_do_olho_de_perfil() > 0
 
 
 def _fileiras_da_testa_entre_o_cabelo() -> int:

@@ -18,6 +18,7 @@ from pixel_forge.application.quadros import quadro_de_repouso
 from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.estilo import StyleDoc
 from pixel_forge.contracts.ir import AssetIR
+from pixel_forge.design import humano as desenho_do_humano
 from pixel_forge.design.construtor import PARTE, AssetBuilder, Parte, ellipse, qv
 from pixel_forge.design.kit import humano, roupa
 from pixel_forge.motion.receita import carregar
@@ -38,11 +39,9 @@ LINHA_DO_OMBRO = ("trap_", "jacket_yoke_")  # as partes que o `pixel-engine` nã
 # o grupo de contorno de cada massa do tronco (na engine o peito e a cintura são uma massa só)
 BOLA_DO_PEITO, BOLA_DA_JAQUETA = (0.70, 0.32), (0.68, 0.36)
 GRUPO_DO_ANTIGO = {"chest": "chest", "waist": "waist", "jacket_chest": "jacket", "jacket_waist": "jacket"}
-# a cabeça do `pixel-engine`: o crânio menor e mais alto, a mandíbula estreita e à frente (o focinho), sem nariz, e
-# cada massa sombreada sozinha
-CABECA_DO_ANTIGO = ((humano, "CRANIO", (-0.06, 0.43, 0.41, 0.33)), (humano, "FACE", (0.08, 0.02, 0.26, 0.30, 0.25)),
-                    (humano, "QUEIXO", (0.27, -0.15, 0.13, 0.10, 0.10)))
-MASSAS_DA_CABECA = {"skull": "head", "jaw": "head", "chin": "head"}
+# a cabeça do `pixel-engine`: três massas (o crânio menor e mais alto, a mandíbula estreita e à frente e o queixo),
+# com o chapéu assentado no crânio dela; na engine a cabeça é um ovo só
+CABECA_DO_ANTIGO = ((humano, "CRANIO", (-0.06, 0.43, 0.41, 0.33)), (roupa, "CHAPEU", ((-0.02, 0.30), (0.06, 0.16))))
 
 
 def abertura_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -120,15 +119,35 @@ def _cabelo_do_antigo(v: roupa.Veste) -> roupa.Vista:
                        back_rules=[roupa.regra("hair_cap", "skull")])
 
 
+def _cabeca_do_antigo(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
+    """As três massas da cabeça do `pixel-engine`: o crânio, a mandíbula e o queixo, cada uma sombreada sozinha."""
+    cab = c["cabeca"]
+    cy, cz, rx, ry, rz = humano.cranio(c)
+    cabeca = Parte(bone="head", group="head")
+    b.part("skull", pele, ellipse(qv(0, cy, cz), qv(rx, ry, rz)), cabeca)
+    b.part("jaw", pele, ellipse(qv(0, 0.08 * cab, 0.02 * cab), qv(0.26 * cab, 0.30 * cab, 0.25 * cab)), cabeca)
+    b.part("chin", pele, ellipse(qv(0, 0.27 * cab, -0.15 * cab), qv(0.13 * cab, 0.10 * cab, 0.10 * cab)), cabeca)
+
+
+def _regras_do_antigo(d: str) -> list[dict[str, str]]:
+    """De frente, o queixo e a mandíbula sobre o pescoço; de costas, o crânio sobre a mandíbula e o queixo."""
+    out = [{"front": "chest", "back": "waist"}, {"front": "waist", "back": "pelvis_block"}]
+    if d in humano.FRONT_VIEWS:
+        return [*out, {"front": "chin", "back": "neck"}, {"front": "jaw", "back": "neck"}]
+    return [*out, {"front": "skull", "back": "jaw"}, {"front": "skull", "back": "chin"}]
+
+
 def cabeca_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A cabeça, os olhos e o cabelo preso do humano como no `pixel-engine`: a engine corrigiu a anatomia da cabeça
-    (mudança intencional), e o oráculo compara o resto do humano na cabeça dele. O chapéu segue o crânio, e volta
-    junto."""
+    """A cabeça, os olhos e o cabelo preso do humano como no `pixel-engine`: na engine a cabeça é um ovo só, feito
+    para a câmera de cima (mudança intencional), e o oráculo compara o resto do humano na cabeça dele. O chapéu
+    segue o crânio, e volta junto."""
     for modulo, nome, valor in CABECA_DO_ANTIGO:
         monkeypatch.setattr(modulo, nome, valor)
+    monkeypatch.setattr(humano, "_cabeca", _cabeca_do_antigo)
+    for modulo in (humano, desenho_do_humano):
+        monkeypatch.setattr(modulo, "regras", _regras_do_antigo)
     monkeypatch.setitem(roupa.PECAS, "olhos", _olhos_do_antigo)
     monkeypatch.setitem(roupa.PECAS, "cabelo_preso", _cabelo_do_antigo)
-    _partes_do_antigo(monkeypatch, MASSAS_DA_CABECA, ("nose",))
 
 
 def tronco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -19,7 +19,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 |---|---|---|
 | Linhas em `src/` | 32 701 | 8 273 |
 | Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~40 s, 279 testes |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~35 s, 278 testes |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
@@ -61,6 +61,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
     fileira sob o olho e uma mecha de cabelo em cada têmpora. Na `13b`, as cabeças de perto (8×).
 14. A abertura das pernas do humano: os pés sob as juntas do quadril (eram 26 cm um do outro, mais que o quadril).
     Na `14b`, o andar de frente e de perfil.
+15. A cabeça do humano é um ovo: uma parte só, sem face, queixo nem nariz (decisão do dono: a figura é para a
+    câmera de cima, não a anatomia). Os olhos no meio do ovo, o chapéu um pouco para trás. Na `15b`, de perto.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -83,4 +85,4 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 14 ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 15 ela ainda não foi reconstruída.

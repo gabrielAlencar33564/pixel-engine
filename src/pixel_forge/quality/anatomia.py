@@ -83,9 +83,10 @@ def _rosto(c: _Corpo) -> list[Medida]:
                   "crânio; abaixo da faixa, a cabeça lê como uma lâmpada")]
     if "eye_l" in c.ms and "eye_r" in c.ms:
         ys = np.nonzero(_uniao(c.ms, "eye_l", "eye_r").any(axis=1))[0]
-        out.append(Medida("olhos_na_cabeca", c.na_cabeca(float(ys.mean())), (0.40, 0.60),
-                          "a altura dos olhos na cabeça (0 = o queixo, 1 = o alto); acima da faixa, os olhos ficam "
-                          "na testa, onde o chapéu e o cabelo assentam"))
+        out.append(Medida("olhos_na_cabeca", c.na_cabeca(float(ys.mean())), (0.40, 0.70),
+                          "a altura dos olhos na cabeça (0 = o queixo, 1 = o alto; no corpo real, 0,5; na figura para "
+                          "a câmera de cima, um pouco acima, para cair no meio da cabeça na tela); acima da faixa, os "
+                          "olhos ficam na testa, onde o chapéu e o cabelo assentam"))
     return out
 
 
