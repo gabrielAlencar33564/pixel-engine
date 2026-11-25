@@ -4,6 +4,7 @@ controles: a moita em massa, a lâmina fina, a folha lisa, o pé no chão e o sa
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 import pytest
@@ -63,7 +64,7 @@ def _borda_sobre_a_area(pena: bool) -> float:
 
 
 def test_a_folha_em_pena_e_serrilhada() -> None:
-    assert _borda_sobre_a_area(True) >= 1.3 * _borda_sobre_a_area(False)
+    assert _borda_sobre_a_area(True) >= 1.15 * _borda_sobre_a_area(False)
 
 
 def _pes(pe: list[str]) -> set[float]:
@@ -154,10 +155,47 @@ def _claras_de_cada_lado() -> tuple[int, int]:
 
 def test_o_claro_das_laminas_fica_do_lado_da_luz() -> None:
     esquerda, direita = _claras_de_cada_lado()
-    assert esquerda >= 6 and direita == 0
+    assert esquerda >= 6 and esquerda >= 3 * direita
 
 
 def test_controle_so_com_o_sorteio_o_claro_cai_dos_dois_lados(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(pecas_ervas, "LADO_DA_LUZ", 0.0)
     esquerda, direita = _claras_de_cada_lado()
     assert esquerda >= 3 and direita >= 3
+
+
+
+FOLHAS = {**CAPIM, "altura": ["60cm", "90cm"], "n": "8", "abre": "0.8", "cai": "0.5", "largura": "16cm", "raio": "0"}
+
+
+def _nervuras_a_mostra(pena: bool) -> int:
+    """As folhas largas com a nervura à mostra (a parte ``_pena`` com pixel)."""
+    q = _quadro(de_uma_peca("touceira", {**FOLHAS, "pena": pena}))
+    return sum(1 for p in q.part_table if p.endswith("_pena") and q.visiveis.get(p, 0) >= 3)
+
+
+def test_a_folha_em_pena_tem_a_nervura_a_mostra() -> None:
+    """Cada folha se lê pela nervura dela, por cima do corpo."""
+    assert _nervuras_a_mostra(True) >= 6
+
+
+def test_controle_a_folha_lisa_nao_tem_nervura() -> None:
+    assert _nervuras_a_mostra(False) == 0
+
+
+def _mais_perto_da_frente(semente: int) -> float:
+    """O ângulo (graus) entre a câmera e a folha larga que mais aponta para ela."""
+    dado = de_uma_peca("touceira", FOLHAS).model_dump(mode="json")
+    ir = ir_da_composicao(validar({**dado, "semente": semente}, Composicao, "teste"))
+    pontas = [p.geometry.points_q8[-1] for p in ir.parts if p.geometry.type == "tapered_polyline"]
+    return min(abs(math.degrees(math.atan2(x, y))) for x, y, _ in pontas)
+
+
+def test_nenhuma_folha_larga_aponta_para_a_camera() -> None:
+    """A roseta deixa a frente livre: a folha de frente para a câmera viraria um talo em pé no meio dela."""
+    assert min(_mais_perto_da_frente(s) for s in range(12)) >= 0.2 * 360 / 8 - 0.5
+
+
+def test_controle_com_o_giro_solto_uma_folha_aponta_para_a_camera(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "FRENTE_LIVRE", 1.0)
+    assert min(_mais_perto_da_frente(s) for s in range(12)) < 0.2 * 360 / 8 - 0.5

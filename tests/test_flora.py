@@ -35,6 +35,7 @@ from pixel_forge.design.kit.pecas_copa import ramos, tufos
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.porte import altura_m
 from pixel_forge.quality import flora
+from pixel_forge.raster import montagem, volume
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.renderer import mascaras
 from pixel_forge.rig.fk import Skeleton
@@ -605,3 +606,37 @@ def test_a_raiz_deita_em_curva() -> None:
 def test_controle_a_raiz_sem_torcer_e_uma_lamina_reta(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(pecas_tronco, "RAIZ_TORCE", (0, 0))
     assert max(_viradas_das_raizes()) < 1
+
+
+def _tom_mais_claro(ganho: float | None, monkeypatch: pytest.MonkeyPatch) -> float:
+    """A parte da folhagem do exemplo no tom mais claro da rampa dela."""
+    if ganho is not None:
+        monkeypatch.setattr(volume, "GANHO", ganho)
+    style = estilo_base()
+    q = quadro_de_repouso(ir_da_composicao(ler(EXEMPLO, Composicao)), estilo_render(style), "S")
+    folhas = np.isin(q.dono, [i + 1 for i, p in enumerate(q.part_table) if p.startswith("copa_")])
+    claro = next(m for m in style.materials if m.id == "copa_folhosa").ramp[-1]
+    return float((q.index[folhas] == claro).mean())
+
+
+def test_o_relevo_da_massa_chega_ao_tom_mais_claro(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O alto dos lóbulos do lado da luz usa o tom mais claro: a massa não é uma mancha de dois tons."""
+    com = _tom_mais_claro(None, monkeypatch)
+    sem = _tom_mais_claro(1.0, monkeypatch)  # o controle: sem o ganho, o claro é só o pixel solto da textura
+    assert com >= 0.04 and com >= 2 * sem
+
+
+def _folhagem_da_moita_pequena(folha_grande: int | None, monkeypatch: pytest.MonkeyPatch) -> int:
+    """Os pixels de folhagem de uma moita de 60 cm (lóbulos de menos de 150 px)."""
+    if folha_grande is not None:
+        monkeypatch.setattr(montagem, "FOLHA_GRANDE", folha_grande)
+    comp = de_uma_peca("copa", {"copa": ["30cm", "22cm", "22cm"], "tufos": "6", "tamanho": "0.45"})
+    q = quadro_de_repouso(ir_da_composicao(comp), estilo_render(estilo_base()), "S")
+    return int(np.isin(q.dono, [i + 1 for i, p in enumerate(q.part_table) if p != "n_miolo"]).sum())
+
+
+def test_a_folha_da_moita_pequena_e_de_um_pixel(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A beira recortada vai na medida da peça: com a folha de 2 px (o controle) a moita pequena perde a forma."""
+    fina = _folhagem_da_moita_pequena(None, monkeypatch)
+    grossa = _folhagem_da_moita_pequena(0, monkeypatch)
+    assert fina >= 1.08 * grossa

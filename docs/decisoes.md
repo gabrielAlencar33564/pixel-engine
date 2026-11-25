@@ -586,8 +586,19 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   arbusto baixo e claro (a `copa` baixa e larga lê como almofada lisa com o claro no meio) e o choupo (a casca
   clara é lisa e lê como cano; a sombra da copa alta sai em duas manchas). A ficha da roseira e a do arbusto não
   foram reescritas quando a construção mudou: o revisor foi avisado.
+- As três que ficaram (pedido do dono, 2026-11-25), cada defeito corrigido na causa:
+  - a samambaia: a folha em pena passou a ser o corpo roliço com a beira serrilhada dente a dente (a marca
+    `borda_serrilhada`) e a nervura no tom escuro por cima (o zigue-zague saiu); a roseta de folhas largas deixa a
+    frente livre (a folha de frente para a câmera virava um talo em pé) e abre por igual; o corpo nunca é do tom
+    escuro, e o lado da luz pesa 0,45 no tom (com 0,6, poucas folhas largas viravam duas manchas);
+  - a moita pequena: a beira em folhas vai na medida da peça (a máscara de menos de 150 px tem a folha de 1 px; a
+    de 2 px comia o lóbulo pequeno), e a luz do relevo sobe 14 % (`GANHO`): o alto de cada lóbulo do lado da luz
+    chega ao tom mais claro da rampa (a massa ficava em dois tons, com o claro liso no meio);
+  - o choupo: o estilo ganhou a `casca_cinzenta`, com o veio da sulcada na rampa cinzenta (a clara é lisa e, no
+    tronco fino, lia como cano). Mudar o estilo muda o id de todo build que se refizer.
 - O que sobra: a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
-  fica do lado errado) e, com poucas lâminas largas, vira um corte seco entre o claro e o escuro; o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
-  folha; não há casca cinzenta com veio (a clara é lisa e lê como metal); a semelhança compara só a silhueta (duas
+  fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
+  folha; o cinzento da paleta puxa para o lilás; a sombra da copa alta sai em manchas (o elipsoide se lança como
+  uma elipse, sem se alongar com a altura); a semelhança compara só a silhueta (duas
   plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se
   leem mais, e as de `copa` dão outro desenho.

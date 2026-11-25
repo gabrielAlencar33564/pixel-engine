@@ -14,6 +14,7 @@ SPH_LIGHT = (-0.42, -0.45, 0.79)  # (lado, cima, frente); o sinal do lado vem do
 SMOOTH_ROWS = 2  # a largura de cada fileira é a média de ±2 fileiras: um degrau de 1 px no contorno não vira emenda
 RELEVO = 0.55  # na massa com relevo, quanto da luz é a da própria peça (o resto é a da massa inteira)
 PENUMBRA = 0.18  # e a luz mínima da massa: o lado da sombra não vira uma mancha do tom mais fundo
+GANHO = 1.14  # a luz do relevo sobe tanto: o alto de cada peça do lado da luz chega ao tom mais claro da rampa
 
 
 def _bordas(mask: Mascara, eixo: int) -> tuple[Floats, Floats]:
@@ -70,5 +71,5 @@ def volume_indices(pj: NaJanela, origem: tuple[int, int], mat: MaterialDef, side
         s = lambert_esfera(pj.mask, side)
     else:
         massa = PENUMBRA + (1 - PENUMBRA) * relevo[0]
-        s = (1 - RELEVO) * massa + RELEVO * lambert_esfera(relevo[1], side)
+        s = ((1 - RELEVO) * massa + RELEVO * lambert_esfera(relevo[1], side)) * GANHO
     return quantize(s + texture_at(xx - origem[0], yy - origem[1], mat.texture), list(mat.ramp), pj.cast)

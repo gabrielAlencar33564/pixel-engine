@@ -105,8 +105,10 @@ sombra da copa cai no chão à direita e entra no canvas. Leve o tronco até per
 da borda: o tronco que para na base dela a deixa no ar). Sob a copa em massa os `galhos` quase não aparecem (deixam
 as pontas para ela pôr um tufo em cada uma) e saem em `escondidas`: é esperado. Os `galhos` acompanham o topo do
 tronco inclinado. O tronco não é um cilindro: por padrão o pé abre no chão e o fuste engrossa
-e afina; dê a ele o que a espécie tem (a `curva` do tronco novo, as `raizes` e os `nos` do velho, a casca
-`casca_sulcada` com o veio em pé ou `casca_anelada` com os anéis deitados).
+e afina; dê a ele o que a espécie tem (a `curva` do tronco novo, as `raizes` e os `nos` do velho, a casca com o veio
+em pé, `casca_sulcada` a castanha e `casca_cinzenta` a cinzenta, ou `casca_anelada` com os anéis deitados; a
+`casca_clara` é lisa e, no tronco fino, lê como cano). A moita e a copa pequenas (menos de ~1,5 m de largura) pedem
+poucos lóbulos grandes (5 ou 6 de 0.45): com muitos e pequenos o relevo some.
 
 **Porte por categoria** (em humanos de 1,65 m):
 

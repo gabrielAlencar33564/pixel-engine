@@ -17,11 +17,12 @@ from .rasterizar import prim_center, rasterize
 from .textura import h32
 
 DETAIL_DEPTH_MARGIN_PX = 2  # o detalhe e a face chapada vencem a superfície a até 2 px à frente deles
-BORDA_DE_FOLHA = "borda_de_folha"  # a marca da peça de folhagem: a beira da máscara dela sai recortada
-FOLHA_FAIXA = 2  # a largura da beira que se recorta (px)
-FOLHA_CELULA = 2  # o lado da célula que sai inteira (px): a folha
-FOLHA_PARTE = 420  # as células que saem (‰)
-FOLHA_AREA_MINIMA = 40  # a máscara menor que isto (px) não se recorta
+BORDA_DE_FOLHA = "borda_de_folha"  # a marca do volume de folhagem: a beira da máscara dele sai recortada em folhas
+BORDA_SERRILHADA = "borda_serrilhada"  # a marca da folha em pena: a beira sai dente a dente (1 px)
+FOLHA_PARTE = 420  # as células da beira que saem na folhagem (‰)
+SERRILHA_PARTE = 500  # e na folha em pena
+FOLHA_GRANDE = 150  # a máscara com esta área (px) ou mais tem a folha de 2 px; a menor, de 1 px
+FOLHA_AREA_MINIMA = 24  # a máscara menor que isto (px) não se recorta
 Buf16 = npt.NDArray[np.uint16]
 Buf32 = npt.NDArray[np.int32]
 Buf64 = npt.NDArray[np.int64]
@@ -47,26 +48,27 @@ class Camadas:
         return sorted(self.cmds)
 
 
-def _recortada(m: Mascara) -> Mascara:
-    """A beira da folhagem: da faixa de ``FOLHA_FAIXA`` px junto à borda da máscara saem as células que o sorteio
-    escolhe (contadas do canto da máscara: a peça deslocada leva o recorte junto). A borda fica de folhas, e o que
-    está atrás (o miolo escuro, o lóbulo de baixo) aparece nos vãos. A máscara pequena fica como está."""
-    if int(m.sum()) < FOLHA_AREA_MINIMA:
-        return m
+def _recortada(m: Mascara, faixa: int, parte: int) -> Mascara:
+    """A beira recortada: da faixa de ``faixa`` px junto à borda da máscara saem ``parte`` ‰ das células de
+    ``faixa`` px de lado, sorteadas (contadas do canto da máscara: a peça deslocada leva o recorte junto). O que
+    está atrás (o miolo escuro, o lóbulo de baixo, o chão) aparece nos vãos."""
     dentro = m
-    for _ in range(FOLHA_FAIXA):
+    for _ in range(faixa):
         dentro = dentro & shift(dentro, 1, 0) & shift(dentro, -1, 0) & shift(dentro, 0, 1) & shift(dentro, 0, -1)
     ys, xs = np.nonzero(m)
     yy, xx = np.indices(m.shape)
-    sorteada = h32((xx - int(xs.min())) // FOLHA_CELULA, (yy - int(ys.min())) // FOLHA_CELULA, 7) % 1000 < FOLHA_PARTE
+    sorteada = h32((xx - int(xs.min())) // faixa, (yy - int(ys.min())) // faixa, 7) % 1000 < parte
     res: Mascara = m & ~(~dentro & sorteada)
     return res
 
 
 def _mascara(c: DrawCommand, w: int, h: int) -> Mascara:
     m = rasterize(c.prim, w, h)
-    if BORDA_DE_FOLHA in c.tags:
-        m = _recortada(m)
+    area = int(m.sum())
+    if BORDA_DE_FOLHA in c.tags and area >= FOLHA_AREA_MINIMA:  # a folha da peça pequena é de 1 px; a da grande, de 2
+        m = _recortada(m, 2 if area >= FOLHA_GRANDE else 1, FOLHA_PARTE)
+    elif BORDA_SERRILHADA in c.tags and area >= FOLHA_AREA_MINIMA:
+        m = _recortada(m, 1, SERRILHA_PARTE)
     if not m.any():  # a primitiva menor que a grade cobre o pixel do centro projetado, em vez de sumir
         cu, cv = prim_center(c.prim)
         x, y = (cu >> 8) + MARGIN, (cv >> 8) + MARGIN

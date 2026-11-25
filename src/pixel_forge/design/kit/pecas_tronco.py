@@ -174,7 +174,8 @@ PECAS_TRONCO = [
              X("base", "comprimento", "a largura do fuste embaixo (o pé abre além dela)"),
              X("topo", "comprimento", "a largura em cima"),
              X("inclinacao", "comprimento", "quanto o topo desvia (positivo: para a direita da tela)", "0"),
-             X("casca", "material", "a casca (casca_sulcada, casca_anelada; lisas: casca, casca_clara)"),
+             X("casca", "material", "a casca (com veio: casca_sulcada, casca_cinzenta, casca_anelada; lisas: casca, "
+               "casca_clara)"),
              X("pe", "escalar", "quanto o pé abre no chão, em fração da largura (0 = sem pé; some a 1 largura de "
                "altura)", "0.35"),
              X("irregular", "escalar", "quanto o fuste engrossa e afina ao longo da altura (0 = reto; só se lê em "

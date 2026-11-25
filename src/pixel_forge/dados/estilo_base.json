@@ -1067,6 +1067,30 @@
     "period_px": 4,
     "seed": 47
    }
+  },
+  {
+   "id": "casca_cinzenta",
+   "ramp": [
+    27,
+    20,
+    21,
+    26
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 600,
+    "depth_permille": 330,
+    "grain": "along",
+    "jitter_permille": 60,
+    "kind": "dashes",
+    "length_px": [
+     3,
+     7
+    ],
+    "lift_permille": 0,
+    "period_px": 3,
+    "seed": 53
+   }
   }
  ],
  "shading": {
