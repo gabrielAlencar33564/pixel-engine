@@ -180,8 +180,9 @@ def achados(m: Leitura, arvore: bool, irmas: dict[str, float]) -> list[dict[str,
     if massa and m.solidez >= LISA:
         out.append(_achado("FOLHAGEM_LISA", "defeito", f"a folhagem enche {m.solidez:.0%} do fecho convexo dela "
                            f"(o limite é {LISA:.0%})", "A silhueta não tem reentrância: lê como ovo, bola ou cone. "
-                           "Use a peça de copa com lóbulos e raminhos, a copa aberta ou a saia recortada; não um "
-                           "elipsoide nem um polígono."))
+                           "Na `copa`, diminua o `tamanho` dos lóbulos e suba o `irregular` (mais lóbulos grandes "
+                           "alisam); ou troque a construção (a copa aberta, a saia recortada). A planta não se faz "
+                           "de elipsoide nem de polígono."))
     if massa and m.simetria >= ESPELHADA:
         out.append(_achado("FOLHAGEM_ESPELHADA", "defeito", f"a folhagem coincide {m.simetria:.0%} com o espelho "
                            f"dela (o limite é {ESPELHADA:.0%})", "Planta nenhuma é simétrica: suba o `irregular`, "

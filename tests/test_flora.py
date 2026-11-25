@@ -27,10 +27,11 @@ from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.contracts.ir import AssetIR
 from pixel_forge.core.recusa import Recusa
 from pixel_forge.core.rng import Stream
+from pixel_forge.design import canvas
 from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.escala import PPM
 from pixel_forge.design.kit import pecas_copa
-from pixel_forge.design.kit.pecas_copa import tufos
+from pixel_forge.design.kit.pecas_copa import ramos, tufos
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.porte import altura_m
 from pixel_forge.quality import flora
@@ -160,15 +161,35 @@ def test_a_altura_da_copa_e_a_pedida() -> None:
     assert altura_m(ir_da_composicao(de_uma_peca("copa", args))) == pytest.approx(2.9, abs=1 / PPM)
 
 
-def test_controle_o_tufo_que_pende_desce_da_copa() -> None:
-    """Com ``pende``, ramos finos caem dos lóbulos de baixo, abaixo do elipsoide, sem entrar no chão; os lóbulos
-    ficam onde estavam."""
-    a = {**COPA_DE_TESTE, "tamanho": 0.3, "irregular": 0.0}
-    sem, com = tufos(Stream(1), a), tufos(Stream(1), {**a, "pende": 2.0})
-    reto = min(c[2] - r[2] for c, r in sem)
-    assert com[:len(sem)] == sem and len(com) > len(sem)
-    assert 0 <= min(c[2] - r[2] for c, r in com[len(sem):]) < reto - 5
-    assert max(r[0] for _, r in com[len(sem):]) < min(r[0] for _, r in sem[:7])
+def test_os_ramos_que_caem_fazem_a_cortina() -> None:
+    """Com ``pende``, ramos finos caem em volta da copa (na frente, atrás e dos lados), de dentro da folhagem até
+    abaixo do elipsoide, sem entrar no chão."""
+    a = {**COPA_DE_TESTE, "pende": 1.8}
+    cortina = ramos(Stream(1), a)
+    assert len(cortina) == 3 * a["tufos"] and all(0 <= ponta[2] < alto[2] for alto, ponta, _ in cortina)
+    assert all(alto[2] >= 60.0 for alto, _, _ in cortina) and min(ponta[2] for _, ponta, _ in cortina) < 30.0 - 5
+    assert min(alto[1] for alto, _, _ in cortina) < -10 and max(alto[1] for alto, _, _ in cortina) > 10
+    assert max(raio for _, _, raio in cortina) < min(r[0] for _, r in tufos(Stream(1), a)[:7]) / 3
+
+
+def test_controle_sem_pende_nao_ha_ramo_caindo() -> None:
+    assert ramos(Stream(1), COPA_DE_TESTE) == []
+
+
+def _copa_alta_e_estreita() -> int:
+    """Os pixels que a copa alta e estreita põe fora do canvas (a sombra dela no chão desce mais que o fundo)."""
+    ir = ir_da_composicao(de_uma_peca("copa", {"copa": ["60cm", "3m", "3.2m"], "perfil": "0.55"}))
+    return quadro_de_repouso(ir, estilo_render(estilo_base()), "S").clipping_px
+
+
+def test_a_copa_alta_e_estreita_cabe_no_quadro() -> None:
+    assert _copa_alta_e_estreita() == 0
+
+
+def test_controle_sem_a_altura_na_sombra_o_canvas_corta_a_copa_alta(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: o canvas contava a sombra do volume só até o fundo dele."""
+    monkeypatch.setattr(canvas, "ALTURA_NA_SOMBRA", 0.0)
+    assert _copa_alta_e_estreita() > 0
 
 
 def _conifera_chapada() -> Composicao:

@@ -123,6 +123,7 @@ def test_a_flora_so_sai_com_a_critica_que_passa(tmp_path: Path, capsys: pytest.C
     assert codigo == 2 and r["errors"][0]["code"] == "CRITICA_PENDENTE" and "pfe critica" in r["errors"][0]["hint"]
     feita = pfe(capsys, "critica", build)[1]["result"]
     assert feita["veredito"] == "pendente" and feita["achados"] == [] and Path(feita["prancha"]).is_file()
+    assert feita["parecida_a_partir_de"] == flora.PARECIDA
     assert set(feita["perguntas"]) == set(critica.PERGUNTAS) and feita["ficha"].startswith("Folhosa")
     assert pfe(capsys, "exportar", build)[1]["errors"][0]["code"] == "CRITICA_PENDENTE"
     # o parecer sem as notas, sem quem revisou, e o que manda corrigir

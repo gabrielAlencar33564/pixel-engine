@@ -522,8 +522,9 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
 - A `copa` põe os lóbulos numa espiral em volta do eixo (o passo é o ângulo áureo, o giro é da semente), cada um
   com o tamanho, o lugar e o recuo sorteados, e raminhos na borda. Tudo fica por dentro do elipsoide da copa, e o
   raminho do alto encosta nele (a altura é a pedida). `tufos` passou a ser o total de lóbulos (era o do anel do
-  meio). `perfil` faz a gota (1) e o guarda-sol (−1); `pende` solta ramos finos de comprimentos desencontrados (os
-  tufos não esticam mais). A peça deixa a âncora `superficie`.
+  meio). `perfil` faz a gota (1) e o guarda-sol (−1); `pende` faz a cortina: três ramos finos por lóbulo em volta
+  da copa, de dentro da folhagem até `pende` meias alturas abaixo do meio dela, sem contorno (os tufos não esticam
+  mais). A peça deixa a âncora `superficie` (os pontos de face que nenhum outro volume cobre).
 - A folhagem de um nó é uma massa de luz: a parte com a marca `massa_<nó>` toma 45 % da luz da união das partes da
   marca (com 0,18 de penumbra) e 55 % da luz dela (`raster/tons.py`, `raster/volume.py`). Vale entre grupos de
   contorno: na conífera cada saia tem a linha dela e a árvore inteira tem um lado claro.
@@ -532,8 +533,9 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
 - A `copa_conica` faz cada andar como um leque pregueado (uma parte por saia): as pontas caem abaixo da barra e a
   saia entra entre elas (`pontas`, `recorte`, `cai`). O argumento `saia` saiu. Na dobra do leque o z-buffer fica
   com o triângulo da frente (o de mais de meio passo à frente); o plano que se repete não troca, e o oráculo não muda.
-- A `touceira` (lâminas em arco a partir de um pé: finas ou, com `largura`, roliças) e o `salpico` (pontos de cor
-  numa âncora; na composição de vista única, só do lado da câmera) fazem a flora baixa, a palma, a flor e o fruto.
+- A `touceira` (lâminas em arco a partir de um pé: finas; com `largura`, roliças; com `pena`, serrilhadas dos dois
+  lados da nervura) e o `salpico` (pontos de cor numa âncora; na composição de vista única, só na metade mais
+  virada para a câmera) fazem a flora baixa, a palma, a flor e o fruto.
 - A crítica (`pfe critica`, `quality/flora.py`, `application/critica.py`): mede no quadro da vista S a solidez da
   folhagem (os pixels dela sobre os do fecho convexo), a simetria (contra o espelho), a luz (o claro do lado da
   luz), o lenho à mostra, as ilhas e a assinatura (a silhueta na grade de 32, do pé para cima), e compara a
@@ -551,7 +553,17 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   conífera enche 0,72 do fecho dela (a saia lisa, 0,90); os galhos aparecem 123 px sob a copa aberta; o ovo, a copa
   em anel e o polígono são acusados; a mesma árvore em outro tamanho é acusada como irmã (a de outra construção,
   não); o export da planta é recusado sem o parecer.
-- O que sobra: a copa de poucos lóbulos grandes ainda lê lisa (0,96 a 0,97); a folha larga é roliça, não chata, e o
-  tom das lâminas é sorteado (sem lado da luz); o capim de 20 a 40 cm tem 6 a 13 px e lê como rabisco; a palma com
-  `cai` alto lê murcha; a semelhança compara só a silhueta (duas plantas de silhuetas iguais e cores diferentes
-  são acusadas). As composições antigas do acervo com `saia` não se leem mais, e as de `copa` dão outro desenho.
+- A prova de fora (um agente sem contexto, dez plantas de uma cena pela skill, em `~/.pixel-forge/acervo-prova-flora`;
+  na `21c`): as dez saíram de construções diferentes e sem defeito medido, em 65 chamadas. O que ela achou e foi
+  corrigido na causa: o canvas cortava a copa alta e estreita (a sombra do elipsoide no chão tem metade da altura
+  dele na tela, e o canvas a contava só até o fundo: `ALTURA_NA_SOMBRA`); os lóbulos paravam no meio da metade de
+  baixo da copa (`BAIXO` foi de −0,45 a −0,8: o choupo lia como pirulito); os ramos do chorão eram presas grossas
+  (viraram a cortina); a samambaia lia como aranha (a folha em pena); a dica da folhagem lisa mandava usar a peça
+  que já se usava. A skill ganhou o que faltava (o tronco até o centro da copa, o `pende`, a flor na lâmina reta,
+  a erva em `objeto`, o que a crítica compara).
+- O que sobra: a copa de poucos lóbulos grandes ainda lê lisa (0,96 a 0,97); a folha larga lisa é roliça, não chata;
+  a folha em pena não tem contorno nem lança sombra (são traços); o tom das lâminas é sorteado (sem lado da luz); o
+  capim de 20 a 40 cm tem 6 a 13 px e lê como rabisco; a `copa` não se desloca do eixo (a copa de um lado só sai
+  pela inclinação do tronco); a agulha da conífera aberta não se distingue da folha; a semelhança compara só a
+  silhueta (duas plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com
+  `saia` não se leem mais, e as de `copa` dão outro desenho.

@@ -19,6 +19,8 @@ TOM = 0.4  # a lâmina sai clara ou escura quando o sorteio dela (de −1 a 1) p
 # a largura da folha em cada ponto do arco (fração da largura): estreita no pé, larga antes do meio, ponta fina
 LARGURA_NO_ARCO = (0.3, 0.6, 1.0, 0.9, 0.55, 0.15)
 RAIO_MINIMO = 32  # o menor raio da folha na IR (q8): 1/8 px
+PASSO_DA_PENA = 1.5  # a folha em pena tem um dente a cada 1,5 px do comprimento dela
+MAX_DENTES = 60  # até 60 (o traço tem até 64 pontos)
 # de onde se vê a vista S (o chão a 0,6 e a altura a cos 45°): o ponto do lado de lá não ganha salpico
 CAMERA = (0.0, 0.6, math.sqrt(0.5))
 DE_FRENTE = 0.5  # na vista única, o salpico sorteia entre a metade dos pontos mais virada para a câmera
@@ -26,22 +28,39 @@ Vec = tuple[float, float, float]
 X = Arg
 
 
-def _arco(pe: Vec, az: float, comprimento: float, forma: tuple[float, float]) -> list[Vec]:
-    """Os pontos da lâmina: sai do pé quase a prumo e abre no azimute ``az`` até ``abre`` do comprimento; a ponta
-    cai ``cai`` da altura do arco (acima de 1, desce abaixo do pé, sem entrar no chão)."""
-    abre, cai = forma
+def _arco(pe: Vec, az: float, comprimento: float, forma: tuple[float, float, int]) -> list[Vec]:
+    """Os pontos da lâmina (``trechos`` mais um): sai do pé quase a prumo e abre no azimute ``az`` até ``abre`` do
+    comprimento; a ponta cai ``cai`` da altura do arco (acima de 1, desce abaixo do pé, sem entrar no chão)."""
+    abre, cai, trechos = forma
     alcance = comprimento * abre
     alto = comprimento * math.sqrt(max(0.04, 1 - abre * abre))
     dx, dy = math.sin(az), math.cos(az)
     ctrl = (pe[0] + dx * alcance * SOBE_ANTES, pe[1] + dy * alcance * SOBE_ANTES, pe[2] + alto * (1 + 0.5 * cai))
     fim = (pe[0] + dx * alcance, pe[1] + dy * alcance, max(0.0, pe[2] + alto * (1 - cai)))
     out = []
-    for i in range(TRECHOS + 1):
-        s = i / TRECHOS
+    for i in range(trechos + 1):
+        s = i / trechos
         out.append((ctrl[0] * 2 * s * (1 - s) + pe[0] * (1 - s) ** 2 + fim[0] * s * s,
                     ctrl[1] * 2 * s * (1 - s) + pe[1] * (1 - s) ** 2 + fim[1] * s * s,
                     ctrl[2] * 2 * s * (1 - s) + pe[2] * (1 - s) ** 2 + fim[2] * s * s))
     return out
+
+
+def _pena(c: Ctx, pid: str, material: str, folha: tuple[list[Vec], float, float]) -> None:
+    """A folha em pena: a nervura (o arco) e um zigue-zague de um lado e do outro dela, com a largura da folha em
+    cada ponto (atravessada ao azimute, na horizontal). São traços de 1 px, sem contorno: a borda é serrilhada."""
+    fino, az, largura = folha
+    n = len(fino) - 1
+    dx, dy = math.cos(az) * largura / 2, -math.sin(az) * largura / 2
+    zigue = []
+    for i, p in enumerate(fino):
+        onde = i / n * (len(LARGURA_NO_ARCO) - 1)
+        j = min(len(LARGURA_NO_ARCO) - 2, int(onde))
+        k = LARGURA_NO_ARCO[j] + (LARGURA_NO_ARCO[j + 1] - LARGURA_NO_ARCO[j]) * (onde - j)
+        lado = k if i % 2 else -k
+        zigue.append((p[0] + dx * lado, p[1] + dy * lado, p[2]))
+    c.b.part(pid, material, polyline([qv(*p) for p in fino[::2] + fino[-1:]], 1), Parte(group=c.grupo, tags=LINE))
+    c.b.part(f"{pid}_pena", material, polyline([qv(*p) for p in zigue], 1), Parte(group=c.grupo, tags=LINE))
 
 
 def _lamina(c: Ctx, pid: str, material: str, arco: list[Vec], largura: float) -> None:
@@ -68,10 +87,15 @@ def _touceira(c: Ctx, a: dict[str, Any]) -> None:
         pe = (a["pe"][0] + math.sin(az) * longe, a["pe"][1] + math.cos(az) * longe, a["pe"][2])
         comprimento = a["altura"][0] + (a["altura"][1] - a["altura"][0]) * st.randint(0, 100) / 100
         abre = min(0.98, a["abre"] * (1 - (1 - ABRE_MENOS) * (st.randint(0, 100) / 100) ** 2))
-        arco = _arco(pe, az, comprimento, (abre, a["cai"]))
+        arco = _arco(pe, az, comprimento, (abre, a["cai"], TRECHOS))
         tom = st.randint(-100, 100) / 100
         material = a["claro"] if tom > TOM else a["escuro"] if tom < -TOM else a["material"]
-        _lamina(c, f"{c.pid}_{i:02d}", material, arco, a["largura"])
+        if a["pena"] and a["largura"] > 0:
+            dentes = max(2 * TRECHOS, min(MAX_DENTES, 2 * round(comprimento / (2 * PASSO_DA_PENA))))
+            _pena(c, f"{c.pid}_{i:02d}", material, (_arco(pe, az, comprimento, (abre, a["cai"], dentes)), az,
+                                                    a["largura"]))
+        else:
+            _lamina(c, f"{c.pid}_{i:02d}", material, arco, a["largura"])
         pontas.append(arco[-1])
     c.deixa("pontas", pontas)
 
@@ -93,14 +117,16 @@ def _salpico(c: Ctx, a: dict[str, Any]) -> None:
 MOITA = ("moita", "copa", {"copa": ["60cm", "40cm", "40cm"], "tufos": "6", "tamanho": "0.45"})
 PECAS_ERVAS = [
     Peca("touceira", "Lâminas que saem de um pé e abrem em arco, cada uma com o comprimento, a abertura e o tom "
-         "sorteados: finas, o capim e o junco; largas, a samambaia e a folha em espada; com o pé no alto de um "
-         "tronco, a palma. Deixa as pontas", (
+         "sorteados: finas, o capim e o junco; largas, a folha em espada; largas e em pena, a samambaia; com o pé no "
+         "alto de um tronco, a palma. Deixa as pontas", (
              X("altura", "faixa", "o comprimento das lâminas, sorteado na faixa"),
              X("n", "inteiro", "lâminas", "9"),
              X("abre", "escalar", "quanto a lâmina mais aberta se afasta do pé, em fração do comprimento (0.2 = em "
                "pé; 0.9 = deitada)", "0.5"),
              X("cai", "escalar", "quanto a ponta cai da altura do arco (0 = reta; 1 = volta à altura do pé)", "0.3"),
              X("largura", "comprimento", "a largura da folha (0 = lâmina fina, de 1 px)", "0"),
+             X("pena", "bool", "a folha larga em pena (a samambaia, a palma): serrilhada dos dois lados da "
+               "nervura, em vez de lisa", False),
              X("raio", "comprimento", "o raio do pé: as lâminas nascem espalhadas nele", "0"),
              X("pe", "ponto", "de onde nasce (o chão, ou o alto de um tronco)", ["0", "0", "0"]),
              X("material", "material", "a lâmina comum", "capim"),
@@ -110,12 +136,12 @@ PECAS_ERVAS = [
                      ("junco", {"altura": ["70cm", "1.2m"], "n": "9", "abre": "0.22", "cai": "0.05",
                                 "raio": "15cm"}),
                      ("samambaia", {"altura": ["50cm", "75cm"], "n": "8", "abre": "0.75", "cai": "0.45",
-                                    "largura": "12cm", "material": "folha", "claro": "folha_clara",
+                                    "largura": "22cm", "pena": True, "material": "folha", "claro": "folha_clara",
                                     "escuro": "folha_escura"}),
                      ("espada", {"altura": ["50cm", "80cm"], "n": "11", "abre": "0.6", "cai": "0",
                                  "largura": "10cm", "material": "agulha", "claro": "agulha_clara",
                                  "escuro": "agulha_escura"})),
-         "tests/test_ervas.py::test_a_touceira_e_de_laminas", (_touceira, _lamina, _arco), vistas=QUATRO,
+         "tests/test_ervas.py::test_a_touceira_e_de_laminas", (_touceira, _lamina, _pena, _arco), vistas=QUATRO,
          flora="lamina", ancoras=("pontas",)),
     Peca("salpico", "Pontos de cor sobre outro nó: a flor e o fruto na superfície de uma copa, a espiga na ponta "
          "de uma lâmina, o broto na ponta de um galho. Pede a âncora de um nó de antes", (

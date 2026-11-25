@@ -82,25 +82,28 @@ tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à
 
 | Construção | Nós | O que dá |
 |---|---|---|
-| a massa | `tronco_em_pe` + `copa` | a folhosa de copa fechada. `perfil`: 0 a redonda, 1 a gota (fina no alto), -1 o guarda-sol (só a metade de cima). `tufos` e `tamanho`: a copa pesada (6 de 0.45) ou a leve (14 de 0.22). `pende`: os ramos finos que caem |
+| a massa | `tronco_em_pe` + `copa` | a folhosa de copa fechada. `perfil`: 0 a redonda, 1 a gota (fina no alto), -1 o guarda-sol (só a metade de cima). `tufos` e `tamanho`: a copa pesada (6 de 0.45) ou a leve (14 de 0.22). `pende`: a cortina de ramos finos em volta da copa (1 desce até o fundo dela; 2 ou mais, com o `perfil` negativo, é o chorão) |
 | a aberta | `tronco_em_pe` + `galhos` com `sobe` + `copa_aberta` | os galhos à mostra e uma nuvem de folhas em cada ponta: a árvore velha, a de copa rala, a de copa em nuvens |
 | os andares | `tronco_em_pe` + `copa_conica` | a conífera de saias recortadas; `pontas`, `recorte` e `cai` dão a saia cheia ou a magra |
-| a roseta no alto | `tronco_em_pe` + `touceira` com o `pe` no alto do tronco e `largura` | a palma, a folha em espada |
+| a roseta no alto | `tronco_em_pe` + `touceira` com o `pe` no alto do tronco, `largura` e `pena` | a palma (em pena), a folha em espada (lisa) |
 | a seca | `tronco_em_pe` + `galhos` | a árvore sem folha |
 | a moita | `copa` no chão, sem tronco | o arbusto; com `salpico` na `superficie` dela, a flor e o fruto |
-| a touceira | `touceira` | lâminas: finas, o capim e o junco; com `largura`, a samambaia; com `salpico` nas `pontas`, a flor do campo e a espiga |
+| a touceira | `touceira` | lâminas: finas, o capim e o junco; com `largura` e `pena`, a samambaia; com `salpico` nas `pontas`, a flor do campo e a espiga (a flor pede a lâmina quase reta: `cai` até 0.1) |
 
 A folhagem de um nó é uma massa de luz só (o claro em cima e à esquerda), e cada lóbulo é um relevo nela. Tudo é
 sorteado pela semente: outra semente dá outra planta da mesma espécie. **Para variar o cenário,** duas plantas do
 mesmo conjunto não saem da mesma receita com outra semente e outro tamanho: varie a construção, o `perfil`, a
 proporção da copa, o tronco (a `curva`, a `inclinacao`, as `raizes`, dois troncos) e a folhagem; dentro da mesma
 espécie, a semente e o `irregular`. A crítica (seção 6) mede a silhueta contra as irmãs do acervo e acusa a parecida.
-A planta não se faz de `elipsoide`, `poligono` nem `fios`: a crítica acusa o ovo, o cone liso e o tom chapado.
+A planta não se faz de `elipsoide`, `poligono` nem `fios`: a crítica acusa o ovo, o cone liso e o tom chapado. A erva
+de menos de 40 cm vai na categoria `objeto` (o `arbusto` começa em 0,25× o humano).
 
 A copa em massa mostra o alto e cobre o tronco pela frente: do tronco sobra na tela a altura do centro da copa × 0,71
 menos √((meio fundo × 0,6)² + (meia altura × 0,71)²); para ele aparecer mais, suba a copa ou diminua o `fundo`. A
-sombra da copa cai no chão à direita e entra no canvas. Sob a copa em massa os `galhos` quase não aparecem (deixam as
-pontas para ela pôr um tufo em cada uma). O tronco não é um cilindro: por padrão o pé abre no chão e o fuste engrossa
+sombra da copa cai no chão à direita e entra no canvas. Leve o tronco até perto do centro da copa (os lóbulos recuam
+da borda: o tronco que para na base dela a deixa no ar). Sob a copa em massa os `galhos` quase não aparecem (deixam
+as pontas para ela pôr um tufo em cada uma) e saem em `escondidas`: é esperado. Os `galhos` acompanham o topo do
+tronco inclinado. O tronco não é um cilindro: por padrão o pé abre no chão e o fuste engrossa
 e afina; dê a ele o que a espécie tem (a `curva` do tronco novo, as `raizes` e os `nos` do velho, a casca
 `casca_sulcada` com o veio em pé ou `casca_anelada` com os anéis deitados).
 
@@ -156,13 +159,15 @@ siga a dica e corrija. A recusa `MOTOR` é defeito da engine, não seu: pare e r
 ## 6. A crítica da planta
 
 A planta (a árvore, o arbusto, qualquer asset com `copa` ou `touceira`) só sai depois de medida e revisada por outro
-agente. `pfe critica <build> --json` devolve:
+agente. `pfe critica <build> --json` (só o caminho do build: o acervo é o dele) devolve:
 
 - `medidas` e `achados`: cada achado tem o `codigo`, a `gravidade`, a `medida` e a `dica`. O `defeito` (a folhagem
   lisa, espelhada ou sem lado claro; a silhueta igual à de uma irmã) impede a crítica de passar: corrija a composição
   e volte ao passo 1 com `pfe atualizar`. O `aviso` (o tronco que sumiu, o pedaço solto) pede o olho de quem revisa. O
   defeito que você acha medido errado é defeito da engine: pare e registre, não contorne.
-- `irmas`: as três plantas da mesma categoria no acervo com a silhueta mais parecida, e o quanto (de 0 a 1).
+- `irmas`: as três composições da mesma categoria no acervo (com ou sem build) de silhueta mais parecida, e o quanto
+  (de 0 a 1; a partir de `parecida_a_partir_de` é defeito). A touceira não tem medida de massa: dela só se compara a
+  silhueta.
 - `prancha` (`criticas/<build>.png`): em cima, o sprite e a silhueta dele; embaixo, as irmãs e as silhuetas delas.
 - `perguntas` e `ficha`: o que só o olho responde.
 

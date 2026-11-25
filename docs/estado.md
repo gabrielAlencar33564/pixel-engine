@@ -105,9 +105,9 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   (`carvalho_roble.r4.89fc47c82e08`, na `20b`); a `r1` e a `r2` usam as peças que saíram e não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
 - O tronco (mudança 20): o perfil irregular não se lê abaixo de 40 cm, a curva é só de lado, e não há forquilha
   nem toco cortado.
-- A flora variada (mudança 21): a copa de poucos lóbulos grandes ainda lê lisa; a folha larga é roliça e o tom das
-  lâminas é sorteado; o capim baixo lê como rabisco; a crítica não mede o brócolis (fica na pergunta de quem
-  revisa) e compara só a silhueta. As plantas antigas do acervo não foram refeitas: as de `copa` dão outro desenho
+- A flora variada (mudança 21): a copa de poucos lóbulos grandes ainda lê lisa; a folha em pena não tem contorno nem
+  sombra, e o tom das lâminas é sorteado; o capim baixo lê como rabisco; a copa não se desloca do eixo; a crítica
+  não mede o brócolis (fica na pergunta de quem revisa) e compara só a silhueta. As plantas antigas do acervo não foram refeitas: as de `copa` dão outro desenho
   e as de `copa_conica` com `saia` não se leem mais (em `docs/decisoes.md`).
 
 ## Espera o dono

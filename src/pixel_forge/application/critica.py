@@ -172,7 +172,8 @@ def criticar(build: Path) -> dict[str, Any]:
     achados = flora.achados(m, comp.categoria in ARVORES, perto)
     return _gravar(build, {
         "build_id": ler_manifesto(build)["build_id"], "prancha": str(alvo), "medidas": m.numeros(),
-        "irmas": {i: round(perto[i], 3) for i in vizinhas}, "achados": achados, "ficha": comp.reference,
+        "irmas": {i: round(perto[i], 3) for i in vizinhas}, "parecida_a_partir_de": flora.PARECIDA,
+        "achados": achados, "ficha": comp.reference,
         "perguntas": PERGUNTAS, "parecer": None, "veredito": "pendente"})
 
 

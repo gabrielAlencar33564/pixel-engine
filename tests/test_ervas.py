@@ -1,6 +1,6 @@
 """A flora de lâminas e de pontos (mudança 21): a touceira lê como lâminas e não como massa, a folha larga é mais
-que um traço, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê. Os controles: a moita em massa, a
-lâmina fina, o pé no chão e o salpico sorteado na volta toda."""
+que um traço, a folha em pena é serrilhada, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê. Os
+controles: a moita em massa, a lâmina fina, a folha lisa, o pé no chão e o salpico sorteado na volta toda."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def test_a_touceira_e_de_laminas() -> None:
     for nome, args in PECAS["touceira"].variacoes:
         comp = de_uma_peca("touceira", args)
         assert flora.solidez(_quadro(comp).dono != 0) < 0.8, nome
-        assert len(ir_da_composicao(comp).parts) == int(args["n"])
+        assert sum(1 for p in ir_da_composicao(comp).parts if not p.id.endswith("_pena")) == int(args["n"])
 
 
 def test_controle_a_moita_em_massa_enche_o_fecho() -> None:
@@ -45,6 +45,22 @@ def _pixels(**args: Any) -> int:
 
 def test_a_folha_larga_e_mais_que_um_traco() -> None:
     assert _pixels(largura="20cm") >= 1.5 * _pixels()
+
+
+def _borda_sobre_a_area(pena: bool) -> float:
+    """Os pixels da borda da figura sobre os da figura: a folha serrilhada tem mais borda que a lisa."""
+    args = {**CAPIM, "altura": ["80cm", "1.1m"], "n": "5", "abre": "0.8", "largura": "30cm", "pena": pena}
+    figura = _quadro(de_uma_peca("touceira", args)).dono != 0
+    dentro = figura.copy()
+    dentro[1:] &= figura[:-1]
+    dentro[:-1] &= figura[1:]
+    dentro[:, 1:] &= figura[:, :-1]
+    dentro[:, :-1] &= figura[:, 1:]
+    return float((figura & ~dentro).sum()) / float(figura.sum())
+
+
+def test_a_folha_em_pena_e_serrilhada() -> None:
+    assert _borda_sobre_a_area(True) >= 1.3 * _borda_sobre_a_area(False)
 
 
 def _pes(pe: list[str]) -> set[float]:
