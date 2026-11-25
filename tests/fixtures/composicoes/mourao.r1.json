@@ -7,7 +7,6 @@
  "categoria": "objeto",
  "semente": 5,
  "medidas": {"alto": "1.1m", "raio": "6cm"},
- "sombra": {"meia_largura": "$raio * 3"},
  "nos": [
   {"id": "poste", "peca": "poste", "args": {"base": ["0", "0", "0"], "altura": "$alto", "raio": "$raio"}},
   {"id": "placa", "peca": "viga", "camada": 2,

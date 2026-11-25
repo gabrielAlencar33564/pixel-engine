@@ -3,7 +3,6 @@
  "description": "Fixture sintética: tronco, galhos grossos e a copa pontilhada com um cacho em cada ponta, na cadeia do balanço",
  "reference": "fixture sintética mínima", "tipo": "prop", "categoria": "arvore_pequena", "semente": 321,
  "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.35", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
- "sombra": {"meia_largura": "$a * 0.5", "dy": "-1px"},
  "nos": [
   {"id": "tronco", "peca": "tronco_em_pe", "osso": "tronco", "grupo": "tronco",
    "args": {"altura": "$copa0", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca"}},

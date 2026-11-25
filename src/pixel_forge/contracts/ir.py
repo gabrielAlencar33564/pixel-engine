@@ -121,11 +121,9 @@ class OcclusionRule(Strict):
 
 
 class ViewSpec(Strict):
-    """O que muda na vista: as partes ocultas, a geometria trocada (a sombra de contato girada), o viés de
-    profundidade e as regras frente/trás."""
+    """O que muda na vista: as partes ocultas, o viés de profundidade e as regras frente/trás."""
 
     visibility: dict[Id, Literal["hidden"]] = Field(default_factory=dict)
-    geometria: dict[Id, Geometry] = Field(default_factory=dict)
     depth_bias: dict[Id, Annotated[int, Field(ge=-65536, le=65536, strict=True)]] = Field(default_factory=dict)
     occlusion_rules: list[OcclusionRule] = Field(default_factory=list)
 

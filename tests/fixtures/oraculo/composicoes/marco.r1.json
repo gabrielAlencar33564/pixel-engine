@@ -3,7 +3,6 @@
  "description": "Fixture sintética: um marco de pedra com uma bola e uma haste, nas 4 vistas cardinais",
  "reference": "fixture sintética mínima", "tipo": "prop", "categoria": "objeto", "semente": 9,
  "medidas": {"r": "20cm"},
- "sombra": {"meia_largura": "$r * 2"},
  "nos": [
   {"id": "base", "peca": "poligono", "args": {"pontos": [["-$r", "$r", "0"], ["$r", "$r", "0"], ["$r", "$r", "40cm"],
                                                          ["-$r", "$r", "40cm"]], "material": "pedra"}},

@@ -6,24 +6,24 @@
     48,
     40
    ],
-   "rgba_sha256": "b17e24420b2947982c2e074e9b5a87881f7114eb3038967c47d1ab9b19d4d1c5",
-   "sem_chao_sha256": "b17e24420b2947982c2e074e9b5a87881f7114eb3038967c47d1ab9b19d4d1c5"
+   "rgba_sha256": "4b6eac0a6b086010242d5a30adc96558aed042a3821309db5b2eddb3064ee260",
+   "sem_chao_sha256": "4b6eac0a6b086010242d5a30adc96558aed042a3821309db5b2eddb3064ee260"
   },
   "E": {
    "tamanho": [
     48,
     40
    ],
-   "rgba_sha256": "6bddae63ec301d6208f48bc66fe5e9a48fbcfcf221b3fc0ab799866f71b66aff",
-   "sem_chao_sha256": "6bddae63ec301d6208f48bc66fe5e9a48fbcfcf221b3fc0ab799866f71b66aff"
+   "rgba_sha256": "1a3b31b6c7c7e02ee47ff5475eee837205208932c2b3e7090cbae3b931ce31cf",
+   "sem_chao_sha256": "1a3b31b6c7c7e02ee47ff5475eee837205208932c2b3e7090cbae3b931ce31cf"
   },
   "N": {
    "tamanho": [
     48,
     40
    ],
-   "rgba_sha256": "290daf63c2aa3aabf37eec36382128c70d6e6b89f7110c479dae0f5debe820fe",
-   "sem_chao_sha256": "290daf63c2aa3aabf37eec36382128c70d6e6b89f7110c479dae0f5debe820fe"
+   "rgba_sha256": "d1352f88984dfabda0060ffa8b8be612f07b159ca7d51bf1cde496531fa68db2",
+   "sem_chao_sha256": "d1352f88984dfabda0060ffa8b8be612f07b159ca7d51bf1cde496531fa68db2"
   }
  }
 }

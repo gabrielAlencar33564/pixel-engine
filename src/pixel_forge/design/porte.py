@@ -32,10 +32,9 @@ def _topo(g: dict[str, Any]) -> float:
 
 
 def altura_m(ir: AssetIR) -> float:
-    """A altura do asset em metros: o ponto mais alto da geometria no repouso, sem a sombra no chão."""
+    """A altura do asset em metros: o ponto mais alto da geometria no repouso."""
     d = ir.model_dump(mode="json")
-    return max((_topo(p["geometry"]) for p in no_mundo(d["parts"], d["bones"]) if "ground_shadow" not in p["tags"]),
-               default=0.0) / PPM
+    return max((_topo(p["geometry"]) for p in no_mundo(d["parts"], d["bones"])), default=0.0) / PPM
 
 
 def conferir_porte(categoria: str, ir: AssetIR) -> None:

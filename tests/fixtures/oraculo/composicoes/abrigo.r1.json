@@ -3,7 +3,6 @@
  "description": "Fixture sintética: parede de pedra com porta e janela, duas águas de palha e um poste na frente",
  "reference": "fixture sintética mínima", "tipo": "prop", "categoria": "casa", "semente": 77,
  "medidas": {"l": "1.6m", "alt": "1.5m", "y": "50cm"},
- "sombra": {"meia_largura": "$l * 1.1"},
  "nos": [
   {"id": "parede", "peca": "muro_fiadas", "args": {"x0": "-$l", "x1": "$l", "y": "$y", "altura": "$alt",
    "vaos": [["-90cm", "-30cm", "0", "1.5m"], ["40cm", "90cm", "70cm", "1.2m"]]}},

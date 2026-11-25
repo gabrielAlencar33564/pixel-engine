@@ -28,10 +28,21 @@ def _gravar(alvo: Path, comp: Composicao) -> None:
                     encoding="utf-8")
 
 
+def _guardada(alvo: Path) -> Composicao | None:
+    """A composição guardada no acervo; a de um formato que saiu (a sombra de contato, a mudança 18) não se lê mais e
+    conta como outro desenho: a revisão seguinte a refaz."""
+    try:
+        return ler(alvo, Composicao)
+    except Recusa as e:
+        if e.codigo != "DOC_INVALIDO":
+            raise
+        return None
+
+
 def conferir(comp: Composicao, acervo: Path) -> Path:
     """O lugar da composição no acervo, sem gravar; a revisão que já existe com outro desenho é recusada."""
     alvo = _arquivo(acervo, comp.id, comp.revision)
-    if alvo.is_file() and ler(alvo, Composicao) != comp:
+    if alvo.is_file() and _guardada(alvo) != comp:
         raise Recusa("IDENTIDADE", f"'{comp.id}' r{comp.revision} já existe no acervo com outro desenho.",
                      "A identidade não muda: grave a mudança como a revisão seguinte com `pfe atualizar "
                      "<composição>`.", "/revision")
@@ -58,8 +69,8 @@ def atualizar(comp: Composicao, acervo: Path) -> Path:
     """A composição editada como a revisão seguinte à última do acervo; sem mudança de desenho, recusa."""
     existentes = revisoes(acervo, comp.id)
     if existentes:
-        ultima = ler(_arquivo(acervo, comp.id, existentes[-1]), Composicao)
-        if ultima.model_copy(update={"revision": comp.revision}) == comp:
+        ultima = _guardada(_arquivo(acervo, comp.id, existentes[-1]))
+        if ultima is not None and ultima.model_copy(update={"revision": comp.revision}) == comp:
             raise Recusa("SEM_MUDANCA", f"'{comp.id}': o desenho é o mesmo da r{existentes[-1]}.",
                          "Mude a composição (as peças, as medidas, os materiais) antes de atualizar.")
     nova = comp.model_copy(update={"revision": (existentes[-1] if existentes else comp.revision - 1) + 1})

@@ -223,7 +223,7 @@ def project_view(asset: AssetIR, pose: Pose, direction: Direcao, lente: tuple[in
                      f"As vistas dele são {', '.join(asset.views)}.")
     cam = Camera(AZIMUTE_MDEG[direction], asset.canvas.pivot_px, lente)
     offset = pose.render_offset_pos()
-    cmds = [_comando(part, view.geometria.get(part.id, part.geometry),
+    cmds = [_comando(part, part.geometry,
                      _Peca(cam, pose, pose.world[part.bone_id], offset))
             for part in asset.parts if part.id not in view.visibility]
     pontos = {lm.id: _Peca(cam, pose, pose.world[lm.bone_id], offset).tela(lm.point_q8) for lm in asset.landmarks}

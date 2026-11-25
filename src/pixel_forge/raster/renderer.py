@@ -65,9 +65,10 @@ def _borda(figura: Mascara) -> Mascara:
     return figura & ~cheio
 
 
-def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D, bufs: tuple[Buf16, npt.NDArray[np.uint8]],
-             material: Buf16) -> Quadro:
-    index, alpha = bufs
+def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D,
+             bufs: tuple[Buf16, npt.NDArray[np.uint8], Mascara], material: Buf16) -> Quadro:
+    """O quadro recortado do canvas, limpo das cores isoladas (``bufs``: os índices, o alfa e a sombra no chão)."""
+    index, alpha, chao = bufs
     width, height = cam.width, cam.height
     inside = np.zeros(alpha.shape, dtype=bool)
     inside[MARGIN:MARGIN + height, MARGIN:MARGIN + width] = True
@@ -83,7 +84,8 @@ def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D, bufs: tuple[Buf16,
     lut = np.zeros(len(cam.cmds) + 1, dtype=bool)
     for p, c in cam.cmds.items():
         lut[cam.num[p]] = bool(MANTER & set(c.tags))
-    limpar_isolados(est, q.index, q.alpha, material[crop], lut[cam.part[crop]])
+    # a sombra no chão não é da figura: para a limpeza ela é vazio (o pixel da borda não fica "dentro da massa")
+    limpar_isolados(est, q.index, np.where(chao[crop], 0, q.alpha), material[crop], lut[cam.part[crop]])
     figura = cam.part != 0
     q.visiveis, q.na_silhueta = _contar(cam, inside & figura), _contar(cam, inside & _borda(figura))
     return q
@@ -101,6 +103,5 @@ def render(scene: Scene2D, est: EstiloRender, width: int, height: int) -> Quadro
     inner = contorno_interno(cam, t, index)
     alpha = np.where(cam.part != 0, 255, 0).astype(np.uint8)
     contorno_externo(est, cam, t, (index, alpha, fill), inner)
-    if scene.chao:
-        sombra_no_chao(est, cam, scene, index, alpha)
-    return _recorte(est, cam, scene, (index, alpha), t.material[cam.part])
+    chao = sombra_no_chao(est, cam, scene, index, alpha) if scene.chao else np.zeros(alpha.shape, dtype=bool)
+    return _recorte(est, cam, scene, (index, alpha, chao), t.material[cam.part])

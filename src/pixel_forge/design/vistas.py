@@ -2,7 +2,7 @@
 
 - **Vistas:** o prop declara 1, 2 ou 4 vistas cardinais (S, E, N, W). A IR é uma só, no mundo; cada vista é a câmera
   girada. A regra de oclusão das pilhas (medida na S) vale na outra vista só se a parte da frente continua mais perto
-  da câmera dela; a sombra de contato gira para ficar igual na tela.
+  da câmera dela.
 - **Ossos:** as peças desenham na raiz. O nó com ``osso: giro`` vai para o osso ``spin`` (os pontos descontam o centro
   do giro); o nó ``tronco``, para o osso do tronco do balanço; o nó ``cadeia``, para o elo da altura do centro de cada
   parte (a peça que já escolheu o osso de cada massa fica como está).
@@ -15,7 +15,6 @@ import math
 from collections.abc import Sequence
 from typing import Any
 
-from ..views.camera import PROFUNDIDADE_PERMILLE
 from .construtor import Vec, q
 from .kit.movimento import Elo, bone_for
 
@@ -102,16 +101,6 @@ def regras_da_vista(parts: Sequence[dict[str, Any]], regras: list[dict[str, Any]
             or perto(f) >= perto(t) - 0.25]
 
 
-def sombra_da_vista(g: dict[str, Any], az_mdeg: int) -> dict[str, Any]:
-    """A elipse de contato girada para a vista: na tela ela fica com a mesma largura e o mesmo deslocamento."""
-    a = math.radians(az_mdeg / 1000)
-    ca, sa = round(math.cos(a)), round(math.sin(a))
-    dx, dy, dz = g["center_q8"]
-    rx, ry, rz = g["radii_q8"]
-    return {"type": "ellipse", "center_q8": [dx * ca + dy * sa, -dx * sa + dy * ca, dz],
-            "radii_q8": [ry, rx, rz] if sa else [rx, ry, rz]}
-
-
 def no_mundo(parts: Sequence[dict[str, Any]], bones: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
     """Cópia das partes com os pontos no mundo (o osso em repouso, só translação), para a caixa do canvas."""
     by = {b["id"]: b for b in bones}
@@ -131,14 +120,3 @@ def no_mundo(parts: Sequence[dict[str, Any]], bones: Sequence[dict[str, Any]]) -
         out.append(p2)
     return out
 
-
-SEN45 = math.sin(math.radians(45))
-
-
-def sombra_no_obliquo(parts: Sequence[dict[str, Any]]) -> None:
-    """A profundidade da sombra de contato reescalada da câmera física de 45° (a do canvas) para o 0,35 do oblíquo:
-    ela continua com a proporção da tela (≈ 3:1) no jogo."""
-    for p in parts:
-        if p["id"] == "ground_shadow":
-            r = p["geometry"]["radii_q8"]
-            r[1] = max(1, round(r[1] * SEN45 / (PROFUNDIDADE_PERMILLE / 1000)))

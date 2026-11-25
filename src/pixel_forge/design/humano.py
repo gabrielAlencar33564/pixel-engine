@@ -19,7 +19,6 @@ from .kit.pecas_humano import corpo_dos_args
 from .kit.pilha import Pilha
 from .kit.registro import PECAS
 from .kit.roupa import Vista
-from .vistas import sombra_no_obliquo
 
 CORPO = "corpo_humano"
 CLIPES = {"idle": "parado", "walk": "andar_poses"}  # o clipe e a receita que o gera
@@ -85,8 +84,7 @@ def _vistas(b: AssetBuilder, vista: Vista) -> dict[str, Any]:
 
 
 def ir_do_humano(comp: Composicao) -> dict[str, Any]:
-    """A IR do humano: o corpo e a roupa pelos nós, as 8 vistas, o canvas do cânone e a sombra de contato no 3/4
-    oblíquo (3:1 na tela)."""
+    """A IR do humano: o corpo e a roupa pelos nós, as 8 vistas e o canvas do cânone."""
     env = medidas(comp)
     b = AssetBuilder()
     humano: dict[str, Any] = {}
@@ -95,7 +93,6 @@ def ir_do_humano(comp: Composicao) -> dict[str, Any]:
         ctx = Ctx(b, Stream(semente_do_no(comp.semente, no.id)), no.id, no.grupo or no.id, Pilha(), 0, no=no.id,
                   humano=humano)
         PECAS[no.peca].desenha(ctx, args)
-    sombra_no_obliquo(b.parts)
     c = humano["medidas"]
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": landmarks(c),
             "canvas": canvas_de(c["estatura"]), "views": _vistas(b, humano["vista"]), "modelo": "humano"}

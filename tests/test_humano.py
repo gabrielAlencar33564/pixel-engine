@@ -65,7 +65,8 @@ def _comp(nome: str) -> Composicao:
 
 
 def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
-    """O tamanho e o hash de cada quadro de cada clipe e vista, no canvas do antigo."""
+    """O tamanho e o hash sem a sombra no chão (a engine só tem a projetada: mudança 18) de cada quadro de cada
+    clipe e vista, no canvas do antigo."""
     ir, style = ir_da_composicao(comp), estilo_base()
     est = estilo_render(style)
     pal = {p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in style.palette}
@@ -79,7 +80,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
                 if k not in quer:
                     continue
                 feito = no_canvas_antigo(quadro_da_pose(ir, est, it.pose, d).to_rgba(pal), quer[k]["tamanho"])
-                out[k] = [feito["tamanho"], feito["rgba_sha256"]]
+                out[k] = [feito["tamanho"], feito["sem_chao_sha256"]]
     return out
 
 
@@ -94,7 +95,7 @@ def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.
     apoio_do_antigo(monkeypatch)
     quer = ESPERADO["vestido"]
     feito = _hashes(_comp("vestido"), quer)
-    diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["rgba_sha256"]])
+    diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["sem_chao_sha256"]])
     assert feito.keys() == quer.keys() and not diferentes, diferentes[:8]
 
 

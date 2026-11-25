@@ -4,7 +4,7 @@ movimento; e os traços que têm de ler no sprite. A revisão é imutável: muda
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, ClassVar, Literal
 
 from pydantic import Field, StringConstraints
 
@@ -78,13 +78,6 @@ class Clipe(Strict):
     receita: Id
 
 
-class Sombra(Strict):
-    meia_largura: Expr
-    proporcao_pm: Annotated[int, Field(ge=1000, le=12000, strict=True)] = 3000
-    dx: Expr = "2px"
-    dy: Expr = "0.6px"
-
-
 class Vista(Strict):
     ocultas: list[Id] = Field(default_factory=list)
 
@@ -100,6 +93,11 @@ class Traco(Strict):
 
 
 class Composicao(Strict):
+    # os campos que saíram do formato: a recusa diz o que fazer no lugar
+    SAIRAM: ClassVar[dict[str, str]] = {
+        "sombra": "A sombra de contato (a mancha redonda embaixo do asset) saiu: a sombra no chão é a que o asset "
+                  "projeta, e ela já vem no quadro. Apague o campo `sombra`."}
+
     id: Id
     revision: PosInt
     description: Texto
@@ -108,7 +106,6 @@ class Composicao(Strict):
     categoria: Categoria
     semente: Annotated[int, Field(ge=0, le=999_999, strict=True)]
     medidas: dict[Id, Expr] = Field(default_factory=dict)
-    sombra: Sombra | None = None
     nos: Annotated[list[No], Field(min_length=1, max_length=64)]
     vistas: dict[Direcao, Vista]
     landmarks: dict[Id, Annotated[list[Expr], Field(min_length=3, max_length=3)]] = Field(default_factory=dict)

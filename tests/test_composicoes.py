@@ -28,10 +28,9 @@ from .oraculo import CASOS, no_canvas_antigo
 from .test_humano import _hashes
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "composicoes.esperado.json").read_text(encoding="utf-8"))["casos"]
-SOMBRA_GIRADA = {("marco", "E"), ("marco", "N"), ("marco", "W")}
 PALHA_NA_CAMADA_DO_NO = {("abrigo", "S")}
 VISTAS = [(c, v) for c in sorted(ESPERADO) if "/" not in c for v in ESPERADO[c]
-          if (c, v) not in SOMBRA_GIRADA | PALHA_NA_CAMADA_DO_NO]
+          if (c, v) not in PALHA_NA_CAMADA_DO_NO]
 
 
 def rgba(nome: str, vista: str) -> np.ndarray[Any, np.dtype[np.uint8]]:
@@ -45,24 +44,8 @@ def rgba(nome: str, vista: str) -> np.ndarray[Any, np.dtype[np.uint8]]:
 def test_igual_ao_oraculo(nome: str, vista: str) -> None:
     quer = ESPERADO[nome][vista]
     feito = no_canvas_antigo(rgba(nome, vista), quer["tamanho"])
-    assert [feito["tamanho"], feito["rgba_sha256"]] == [quer["tamanho"], quer["rgba_sha256"]]
-
-
-def _altura_da_sombra(img: np.ndarray[Any, np.dtype[np.uint8]]) -> int:
-    chao = next(p.rgba for p in estilo_base().palette if p.id == "sombra_chao")
-    ys = np.nonzero(np.all(img == np.array(chao, dtype=np.uint8), axis=-1))[0]
-    return int(ys.max() - ys.min() + 1)
-
-
-def test_a_sombra_de_contato_tem_a_mesma_altura_em_toda_vista() -> None:
-    alturas = {v: _altura_da_sombra(rgba("marco", v)) for v in ("S", "E", "N", "W")}
-    assert max(alturas.values()) - min(alturas.values()) <= 1, alturas
-
-
-def test_controle_o_oraculo_acusa_a_sombra_girada_de_antes() -> None:
-    feitos = {v: no_canvas_antigo(rgba("marco", v), ESPERADO["marco"][v]["tamanho"])["rgba_sha256"]
-              for v in ("E", "N", "W")}
-    assert all(feitos[v] != ESPERADO["marco"][v]["rgba_sha256"] for v in feitos)
+    # sem a sombra no chão: o antigo só a desenhava com a de contato, e a engine só tem a projetada (mudança 18)
+    assert [feito["tamanho"], feito["sem_chao_sha256"]] == [quer["tamanho"], quer["sem_chao_sha256"]]
 
 
 def test_o_no_de_camada_maior_cobre_o_de_camada_menor() -> None:
@@ -79,7 +62,7 @@ def test_o_no_de_camada_maior_cobre_o_de_camada_menor() -> None:
 
 def test_controle_o_oraculo_acusa_a_palha_de_antes() -> None:
     quer = ESPERADO["abrigo"]["S"]
-    assert no_canvas_antigo(rgba("abrigo", "S"), quer["tamanho"])["rgba_sha256"] != quer["rgba_sha256"]
+    assert no_canvas_antigo(rgba("abrigo", "S"), quer["tamanho"])["sem_chao_sha256"] != quer["sem_chao_sha256"]
 
 
 def test_composicao_de_fixture_tem_um_arquivo_por_caso() -> None:
@@ -121,8 +104,8 @@ def test_o_balanco_da_arvore_igual_ao_oraculo() -> None:
     """O balanço por deslocamento, quadro a quadro (a cadeia ``sway_*`` em px inteiros)."""
     quer = ESPERADO["arvore/clipes"]
     feito = _hashes(ler(CASOS / "composicoes" / "arvore.r1.json", Composicao), quer)
-    assert [k for k in quer if feito[k] != [quer[k]["tamanho"], quer[k]["rgba_sha256"]]] == []
-    assert len({quer[k]["rgba_sha256"] for k in quer}) > 1  # ele se mexe
+    assert [k for k in quer if feito[k] != [quer[k]["tamanho"], quer[k]["sem_chao_sha256"]]] == []
+    assert len({quer[k]["sem_chao_sha256"] for k in quer}) > 1  # ele se mexe
 
 
 def _cata_vento(quadros: int) -> Composicao:

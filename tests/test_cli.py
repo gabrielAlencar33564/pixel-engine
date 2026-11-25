@@ -78,6 +78,19 @@ def test_a_identidade_e_imutavel_e_a_mudanca_e_a_revisao_seguinte(tmp_path: Path
     assert pfe(capsys, "atualizar", str(mudada), "--acervo", acervo)[1]["errors"][0]["code"] == "SEM_MUDANCA"
 
 
+def test_a_revisao_num_formato_que_saiu_vira_a_seguinte(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """A r1 guardada com a sombra de contato (o campo saiu) não se lê: o build pede a revisão seguinte, que a refaz."""
+    pasta = tmp_path / "acervo" / "composicoes"
+    pasta.mkdir(parents=True)
+    dado = json.loads(MOURAO.read_text(encoding="utf-8"))
+    (pasta / MOURAO.name).write_text(json.dumps({**dado, "sombra": {"meia_largura": "30cm"}}), encoding="utf-8")
+    acervo = str(tmp_path / "acervo")
+    codigo, r = pfe(capsys, "build", str(MOURAO), "--acervo", acervo)
+    assert codigo == 2 and r["errors"][0]["code"] == "IDENTIDADE"
+    _, a = pfe(capsys, "atualizar", str(MOURAO), "--acervo", acervo)
+    assert Path(a["result"]["composicao"]).name == "mourao.r2.json"
+
+
 def test_o_build_recusado_nao_registra_a_composicao(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     acervo = tmp_path / "acervo"
     errada = _copia(tmp_path, MOURAO, categoria="arvore_grande")

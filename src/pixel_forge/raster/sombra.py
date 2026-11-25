@@ -6,18 +6,31 @@ profundidade, não de uma constante). A peça chapada compara peça com peça e 
 telhado e as pedras de uma parede, do mesmo plano, não se sombreiam.
 
 No chão: cada peça volta da tela ao mundo pela câmera da vista, é lançada no chão (z = 0) na direção da luz e volta à
-tela, em xadrez (o chão aparece entre os pixels); a sombra de contato embaixo do objeto fica cheia.
+tela, em xadrez (o chão aparece entre os pixels), no material ``sombra`` do estilo. É a única sombra no chão: não há
+sombra de contato (a mancha redonda embaixo do asset), e a do pé nasce no pé, que se lança sobre si mesmo. O tronco
+(o sólido de revolução) se lança como o tubo do eixo dele; o cacho pontilhado da copa é um plano virado para a câmera,
+que a luz pega de lado (no chão ele seria uma linha), e se lança como a almofada redonda que ele desenha.
 """
 
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 
 import numpy as np
 import numpy.typing as npt
 
 from ..views.camera import ELEVACAO_MDEG, PROFUNDIDADE_PERMILLE
-from ..views.primitivas import EllipsePrim, Scene2D, SupElipsoide, SupLeque, SupTubo
+from ..views.primitivas import (
+    DrawCommand,
+    EllipsePrim,
+    RevolutionPrim,
+    Scene2D,
+    StipplePrim,
+    SupElipsoide,
+    SupLeque,
+    SupTubo,
+)
 from .estilo import EstiloRender
 from .formas import raster_ellipse, raster_polygon, raster_tapered
 from .grade import MARGIN, Mascara, shift
@@ -124,34 +137,48 @@ def _ground_projection(scene: Scene2D, light: tuple[float, float, float], w: int
         return round(float(g @ eu)) + pu, round(float(g @ ev)) + pv
 
     for c in scene.commands:
-        if {"ground_shadow", "detail", "no_cast"} & set(c.tags):
-            continue
-        if isinstance(c.surface, SupLeque):
-            pts = [chao(*p) for p in c.surface.pts]
-            for b, d in zip(pts[1:], pts[2:], strict=False):
-                out |= raster_polygon(w, h, MARGIN, (pts[0], b, d))
-        elif isinstance(c.surface, SupTubo):
-            pts = [chao(*p) for p in c.surface.pts]
-            out |= raster_tapered(w, h, MARGIN, tuple(pts), c.surface.radii)
-        elif isinstance(c.surface, SupElipsoide) and isinstance(c.prim, EllipsePrim):
-            s = c.surface
-            out |= raster_ellipse(w, h, MARGIN, chao(s.cu, s.cv, s.dc), (c.prim.hu, max(1, c.prim.hv // 2)))
+        if not {"detail", "no_cast"} & set(c.tags):
+            out |= _lancada(c, chao, sd, w, h)
     return out
 
 
+def _lancada(c: DrawCommand, chao: Callable[[float, float, float], tuple[int, int]], sd: float, w: int,
+             h: int) -> Mascara:
+    """A peça lançada no chão, com ``chao`` levando um ponto (u, v, profundidade) em q8 ao chão sob a luz."""
+    if isinstance(c.prim, RevolutionPrim):
+        eixo = [chao(s[0] * 256, s[1] * 256, s[2] * 256) for s in c.prim.stations]
+        return raster_tapered(w, h, MARGIN, tuple(eixo), tuple(round(s[3] * 256) for s in c.prim.stations))
+    if isinstance(c.prim, StipplePrim) and isinstance(c.surface, SupLeque):
+        us, vs = zip(*(chao(*p) for p in c.surface.pts), strict=True)
+        meia = (max(us) - min(us)) // 2  # a almofada tem no chão a profundidade da largura
+        return raster_ellipse(w, h, MARGIN, ((max(us) + min(us)) // 2, sum(vs) // len(vs)), (meia, round(meia * sd)))
+    if isinstance(c.surface, SupLeque):
+        pts = [chao(*p) for p in c.surface.pts]
+        out = np.zeros((h, w), dtype=bool)
+        for b, d in zip(pts[1:], pts[2:], strict=False):
+            out |= raster_polygon(w, h, MARGIN, (pts[0], b, d))
+        return out
+    if isinstance(c.surface, SupTubo):
+        return raster_tapered(w, h, MARGIN, tuple(chao(*p) for p in c.surface.pts), c.surface.radii)
+    if isinstance(c.surface, SupElipsoide) and isinstance(c.prim, EllipsePrim):
+        s = c.surface
+        return raster_ellipse(w, h, MARGIN, chao(s.cu, s.cv, s.dc), (c.prim.hu, max(1, c.prim.hv // 2)))
+    return np.zeros((h, w), dtype=bool)
+
+
+MATERIAL_DA_SOMBRA = "sombra"  # o material do estilo que pinta a sombra no chão (sem ele, o chão fica limpo)
+
+
 def sombra_no_chao(est: EstiloRender, cam: Camadas, scene: Scene2D, index: Buf16,
-                   alpha: npt.NDArray[np.uint8]) -> None:
-    """A sombra no chão, camada atrás de tudo: a de contato cheia e a projetada em xadrez, na fase do pivô."""
-    if cam.shadow_mat is None:
-        return
+                   alpha: npt.NDArray[np.uint8]) -> Mascara:
+    """A sombra que o asset projeta no chão, camada atrás de tudo, em xadrez na fase do pivô; devolve os pixels dela
+    (sem dono: não são da figura, e a limpeza não os toca)."""
     h, w = cam.part.shape
-    proj = _ground_projection(scene, est.light, w, h) & ~cam.shadow
+    if MATERIAL_DA_SOMBRA not in est.materials:
+        return np.zeros((h, w), dtype=bool)
     yy, xx = np.indices((h, w))
     ox, oy = (scene.pivot_q8[0] >> 8) + MARGIN, (scene.pivot_q8[1] >> 8) + MARGIN
-    shadow = cam.shadow | (proj & ((xx - ox + yy - oy) % 2 == 0))
-    sh = shadow & (alpha == 0)
-    index[sh] = est.materials[cam.shadow_mat].ramp[0]
+    sh: Mascara = _ground_projection(scene, est.light, w, h) & ((xx - ox + yy - oy) % 2 == 0) & (alpha == 0)
+    index[sh] = est.materials[MATERIAL_DA_SOMBRA].ramp[0]
     alpha[sh] = 255
-    for p, c in sorted(cam.cmds.items()):
-        if "ground_shadow" in c.tags:
-            cam.part[sh] = cam.num[p]
+    return sh

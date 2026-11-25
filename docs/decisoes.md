@@ -377,6 +377,28 @@ A mesma regra das formas simples, no tronco.
 - A mão cresce um pouco (a meia altura de 0,34 para 0,38 do comprimento dela): com 0,34, de costas ela sumia
   atrás do quadril no corpo vestido.
 
+## A sombra no chão é só a projetada (decisão do dono, 2026-11-25)
+
+A mancha redonda e cheia embaixo do asset (a sombra de contato) saiu: a sombra no chão é a que o asset projeta pela
+luz, em xadrez, que já nasce no pé (o ponto no chão se lança sobre si mesmo). Prancha: `18_so_a_sombra_projetada`.
+
+- A composição não tem mais o campo `sombra`; pedir é recusa (`DOC_INVALIDO` em `/sombra`) com a dica. O corpo do
+  humano e o do canino não desenham mais a elipse; a vista não troca mais a geometria de uma parte (só a sombra
+  girada usava). Ficam sem objeto as decisões da sombra de contato reescalada nas vistas e da pegada do quadrúpede.
+- A sombra no chão sai do material `sombra` do estilo, em todo asset (antes só quem tinha a de contato a ganhava;
+  o estilo sem o material não pinta chão).
+- O tronco (a revolução) se lança como o tubo do eixo, e o cacho pontilhado como a almofada redonda que desenha (no
+  chão, com a profundidade da largura): o cacho é um plano virado para a câmera, a luz o pega de lado, e a sombra
+  dele era uma linha. Sem isso, a árvore ficava sem sombra nenhuma. O canvas mede as duas.
+- A limpeza de cor isolada trata a sombra no chão como vazio: o pixel da borda de baixo da figura não fica "dentro da
+  massa" por causa do chão (a de contato fazia o antigo limpar pixels da borda).
+- A composição guardada no acervo com a `sombra` não se lê mais e conta como outro desenho: o build da mesma revisão
+  é recusado (`IDENTIDADE`) e `pfe atualizar` faz a seguinte sem ela.
+- O oráculo roda o antigo sem a sombra de contato (`oraculo_antigo.py` tira as partes) e compara o quadro sem a sombra
+  no chão (`sem_chao_sha256`): a do antigo só existia com a de contato. Os esperados foram regerados.
+- O teste (`tests/test_sombra.py`): no banco, na árvore, no humano e no canino a sombra no chão está toda na fase do
+  xadrez e encosta na base do asset; o controle pinta a elipse do jeito antigo e é acusado.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

@@ -219,10 +219,8 @@ def _juntas(b: AssetBuilder, c: dict[str, float], junta: str, side: str) -> None
 
 
 def corpo(b: AssetBuilder, c: dict[str, float], pele: str, junta: str) -> None:
-    """A sombra de contato, as massas do corpo em ``pele`` (o tronco numa massa só, sem linha nem sombra entre o
-    peito e a cintura, a linha do ombro de cada lado e a cabeça) e uma esfera em cada junta em ``junta``."""
-    b.part("ground_shadow", "sombra", ellipse(qv(0, 0.3, 0), qv(c["quadril_larg_x"] * 1.1, 3.6, 0.3)),
-           Parte(tags=("ground_shadow",), priority=-100))
+    """As massas do corpo em ``pele`` (o tronco numa massa só, sem linha nem sombra entre o peito e a cintura, a
+    linha do ombro de cada lado e a cabeça) e uma esfera em cada junta em ``junta``."""
     _tronco(b, c, pele)
     _cabeca(b, c, pele)
     for side, _ in SIDES:

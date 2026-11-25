@@ -1,10 +1,10 @@
 """A limpeza de cor isolada: o pixel de uma cor sozinha dentro de uma massa assume a cor dominante dos 4 vizinhos do
 mesmo material.
 
-Candidato: pixel opaco, fora de peça intencional (detalhe, olho, sombra no chão), cujo índice não é tinta de
-contorno, com os 4 vizinhos opacos e nenhum com o mesmo índice. Substituto: o índice mais frequente entre os vizinhos
-do mesmo material que não são contorno (empate: o menor); sem vizinho elegível, o pixel fica. A decisão usa só o
-buffer original: nenhuma troca influencia outra.
+Candidato: pixel opaco da figura (a sombra no chão conta como vazio), fora de peça intencional (detalhe, olho), cujo
+índice não é tinta de contorno, com os 4 vizinhos opacos e nenhum com o mesmo índice. Substituto: o índice mais
+frequente entre os vizinhos do mesmo material que não são contorno (empate: o menor); sem vizinho elegível, o pixel
+fica. A decisão usa só o buffer original: nenhuma troca influencia outra.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import numpy.typing as npt
 from .estilo import EstiloRender
 from .montagem import Buf16
 
-MANTER = frozenset({"detail", "pixel_detail", "eye", "ground_shadow"})
+MANTER = frozenset({"detail", "pixel_detail", "eye"})
 VIZINHOS = ((1, 2), (1, 0), (2, 1), (0, 1))  # direita, esquerda, baixo, cima (no buffer com borda)
 
 
@@ -49,7 +49,8 @@ class _Vizinhos:
 
 def limpar_isolados(est: EstiloRender, index: Buf16, alpha: npt.NDArray[np.uint8], material: Buf16,
                     manter: npt.NDArray[np.bool_]) -> None:
-    """Aplica a limpeza em ``index`` (o quadro já recortado); ``manter`` marca os pixels das peças intencionais."""
+    """Aplica a limpeza em ``index`` (o quadro já recortado, com a sombra no chão fora do ``alpha``: ela não é da
+    figura); ``manter`` marca os pixels das peças intencionais."""
     outline = sorted({m.outline_index for m in est.doc.materials})
     opaque = alpha == 255
     h, w = index.shape

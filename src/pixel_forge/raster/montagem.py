@@ -23,8 +23,8 @@ Buf64 = npt.NDArray[np.int64]
 
 @dataclass
 class Camadas:
-    """O quadro com margem em montagem: as máscaras completas das peças, a sombra de contato no chão, o dono de cada
-    pixel (``part``), a profundidade e a ordem por pixel."""
+    """O quadro com margem em montagem: as máscaras completas das peças, o dono de cada pixel (``part``), a
+    profundidade e a ordem por pixel."""
 
     width: int
     height: int
@@ -34,8 +34,6 @@ class Camadas:
     part: Buf16
     zbuf: Buf64
     order: Buf32 = field(default_factory=lambda: np.zeros((0, 0), np.int32))
-    shadow: Mascara = field(default_factory=lambda: np.zeros((0, 0), bool))
-    shadow_mat: str | None = None
     massa: dict[str, Mascara] = field(default_factory=dict)  # a união das máscaras do grupo ``shade_group``
 
     @property
@@ -59,7 +57,7 @@ def compor(scene: Scene2D, materials: dict[str, MaterialDef], width: int, height
     cmds = {c.part_id: c for c in scene.commands}
     num = {p: i + 1 for i, p in enumerate(sorted(cmds))}
     cam = Camadas(width, height, cmds, num, {}, np.zeros((H, W), np.uint16),
-                  np.full((H, W), np.iinfo(np.int64).min, dtype=np.int64), shadow=np.zeros((H, W), bool))
+                  np.full((H, W), np.iinfo(np.int64).min, dtype=np.int64))
     dmaps: dict[str, Buf64] = {}
     for c in scene.commands:
         if c.material not in materials:
@@ -67,10 +65,6 @@ def compor(scene: Scene2D, materials: dict[str, MaterialDef], width: int, height
                          "tem.", "Use um material do estilo (`pfe catalogo` lista os materiais).")
         m = _mascara(c, W, H)
         cam.full[c.part_id] = m
-        if "ground_shadow" in c.tags:
-            cam.shadow |= m
-            cam.shadow_mat = c.material
-            continue
         dm = depth_map(c.surface, m) + scene.depth_bias_q8.get(c.part_id, 0) * DEPTH_QUANT // 256
         marca = DETAIL_DEPTH_MARGIN_PX * DEPTH_QUANT if "detail" in c.tags or "flat" in c.tags else 0
         dmaps[c.part_id] = dm + marca

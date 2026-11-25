@@ -4,7 +4,6 @@
  "reference": "Banco rústico de praça de vila: assento de 1,1 m por 30 cm a 45 cm do chão, tábuas de 10 cm, pés de 8 cm",
  "tipo": "prop", "categoria": "objeto", "semente": 41,
  "medidas": {"alto": "45cm", "meio": "55cm"},
- "sombra": {"meia_largura": "$meio * 1.1"},
  "nos": [
   {"id": "pe", "peca": "poste", "repete": {"sobre": "lados", "n": 2},
    "args": {"base": ["$lado * ($meio - 10cm)", "0", "0"], "altura": "$alto - 3cm", "raio": "4cm"}},

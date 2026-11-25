@@ -527,29 +527,6 @@
       1024
      ]
     }
-   },
-   {
-    "id": "sombra",
-    "bone_id": "root",
-    "material": "chao",
-    "outline_group": "sombra",
-    "tags": [
-     "ground_shadow"
-    ],
-    "draw_priority": -100,
-    "geometry": {
-     "type": "ellipse",
-     "center_q8": [
-      0,
-      0,
-      0
-     ],
-     "radii_q8": [
-      2816,
-      2304,
-      256
-     ]
-    }
    }
   ],
   "views": {

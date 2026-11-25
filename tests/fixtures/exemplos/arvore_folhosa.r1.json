@@ -4,7 +4,6 @@
  "reference": "Folhosa jovem de quintal: 3 m de altura, copa redonda de 2,8 m com a base a 1 m, tronco de 30 cm; a vida está nos cachos de folha com luz em cima e o miolo escuro",
  "tipo": "prop", "categoria": "arvore_pequena", "semente": 77,
  "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.35", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
- "sombra": {"meia_largura": "$a * 0.5", "dy": "-1px"},
  "nos": [
   {"id": "tronco", "peca": "tronco_em_pe", "grupo": "tronco",
    "args": {"altura": "$copa0", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca"}},

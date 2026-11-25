@@ -2,7 +2,8 @@
 de cada vista como o build antigo fazia (o render e as correções de pixel do build), ou os quadros dos clipes pedidos.
 Lê do stdin ``{"style": ..., "camera": {"elevation_mdeg", "depth_permille"}, "casos": [{"nome", "asset" ou
 "composicao", "vistas", "clipes"?, "mp"?}]}`` no formato antigo (sem ``style``, o estilo base antigo; a câmera é a da
-engine nova, que a composição antiga recebe) e escreve no stdout, por quadro, o tamanho, o sha256 do RGBA, o sha256
+engine nova, que a composição antiga recebe), sem a sombra de contato (a engine não a tem: mudança 18; sem ela, o
+antigo não desenha sombra no chão), e escreve no stdout, por quadro, o tamanho, o sha256 do RGBA, o sha256
 sem a sombra no chão (os pixels da cor dela e os transparentes zerados: o corpo igual onde a sombra mudou de
 propósito) e o RGBA em base64.
 
@@ -34,14 +35,26 @@ def _quadro(rgba: Any, style: Any) -> dict[str, Any]:
             "rgba_b64": base64.b64encode(rgba.tobytes()).decode("ascii")}
 
 
+def _sem_contato(asset: Any) -> Any:
+    """O asset antigo sem as partes da sombra de contato, nem nas vistas (o canvas fica o que o antigo mediu)."""
+    fora = {p.id for p in asset.parts if "ground_shadow" in p.tags}
+
+    def limpa(d: dict[str, Any]) -> dict[str, Any]:
+        return {k: v for k, v in d.items() if k not in fora}
+
+    vistas = {d: v.model_copy(update={"part_variants": limpa(v.part_variants), "visibility": limpa(v.visibility),
+                                      "depth_bias": limpa(v.depth_bias)}) for d, v in asset.views.items()}
+    return asset.model_copy(update={"parts": [p for p in asset.parts if p.id not in fora], "views": vistas})
+
+
 def _asset(caso: dict[str, Any], style: Any, camera: Any) -> Any:
     loader: Any = importlib.import_module("pixel_forge.contracts.loader")
     if "asset" in caso:
-        return loader.validate_document(caso["asset"], "asset")
+        return _sem_contato(loader.validate_document(caso["asset"], "asset"))
     prev: Any = importlib.import_module("pixel_forge.application.compose_preview")
     grammar, comp = prev.grammar_for(caso["composicao"])
     ref = {"id": style.id, "revision": style.revision, "sha256": "0" * 64}
-    return prev.preview_asset(grammar, comp, ref, camera=camera)
+    return _sem_contato(prev.preview_asset(grammar, comp, ref, camera=camera))
 
 
 def _vistas(caso: dict[str, Any], style: Any, camera: Any) -> dict[str, Any]:
@@ -75,6 +88,7 @@ def _clipes(caso: dict[str, Any], style: Any, camera: Any) -> dict[str, Any]:
         asset = prev.preview_asset(grammar, comp, ref, camera=camera)
         p = {s.name: int(s.default or 0) if s.distribution == "fixed" else (s.lo + s.hi) // 2 for s in grammar.params}
         mp = grammar.motion(p, 96)
+    asset = _sem_contato(asset)
     fr = render.FrameRenderer(asset, style)
     tags = {pt.id: set(pt.tags) for pt in asset.parts}
     aref = {"id": asset.id, "revision": asset.revision, "sha256": "0" * 64}

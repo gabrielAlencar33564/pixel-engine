@@ -1,5 +1,5 @@
-"""O prop como composição: só peças do kit, na raiz (ou na cadeia do balanço, ou no osso do giro), com a sombra de
-contato, os pontos do jogo, as vistas declaradas (1, 2 ou 4) e o canvas do tamanho dele."""
+"""O prop como composição: só peças do kit, na raiz (ou na cadeia do balanço, ou no osso do giro), com os pontos do
+jogo, as vistas declaradas (1, 2 ou 4) e o canvas do tamanho dele."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from ..core.recusa import Recusa
 from ..core.rng import Stream
 from .canvas import canvas_do_prop
 from .composicao import conferir_medidas, conferir_nos, medidas, repeticoes, semente_do_no
-from .construtor import AssetBuilder, Junta, Parte, ellipse, q, qv
+from .construtor import AssetBuilder, Junta, q, qv
 from .expressao import compilar, valor, variaveis
 from .kit.movimento import Elo, sway_chain
 from .kit.peca import CAMADAS_DO_NO, Ctx, ler_args
@@ -19,13 +19,10 @@ from .kit.registro import PECAS
 from .vistas import (
     AZIMUTE,
     N_VISTAS,
-    SEN45,
     VISTAS,
     no_mundo,
     regras_da_vista,
     reparentar,
-    sombra_da_vista,
-    sombra_no_obliquo,
 )
 
 PRECISA = {"tronco": "balanco", "cadeia": "balanco", "giro": "giro"}
@@ -86,17 +83,6 @@ def validar_prop(comp: Composicao) -> None:
     conferir_nos(comp, conhecidas)
 
 
-def _sombra(b: AssetBuilder, comp: Composicao, env: dict[str, float]) -> None:
-    """A sombra de contato com a proporção (≈ 3:1) na tela da câmera física de 45° do kit (a do canvas), deslocada
-    para o lado da sombra; :func:`sombra_no_obliquo` a leva ao 3/4 oblíquo depois do canvas."""
-    sh = comp.sombra
-    if sh is None:
-        return
-    meia = valor(sh.meia_largura, env)
-    g = ellipse(qv(valor(sh.dx, env), valor(sh.dy, env), 0), qv(meia, meia / (sh.proporcao_pm / 1000) / SEN45, 0.3))
-    b.part("ground_shadow", "sombra", g, Parte(tags=("ground_shadow",), priority=-100))
-
-
 def _ossos(b: AssetBuilder, comp: Composicao, env: dict[str, float]) -> tuple[list[Elo], tuple[float, ...] | None]:
     """A raiz, o tronco e a cadeia do balanço e o osso do giro; devolve a cadeia e o centro do giro."""
     b.bone("root", None, [0, 0, 0], Junta("z"))
@@ -142,14 +128,11 @@ def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[
 def _vistas(comp: Composicao, b: AssetBuilder, regras: list[Any], por_vista: dict[str, dict[str, Any]]
             ) -> dict[str, Any]:
     out: dict[str, Any] = {}
-    sombra = next((p for p in b.parts if p["id"] == "ground_shadow"), None)
     for d, vista in comp.vistas.items():
         az = AZIMUTE[d]
         v: dict[str, Any] = {"occlusion_rules": regras_da_vista(b.parts, regras, az),
                              "visibility": dict.fromkeys(vista.ocultas, "hidden"),
                              "depth_bias": por_vista.get(d, {}).get("depth_bias", {})}
-        if sombra is not None and az:
-            v["geometria"] = {"ground_shadow": sombra_da_vista(sombra["geometry"], az)}
         out[d] = v
     return out
 
@@ -159,7 +142,6 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     env = medidas(comp)
     b = AssetBuilder()
     ossos = _ossos(b, comp, env)
-    _sombra(b, comp, env)
     regras, por_vista = _nos(b, comp, env, ossos)
     ids = [p["id"] for p in b.parts]
     repetidos = sorted({x for x in ids if ids.count(x) > 1})
@@ -171,6 +153,5 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     lms = [{"id": nome, "bone_id": "root", "point_q8": qv(*(valor(t, env) for t in ponto))}
            for nome, ponto in comp.landmarks.items()]
     canvas = canvas_do_prop(no_mundo(b.parts, b.bones), folga, tuple(AZIMUTE[v] for v in comp.vistas))
-    sombra_no_obliquo(b.parts)
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": lms,
             "canvas": canvas, "views": _vistas(comp, b, regras, por_vista)}

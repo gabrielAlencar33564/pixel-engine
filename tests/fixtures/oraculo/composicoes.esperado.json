@@ -4,153 +4,153 @@
   "abrigo": {
    "S": {
     "tamanho": [
-     124,
+     122,
      87
     ],
-    "rgba_sha256": "ccde3a17a587b75d0fad5f995bf6abe317aea7004a631514036ca8b590ac238c",
-    "sem_chao_sha256": "2d9d90265a85c4ec90f6eba3e6954bc4dcc5be66169c2aaadfcccb3e8851b0d4"
+    "rgba_sha256": "7935cead1a43b502361f2e5f2f1608e9b484afc98464787a6c3ff4ffd955555b",
+    "sem_chao_sha256": "7935cead1a43b502361f2e5f2f1608e9b484afc98464787a6c3ff4ffd955555b"
    }
   },
   "arvore": {
    "S": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "2218419bd828c46914c91c15725adcd50bdf03a1b829e2579bda60bf0fdd035b",
-    "sem_chao_sha256": "b5cd88eec46b15d7082c978169adbb70ecef76bf53783b5ecae2a481dff86aee"
+    "rgba_sha256": "375c69568d7ea5e66563a60c1a1c90df688b2624011af846e5045c62c3bc2b04",
+    "sem_chao_sha256": "375c69568d7ea5e66563a60c1a1c90df688b2624011af846e5045c62c3bc2b04"
    }
   },
   "arvore/clipes": {
    "sway/S/0": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "c531c0b69fafe3e0526950160949c94e9bafa5f6218582ada02cd76c6cbd27c6",
-    "sem_chao_sha256": "a849873002a4955402f955728c55f36bec47bca9fdbb40210701d55db529e365"
+    "rgba_sha256": "a7504e805aeda5b7ec5afb65b632e107fe3c6d6e4ba94eb03582167e7b4bb8c9",
+    "sem_chao_sha256": "6ea2958245cbbff742acd20be08217dabfb197d5923ea5bf218a53a0585c0c99"
    },
    "sway/S/1": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "c751c16e36443c0125bbcec740d7e86afd5878d327de9ed7a16ea0feaabcddc8",
-    "sem_chao_sha256": "db2d4a40b098e9855e2e7291a6333a5dc99841a8458776368107bd9d762ac6ca"
+    "rgba_sha256": "a013f508bc3ef25503ea4a8deac1a62faf851a23ad1d4e39e7277db93f799fe0",
+    "sem_chao_sha256": "a013f508bc3ef25503ea4a8deac1a62faf851a23ad1d4e39e7277db93f799fe0"
    },
    "sway/S/2": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "3948adf6f3448507042f70718d8fc5b0ca1ac1c9acb2e1af67b7bd82c2c760d4",
-    "sem_chao_sha256": "a82dedfb24d6f147917aeae004770f28bfafab7d216d17bfb78e0fbc0bb83751"
+    "rgba_sha256": "7baf9c3d9eab87f6a911d30af888622e039fec3b2a1ba616406224b648a2d5f0",
+    "sem_chao_sha256": "7baf9c3d9eab87f6a911d30af888622e039fec3b2a1ba616406224b648a2d5f0"
    },
    "sway/S/3": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "dc32a3bc4d6382e408518914244d206270f3575102775e4397d0665a73a9a61a",
-    "sem_chao_sha256": "1e0575bcf9d921e50affa797df5cce22bd1a21813870d2212846d7f1063545f3"
+    "rgba_sha256": "4a357fb21b89ce2f90c68b4ddf26ae2941cac637794a7493266e440590a3635a",
+    "sem_chao_sha256": "4a357fb21b89ce2f90c68b4ddf26ae2941cac637794a7493266e440590a3635a"
    },
    "sway/S/4": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "bcdc50a409b61591137a6344f13c58aa70e700f2cb30186e4f8e417a7c030806",
-    "sem_chao_sha256": "46f8307faa03c275fa0dc9a28580f4168f88b32b052dde86943952d47baac4db"
+    "rgba_sha256": "eb50104677a6ae6b57a9f14ec1c321d23b72c27cf33ae6274f886517e52464a0",
+    "sem_chao_sha256": "b2177734b1fedd65341ddb1b8d53999be475598abe69e6a1db739d69b2ad9290"
    },
    "sway/S/5": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "bcdc50a409b61591137a6344f13c58aa70e700f2cb30186e4f8e417a7c030806",
-    "sem_chao_sha256": "46f8307faa03c275fa0dc9a28580f4168f88b32b052dde86943952d47baac4db"
+    "rgba_sha256": "eb50104677a6ae6b57a9f14ec1c321d23b72c27cf33ae6274f886517e52464a0",
+    "sem_chao_sha256": "b2177734b1fedd65341ddb1b8d53999be475598abe69e6a1db739d69b2ad9290"
    },
    "sway/S/6": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "1081a406f5860236f6a64ed666e0ca09de1cda724d86b08038067b0583ddc6ae",
-    "sem_chao_sha256": "7f16ef16216afa146dceac3391cb37462460372916d7a66ce2d80b23f0154658"
+    "rgba_sha256": "7728eea10d23bfc6aed0195ce1b9d2f28bef4a11c5e53cd36dbfcc189677c052",
+    "sem_chao_sha256": "7728eea10d23bfc6aed0195ce1b9d2f28bef4a11c5e53cd36dbfcc189677c052"
    },
    "sway/S/7": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "1081a406f5860236f6a64ed666e0ca09de1cda724d86b08038067b0583ddc6ae",
-    "sem_chao_sha256": "7f16ef16216afa146dceac3391cb37462460372916d7a66ce2d80b23f0154658"
+    "rgba_sha256": "7728eea10d23bfc6aed0195ce1b9d2f28bef4a11c5e53cd36dbfcc189677c052",
+    "sem_chao_sha256": "7728eea10d23bfc6aed0195ce1b9d2f28bef4a11c5e53cd36dbfcc189677c052"
    },
    "sway/S/8": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "2218419bd828c46914c91c15725adcd50bdf03a1b829e2579bda60bf0fdd035b",
-    "sem_chao_sha256": "b5cd88eec46b15d7082c978169adbb70ecef76bf53783b5ecae2a481dff86aee"
+    "rgba_sha256": "375c69568d7ea5e66563a60c1a1c90df688b2624011af846e5045c62c3bc2b04",
+    "sem_chao_sha256": "375c69568d7ea5e66563a60c1a1c90df688b2624011af846e5045c62c3bc2b04"
    },
    "sway/S/9": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "999ab9b68b87e38841a205c846454320cbaab289f2a7dd734515a3ee55147604",
-    "sem_chao_sha256": "48c9ced2fb8a76ec3932bb1de96cfeb4b84a8917cc0de9bb5395aae0aa90b6bd"
+    "rgba_sha256": "c3022acc0c5af65f0d2bd6257229f93f5efce1927d67fcb81ab98ce29afdfe20",
+    "sem_chao_sha256": "fae22524c169d686c7f0e98a77be906848090e12226732479ecccd46fc0ac9a1"
    },
    "sway/S/10": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "e130dafd54c29c2557566b52a73efb1da64fcaa47c0b70d751a42b338924132d",
-    "sem_chao_sha256": "e03a18940852011d1ba334f63cb0c3801f958201412d22f217cf6d8085745a7e"
+    "rgba_sha256": "80efb3e87ff6108aaa5864e8c7c1877100c9827a3fd72bca0db7f8a31136fa4b",
+    "sem_chao_sha256": "b84f962e4629bfb472e8b6f3a41f378492d093820c8698c534967a0bb9cdb89b"
    },
    "sway/S/11": {
     "tamanho": [
      110,
-     88
+     85
     ],
-    "rgba_sha256": "e130dafd54c29c2557566b52a73efb1da64fcaa47c0b70d751a42b338924132d",
-    "sem_chao_sha256": "e03a18940852011d1ba334f63cb0c3801f958201412d22f217cf6d8085745a7e"
+    "rgba_sha256": "80efb3e87ff6108aaa5864e8c7c1877100c9827a3fd72bca0db7f8a31136fa4b",
+    "sem_chao_sha256": "b84f962e4629bfb472e8b6f3a41f378492d093820c8698c534967a0bb9cdb89b"
    }
   },
   "marco": {
    "S": {
     "tamanho": [
-     38,
-     42
+     20,
+     36
     ],
-    "rgba_sha256": "8525f2d079946550b4fc859858bdba3f4844c44e15dde237130ec8267b779f03",
-    "sem_chao_sha256": "1572e71108f8de88fc772a9840d1c3fffc4ce26bfd81a14b3a45a89fc9e5196a"
+    "rgba_sha256": "13d9146e50131b8e0ba2c0ba706afda7336d6d76112c67d1515cf20b632693c5",
+    "sem_chao_sha256": "13d9146e50131b8e0ba2c0ba706afda7336d6d76112c67d1515cf20b632693c5"
    },
    "E": {
     "tamanho": [
-     38,
-     42
+     20,
+     36
     ],
-    "rgba_sha256": "dfc416704e584661ca5efe2ea200a009235cab16e945033af294b63f5e2d951d",
-    "sem_chao_sha256": "a18db19ba80e513096f3560195e4c2d4a201e258be166ddc69b7a9a2bce3f96d"
+    "rgba_sha256": "58197e0a140f8bc869db812b0f896132b4a6bb4a7e9af77af6f4a6e4132d0b30",
+    "sem_chao_sha256": "58197e0a140f8bc869db812b0f896132b4a6bb4a7e9af77af6f4a6e4132d0b30"
    },
    "N": {
     "tamanho": [
-     38,
-     42
+     20,
+     36
     ],
-    "rgba_sha256": "41f2704b9d79ace2f1fd8f834033e631cf4e5100dee2765c070716debbc0a2c0",
-    "sem_chao_sha256": "44877c591ffe5b776d67a7691bbe8b52debe8d4681d203ab8fbba00e330d00ed"
+    "rgba_sha256": "65b1c88e9f42bc476511b3f2a8f3c30727fd13275b5042b91f69225c71046667",
+    "sem_chao_sha256": "65b1c88e9f42bc476511b3f2a8f3c30727fd13275b5042b91f69225c71046667"
    },
    "W": {
     "tamanho": [
-     38,
-     42
+     20,
+     36
     ],
-    "rgba_sha256": "2f40b915c42beb51a7d5598e13771d7416b78194c13e237b56d0e5a5c9406a5c",
-    "sem_chao_sha256": "7e4a76957104c440de7d0bccbad8efdb06db81b4725bd5779f6f5687583ced23"
+    "rgba_sha256": "09f0419a8014b2d895e59d05ad69e054a123d65c13634ddce28e4e59cae73744",
+    "sem_chao_sha256": "dcf21443bb655f57dfe37ad1ffc174b419971e90658d1cd62106d153aea5a82a"
    }
   }
  }

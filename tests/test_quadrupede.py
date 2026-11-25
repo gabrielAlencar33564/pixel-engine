@@ -14,7 +14,6 @@ from pixel_forge.application.estilo import estilo_base
 from pixel_forge.application.quadros import quadro_de_repouso
 from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.composicao import Composicao
-from pixel_forge.contracts.ir import EllipseGeom
 from pixel_forge.core.recusa import Recusa
 from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.kit.registro import PECAS
@@ -34,7 +33,7 @@ ARQ = CASOS / "quadrupedes" / "quatro_patas.r1.json"
 def test_o_quadrupede_parado_e_andando_igual_ao_oraculo() -> None:
     quer = ESPERADO["quatro_patas"]
     feito = _hashes(ler(ARQ, Composicao), quer)
-    diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["rgba_sha256"]])
+    diferentes = sorted(k for k in quer if feito.get(k) != [quer[k]["tamanho"], quer[k]["sem_chao_sha256"]])
     assert feito.keys() == quer.keys() and not diferentes, diferentes[:8]
 
 
@@ -67,14 +66,3 @@ def test_controle_o_quadrupede_com_uma_vista_e_recusado() -> None:
     with pytest.raises(Recusa) as e:
         ir_da_composicao(validar(dado, Composicao, "teste"))
     assert e.value.codigo == "VISTA" and "8 direções" in e.value.dica
-
-
-def test_a_pegada_no_chao_nao_passa_do_corpo() -> None:
-    """A sombra de contato gira com o corpo: de lado ela não passa do comprimento dele (a do antigo, reescalada para o
-    oblíquo, saía 2× mais longa e cortava no canvas)."""
-    ir = ir_da_composicao(ler(ARQ, Composicao))
-    sombra = next(p for p in ir.parts if p.id == "ground_shadow").geometry
-    corpo = [p.geometry for p in ir.parts if p.id in ("chest", "body")]
-    frente = max(g.center_q8[1] + g.radii_q8[1] for g in corpo if isinstance(g, EllipseGeom))
-    tras = min(g.center_q8[1] - g.radii_q8[1] for g in corpo if isinstance(g, EllipseGeom))
-    assert isinstance(sombra, EllipseGeom) and 2 * sombra.radii_q8[1] <= 1.3 * (frente - tras)  # o tronco, folga 30 %

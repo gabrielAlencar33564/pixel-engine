@@ -67,6 +67,9 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
     punho, cada membro numa massa. Na `16b`, de perto.
 17. O tronco é um bloco: o quadril no mesmo grupo e na mesma massa do tronco (a linha em volta dele lia como
     sunga), a cintura e o quadril quase da largura do peito.
+18. A sombra no chão é só a projetada: a mancha de contato saiu (o campo `sombra` da composição é recusado), o
+    tronco e a copa pontilhada passam a se lançar no chão, e a limpeza não conta o chão como figura. A 2 e a 4
+    (a sombra de contato) ficam sem objeto. Na `18`, banco, abrigo, árvore, humano e canino.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -88,4 +91,4 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 17 ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 18 ela ainda não foi reconstruída.

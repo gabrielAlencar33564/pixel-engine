@@ -54,8 +54,8 @@ def test_cada_variacao_monta(peca: str, nome: str, args: dict[str, Any], monkeyp
         membros_do_antigo(monkeypatch)  # e as juntas, as mãos e os pés nas formas do corpo real
     quer = ESPERADO[f"{peca}/{nome}"]["S"]
     feito = rgba_da_variacao(peca, args, quer["tamanho"])
-    chave = "sem_chao_sha256" if PECAS[peca].tipo == "quadrupede" else "rgba_sha256"  # a pegada do quadrúpede mudou
-    assert [feito["tamanho"], feito[chave]] == [quer["tamanho"], quer[chave]]
+    # sem a sombra no chão: a engine só tem a projetada, em todo asset (mudança intencional; tests/test_sombra.py)
+    assert [feito["tamanho"], feito["sem_chao_sha256"]] == [quer["tamanho"], quer["sem_chao_sha256"]]
 
 
 def test_controle_a_peca_acima_do_teto_e_recusada_pelo_registro() -> None:
@@ -83,7 +83,7 @@ def test_a_face_fica_na_faixa_do_no() -> None:
 def test_controle_a_variacao_mudada_sai_diferente() -> None:
     quer = ESPERADO["poste/fino"]["S"]
     feito = rgba_da_variacao("poste", {"base": ["0", "0", "0"], "altura": "1.1m", "raio": "5cm"}, quer["tamanho"])
-    assert feito["rgba_sha256"] != quer["rgba_sha256"]
+    assert feito["sem_chao_sha256"] != quer["sem_chao_sha256"]
 
 
 def test_toda_peca_tem_oraculo_ou_e_nova() -> None:

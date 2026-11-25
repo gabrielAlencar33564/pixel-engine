@@ -48,7 +48,6 @@ Um JSON `<id>.r<n>.json` (o `<id>` em minúsculas, `_` e dígitos). Campos:
 | `categoria` | o porte esperado (tabela abaixo); a engine mede a altura e recusa fora da faixa |
 | `semente` | inteiro; a semente de cada nó sai dela e do id do nó |
 | `medidas` | nomes → expressões, usados nos argumentos como `$nome` |
-| `sombra` | só no prop: `meia_largura` (e `proporcao_pm`, `dx`, `dy`) da sombra de contato |
 | `nos` | as peças, em ordem (veja abaixo) |
 | `vistas` | o prop parado: `{"S": {}}` (2 ou 4 cardinais só se o pedido disser); quem anda: as 8 direções `S SW W NW N NE E SE` |
 | `movimento` | o prop: `["static"]` (balanço `{"receita": "balanco", ...}` ou giro `{"receita": "giro", ...}` se o pedido disser); o humano e o quadrúpede: `["idle", "walk"]` |

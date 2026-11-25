@@ -119,8 +119,6 @@ def _corpo_canino(c: Ctx, a: dict[str, Any]) -> None:
     mat = {"pelagem": a["pelagem"], "ventre": a["ventre"], "meias": a["meias"] or a["pelagem"],
            "dorso": a["dorso"] or a["pelagem"], "ponta": a["dorso"] or a["ventre"]}
     b, kx, ky, kz = c.b, k["x"], k["y"], k["z"]
-    b.part("ground_shadow", "sombra", _el((0, 0, 0), (5.0, 12.5, 0.6), (kx, ky, 1)),
-           Parte(tags=("ground_shadow",), priority=-100))
     for pid, m, cen, r, tags in TRONCO:
         b.part(pid, mat[m], _el(cen, r, (kx, ky, kz)), Parte(bone="body", group="body", tags=tags))
     if a["dorso"]:
