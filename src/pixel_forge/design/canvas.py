@@ -18,7 +18,6 @@ _S, _C = math.sin(math.radians(45)), math.cos(math.radians(45))
 # o sólido de revolução (o detalhe não projeta)
 PROJETAM = ("bound_polygon", "polyline", "tapered_polyline", "ellipse", "revolution")
 NAO_PROJETAM = frozenset({"detail", "no_cast", "oriented"})
-ALTURA_NA_SOMBRA = 0.5  # a sombra do elipsoide no chão tem esta parte da altura dele na tela (``raster/sombra.py``)
 
 
 def projeta(part: dict[str, Any]) -> bool:
@@ -57,10 +56,9 @@ class _Caixa:
         vv = ((cx * sa + cy * ca) / 256) * _S - (cz / 256) * _C
         dv = ry * _S + rz * _C
         self.vs.extend((vv - dv, vv + dv))
+        # o render lança o elipsoide pela luz (``raster/sombra.py``): no chão ele vai, na largura, até o raio de lado
+        # (a luz não tem componente para a frente) e, para a direita, até o ponto mais alto lançado mais o raio
         self.sombra(x + rx, ((cx * sa + cy * ca) / 256 + ry) * _S, cz / 256 + rz)
-        # o render lança o elipsoide como a elipse dele na tela com parte da altura: a do volume alto e estreito
-        # desce no chão mais que o fundo dele
-        self.sombra(x + rx, ((cx * sa + cy * ca) / 256) * _S + dv * ALTURA_NA_SOMBRA, cz / 256)
 
     def geometria(self, g: dict[str, Any], rot: tuple[int, int]) -> None:
         t = g["type"]

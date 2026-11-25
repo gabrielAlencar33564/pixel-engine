@@ -36,6 +36,15 @@ TUFO_DO_GALHO = 0.8  # o tufo na ponta de um galho, em fração do lóbulo
 PARA_CIMA = 0.3  # o ponto da âncora ``superficie`` sobe tanto da direção de fora (a face de cima do volume)
 SOBE = 1.6  # cada saia da conífera sobe 1,6 passo: entra na de cima
 MAX_PONTAS = 15  # as pontas de uma saia (o leque tem até 32 vértices)
+# a nuvem de agulha (a copa aberta de material de agulha): os leques empilhados, quanto o de cima é menor que o de
+# baixo, a altura do bico de cada um (em meias alturas da nuvem: o tufo é chato, não um cone), uma ponta a cada
+# tantos px da volta, quanto elas caem e quanto o leque entra entre duas delas
+AGULHA = "agulha"
+LEQUES_DA_AGULHA = 2
+LEQUE_DE_CIMA = 0.4
+LEQUE_ALTO = 0.8
+PASSO_DA_AGULHA = 5.0
+AGULHA_CAI, AGULHA_RECORTE = 0.3, 0.4
 Vec = tuple[float, float, float]
 Tufo = tuple[Vec, float]  # o centro e o raio, em frações da copa (a copa é a esfera de raio 1)
 X = Arg
@@ -115,10 +124,10 @@ def _na_massa(c: Ctx) -> tuple[str, ...]:
     return ("volume_sphere", f"massa_{c.grupo}", "borda_de_folha")
 
 
-def _volumes(c: Ctx, material: str, massas: list[tuple[Vec, Vec]], meio: Vec) -> None:
-    """Os volumes como partes do nó, no grupo de contorno dele (sem linha entre eles) e numa massa de luz só; deixa
-    a âncora ``superficie``: um ponto na face de cada volume, para fora do ``meio`` e para cima (a face que a
-    câmera de cima vê), se nenhum outro volume o cobre."""
+def _volumes(c: Ctx, material: str, massas: list[tuple[Vec, Vec]], meio: Vec) -> list[Vec]:
+    """Os volumes como partes do nó, no grupo de contorno dele (sem linha entre eles) e numa massa de luz só; devolve
+    a superfície: um ponto na face de cada volume, para fora do ``meio`` e para cima (a face que a câmera de cima
+    vê), se nenhum outro volume o cobre."""
     fora: list[Vec] = []
     for i, (centro, raios) in enumerate(massas):
         c.b.part(f"{c.pid}_{i:02d}", material, ellipse(qv(*centro), qv(*raios)),
@@ -131,7 +140,7 @@ def _volumes(c: Ctx, material: str, massas: list[tuple[Vec, Vec]], meio: Vec) ->
         if not any(j != i and math.hypot(*((p[k] - o[k]) / r[k] for k in range(3))) < 1
                    for j, (o, r) in enumerate(massas)):
             fora.append(p)
-    c.deixa("superficie", fora)
+    return fora
 
 
 def _copa(c: Ctx, a: dict[str, Any]) -> None:
@@ -151,7 +160,8 @@ def _copa(c: Ctx, a: dict[str, Any]) -> None:
     f = a["tamanho"] * TUFO_DO_GALHO
     nas_pontas = [((x, y, z), (eixos[0] * f, eixos[1] * f, eixos[2] * f)) for x, y, z in c.ancora(a["pontas"])]
     volumes = tufos(c.st, a)
-    _volumes(c, a["material"], [(fora_do_eixo(o), r) for o, r in volumes] + nas_pontas, (dx, dy, cz))
+    c.deixa("superficie", _volumes(c, a["material"], [(fora_do_eixo(o), r) for o, r in volumes] + nas_pontas,
+                                   (dx, dy, cz)))
     for i, (alto, ponta, raio) in enumerate(ramos(c.st, a, volumes[:a["tufos"]])):
         meio = ((alto[0] * 2 + ponta[0]) / 3, (alto[1] + ponta[1]) / 2, (alto[2] + ponta[2]) / 2)
         geo = {"type": "tapered_polyline",
@@ -161,19 +171,42 @@ def _copa(c: Ctx, a: dict[str, Any]) -> None:
                  Parte(group=c.grupo, tags=("volume_sphere", f"massa_{c.grupo}", "no_outline")))
 
 
+def _de_agulha(c: Ctx, a: dict[str, Any], i: int, ponta: Vec, raio: float) -> list[Vec]:
+    """A nuvem de agulha: leques pregueados empilhados, o de baixo mais largo, cada um com o contorno dele (o tufo
+    chato da conífera de galhos à mostra), e a beira em muitas pontas finas que caem; devolve o bico de cada leque."""
+    x, y, z = ponta
+    meia = raio * a["achata"]
+    base = z + meia * (a["assenta"] - 1)
+    pontas = max(7, min(MAX_PONTAS, round(2 * math.pi * raio / PASSO_DA_AGULHA)))
+    leque = {"irregular": a["irregular"], "cai": AGULHA_CAI, "recorte": AGULHA_RECORTE}
+    bicos: list[Vec] = []
+    for k in range(LEQUES_DA_AGULHA):
+        z0, r0 = base + k * meia, raio * (1 - LEQUE_DE_CIMA * k)
+        pts = [(px + x, py + y, pz) for px, py, pz in _saia(c, leque, (z0, r0, meia * LEQUE_ALTO, pontas))]
+        c.b.part(f"{c.pid}_{i:02d}_{k}", a["material"], bound_polygon(pts),
+                 Parte(group=f"{c.grupo}_{i:02d}_{k}", tags=_na_massa(c)[:-1]))  # a beira já é das pontas
+        bicos.append(pts[0])
+    return bicos
+
+
 def _aberta(c: Ctx, a: dict[str, Any]) -> None:
     """Uma nuvem de folhas em cada ponta de ``pontas``: uma copa pequena e chata, de tamanho sorteado, assentada
-    sobre a ponta. As nuvens não se fecham numa massa: os galhos e o chão aparecem entre elas."""
+    sobre a ponta; a de material de agulha, em leques de pontas finas. As nuvens não se fecham numa massa: os galhos
+    e o chão aparecem entre elas."""
     massas: list[tuple[Vec, Vec]] = []
+    bicos: list[Vec] = []
     pontas = c.ancora(a["pontas"])
-    for x, y, z in pontas:
+    for i, (x, y, z) in enumerate(pontas):
         raio = a["raio"] * (1 + 2 * a["irregular"] * _sorte(c.st))
+        if AGULHA in a["material"]:
+            bicos += _de_agulha(c, a, i, (x, y, z), raio)
+            continue
         nuvem = {"copa": (raio, raio * a["achata"], z + raio * a["achata"] * a["assenta"]), "fundo": 1.0,
                  "tufos": a["tufos"], "tamanho": a["tamanho"], "irregular": a["irregular"], "perfil": 0.0,
                  "raminhos": a["raminhos"]}
         massas += [((cx + x, cy + y, cz), raios) for (cx, cy, cz), raios in tufos(c.st, nuvem)]
     alto = sum(p[2] for p in pontas) / max(1, len(pontas))
-    _volumes(c, a["material"], massas, (0.0, 0.0, alto))
+    c.deixa("superficie", _volumes(c, a["material"], massas, (0.0, 0.0, alto)) + bicos)
 
 
 def _saia(c: Ctx, a: dict[str, Any], andar: tuple[float, float, float, int]) -> list[Vec]:
@@ -255,8 +288,9 @@ PECAS_COPA = [
          TESTE, (_copa, _volumes, _na_massa, tufos, ramos, _lobulos, _raminhos, _sorte), vistas=QUATRO,
          flora="folhagem", ancoras=("superficie",), apoio=_tronco_da_copa),
     Peca("copa_aberta", "A copa aberta: uma nuvem de folhas em cada ponta de galho, com os galhos e o chão à mostra "
-         "entre elas (a árvore de galhos abertos, a de copa rala, a velha). Pede as pontas de um nó de antes. Deixa "
-         "a superfície", (
+         "entre elas (a árvore de galhos abertos, a de copa rala, a velha). De material de agulha, cada nuvem é um "
+         "tufo chato de leques empilhados, de pontas finas (a conífera aberta). Pede as pontas de um nó de antes. "
+         "Deixa a superfície", (
              X("pontas", "ancora", "onde cai cada nuvem ('<nó>.pontas')"),
              X("raio", "comprimento", "a meia largura da nuvem"),
              X("achata", "escalar", "a meia altura da nuvem, em fração do raio", "0.6"),
@@ -269,7 +303,8 @@ PECAS_COPA = [
                    ("chatas", {"pontas": "galhos.pontas", "raio": "70cm", "achata": "0.35", "tufos": "5"}),
                    ("ralas", {"pontas": "galhos.pontas", "raio": "35cm", "tufos": "3", "material": "copa_folha"})),
          "tests/test_flora.py::test_a_copa_aberta_deixa_os_galhos_a_mostra",
-         (_aberta, _volumes, _na_massa, tufos, _lobulos, _raminhos, _sorte), vistas=QUATRO, flora="folhagem",
+         (_aberta, _de_agulha, _saia, _volumes, _na_massa, tufos, _lobulos, _raminhos, _sorte), vistas=QUATRO,
+         flora="folhagem",
          ancoras=("superficie",),
          apoio=(("tronco", "tronco_em_pe", {"altura": "2.2m", "base": "26cm", "topo": "12cm",
                                             "casca": "casca_sulcada"}),

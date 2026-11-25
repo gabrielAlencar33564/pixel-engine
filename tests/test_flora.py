@@ -27,7 +27,6 @@ from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.contracts.ir import AssetIR
 from pixel_forge.core.recusa import Recusa
 from pixel_forge.core.rng import Stream
-from pixel_forge.design import canvas
 from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.escala import PPM
 from pixel_forge.design.kit import pecas_copa, pecas_tronco
@@ -35,8 +34,9 @@ from pixel_forge.design.kit.pecas_copa import ramos, tufos
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.porte import altura_m
 from pixel_forge.quality import flora
-from pixel_forge.raster import montagem, tons, volume
+from pixel_forge.raster import montagem, sombra, tons, volume
 from pixel_forge.raster.estilo import estilo_render
+from pixel_forge.raster.grade import MARGIN
 from pixel_forge.raster.renderer import mascaras
 from pixel_forge.rig.fk import Skeleton
 from pixel_forge.rig.pose import rest_pose
@@ -222,10 +222,36 @@ def test_a_copa_alta_e_estreita_cabe_no_quadro() -> None:
     assert _copa_alta_e_estreita() == 0
 
 
-def test_controle_sem_a_altura_na_sombra_o_canvas_corta_a_copa_alta(monkeypatch: pytest.MonkeyPatch) -> None:
-    """O jeito de antes: o canvas contava a sombra do volume só até o fundo dele."""
-    monkeypatch.setattr(canvas, "ALTURA_NA_SOMBRA", 0.0)
+def test_controle_a_sombra_da_elipse_na_tela_sai_do_canvas(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: o volume de folhagem se lançava como a elipse dele na tela, com metade da altura dele, e a
+    do volume alto e estreito descia no chão mais que o fundo dele (o canvas pedia uma folga para isso)."""
+    monkeypatch.setattr(sombra, "FOLHAGEM", frozenset())
     assert _copa_alta_e_estreita() > 0
+
+
+def _sombra_da_copa_alta(semente: int) -> Mascara:
+    """A sombra no chão inteira (sem a figura por cima) da árvore de copa alta e estreita, na vista S."""
+    dado = json.loads(EXEMPLO.read_text(encoding="utf-8"))
+    del dado["medidas"]
+    comp = validar({**dado, "categoria": "arvore_grande", "semente": semente, "nos": [], "tracos": [],
+                    "planta": {"habito": "excurrente", "altura": "10m", "largura": "2m"}}, Composicao, "teste")
+    ir = ir_da_composicao(comp)
+    cena = project_view(ir, rest_pose(Skeleton(ir.bones)), "S")
+    return sombra._ground_projection(cena, estilo_render(estilo_base()).light, ir.canvas.width + 2 * MARGIN,
+                                     ir.canvas.height + 2 * MARGIN)
+
+
+def test_a_copa_alta_lanca_uma_sombra_so() -> None:
+    """Cada volume da copa se lança inteiro pela luz (o alto vai mais longe): a sombra da copa alta é uma mancha só,
+    junto com a do tronco, como a copa."""
+    assert [flora.ilhas(_sombra_da_copa_alta(s)) for s in (1, 2, 3)] == [1, 1, 1]
+
+
+def test_controle_a_elipse_na_tela_lanca_a_copa_alta_em_manchas(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: cada volume no chão como a elipse dele na tela, curta, no centro lançado; os do alto da
+    copa alta caem longe dos de baixo, e a sombra sai em manchas."""
+    monkeypatch.setattr(sombra, "FOLHAGEM", frozenset())
+    assert all(flora.ilhas(_sombra_da_copa_alta(s)) > 1 for s in (1, 2, 3))
 
 
 def _conifera_chapada() -> Composicao:
@@ -442,6 +468,37 @@ def test_a_copa_aberta_deixa_os_galhos_a_mostra() -> None:
 def test_controle_a_copa_em_massa_cobre_os_galhos() -> None:
     aberta, fechada = _aberta_e_fechada()
     assert fechada < 0.5 * aberta
+
+
+def _pontas_da_nuvem(material: str, semente: int) -> int:
+    """As pontas da silhueta de uma nuvem só da copa aberta (num galho só), na vista S: no perfil polar em volta do
+    centro dela (72 setores), os máximos que passam 1,5 px dos vales dos dois lados."""
+    dado = de_uma_peca("copa_aberta", {**ABERTA, "material": material}).model_dump(mode="json")
+    for no in dado["nos"]:
+        if no["peca"] == "galhos":
+            no["args"]["n"] = "1"
+    ir = ir_da_composicao(validar({**dado, "semente": semente}, Composicao, "teste"))
+    cheias = mascaras(project_view(ir, rest_pose(Skeleton(ir.bones)), "S"), estilo_render(estilo_base()),
+                      ir.canvas.width, ir.canvas.height)
+    ys, xs = np.nonzero(np.logical_or.reduce([m for p, m in cheias.items() if p.startswith("n_")]))
+    setor = ((np.arctan2(ys - ys.mean(), xs - xs.mean()) + np.pi) / (2 * np.pi) * 72).astype(int) % 72
+    r = np.zeros(72)
+    np.maximum.at(r, setor, np.hypot(ys - ys.mean(), xs - xs.mean()))
+    vales = [(min(r[(i - k) % 72] for k in range(1, 6)), min(r[(i + k) % 72] for k in range(1, 6))) for i in range(72)]
+    return sum(1 for i in range(72) if r[i] >= r[(i + 1) % 72] and r[i] > r[i - 1] and r[i] - max(vales[i]) >= 1.5)
+
+
+def test_a_nuvem_de_agulha_tem_a_beira_em_pontas() -> None:
+    """A copa aberta de agulha (o pinheiro de galhos à mostra): cada nuvem é um tufo chato de leques, e a silhueta
+    dela tem muitas pontas finas, como a conífera; a de folha larga segue em lóbulos (poucas)."""
+    assert all(_pontas_da_nuvem("copa_agulha", s) >= 10 for s in range(2, 7))
+    assert all(_pontas_da_nuvem("copa_folhosa", s) <= 8 for s in range(2, 7))
+
+
+def test_controle_a_nuvem_de_agulha_em_lobulos_le_como_folha(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: a nuvem de agulha era a de folha em outra cor, em lóbulos redondos."""
+    monkeypatch.setattr(pecas_copa, "AGULHA", "<nenhum>")
+    assert all(_pontas_da_nuvem("copa_agulha", s) <= 8 for s in range(2, 7))
 
 
 def _solidez_da_conifera(**args: str) -> float:

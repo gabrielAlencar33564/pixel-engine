@@ -8,13 +8,13 @@ telhado e as pedras de uma parede, do mesmo plano, não se sombreiam.
 No chão: cada peça volta da tela ao mundo pela câmera da vista, é lançada no chão (z = 0) na direção da luz e volta à
 tela, em xadrez (o chão aparece entre os pixels), no material ``sombra`` do estilo. É a única sombra no chão: não há
 sombra de contato (a mancha redonda embaixo do asset), e a do pé nasce no pé, que se lança sobre si mesmo. O tronco
-(o sólido de revolução) se lança como o tubo do eixo dele, e o elipsoide como a elipse dele no chão.
+(o sólido de revolução) se lança como o tubo do eixo dele; o volume de folhagem, exato (o chão de onde o raio para a
+luz o corta); e o outro elipsoide, como a elipse dele na tela com metade da altura, no centro lançado.
 """
 
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -32,7 +32,7 @@ from ..views.primitivas import (
 from .estilo import EstiloRender
 from .formas import raster_ellipse, raster_polygon, raster_tapered
 from .grade import MARGIN, Mascara, shift
-from .montagem import Buf16, Camadas, Tabelas
+from .montagem import BORDA_DE_FOLHA, Buf16, Camadas, Tabelas
 from .profundidade import DEPTH_QUANT
 from .textura import Floats
 
@@ -40,6 +40,7 @@ CAST_TONES = 2  # quantos tons da rampa a sombra entre peças desce
 CAST_BIAS_PX = 0.5  # a folga de profundidade: a peça encostada não sombreia a vizinha
 CAST_SAME_PLANE_PERMILLE = 950  # normais com cosseno acima de 0,95 ...
 CAST_PLANE_GAP_PX = 1.0  # ... e planos a menos de 1 px um do outro são o mesmo plano
+FOLHAGEM = frozenset({BORDA_DE_FOLHA, "miolo"})  # as marcas da folhagem da copa (o volume em folhas e o miolo escuro)
 
 
 class _Planos:
@@ -117,45 +118,85 @@ def sombra_entre_pecas(est: EstiloRender, cam: Camadas, t: Tabelas, index: Buf16
         _desce(index, sel, list(est.materials[c.material].ramp))
 
 
+class _Chao:
+    """O chão da vista sob a luz: a câmera (as linhas ``e`` levam o mundo à tela e à profundidade, em q8) e a luz no
+    mundo (``lw``, para cima)."""
+
+    def __init__(self, scene: Scene2D, light: tuple[float, float, float]) -> None:
+        a, e = math.radians(scene.azimuth_mdeg / 1000), math.radians(ELEVACAO_MDEG / 1000)
+        sa, ca, se, ce = math.sin(a), math.cos(a), math.sin(e), math.cos(e)
+        sd = PROFUNDIDADE_PERMILLE / 1000
+        self.e = np.array([[ca, -sa, 0.0], [sa * sd, ca * sd, -ce], [sa * ce, ca * ce, se]])
+        self.inv = np.linalg.inv(self.e)
+        self.lw = light[0] * self.e[0] + light[1] * np.array([sa * se, ca * se, -ce]) + light[2] * self.e[2]
+        self.pu, self.pv = scene.pivot_q8
+
+    def ponto(self, u: float, v: float, d: float) -> tuple[int, int]:
+        """O ponto (u, v, profundidade) em q8 lançado no chão, na tela."""
+        p: npt.NDArray[np.float64] = self.inv @ np.array([u - self.pu, v - self.pv, d])
+        g = p - self.lw * (max(p[2], 0.0) / self.lw[2])
+        return round(float(g @ self.e[0])) + self.pu, round(float(g @ self.e[1])) + self.pv
+
+    def elipsoide(self, s: SupElipsoide, w: int, h: int) -> Mascara:
+        """A sombra exata do elipsoide: os pontos do chão de onde o raio para a luz o corta (t ≥ 0). O volume alto
+        se lança comprido, e os volumes de uma copa se lançam como a copa: uma mancha só."""
+        forma = np.array([[s.inv[0], s.inv[1], s.inv[2]], [s.inv[1], s.inv[3], s.inv[4]],
+                          [s.inv[2], s.inv[4], s.inv[5]]])
+        a_mundo = self.e.T @ forma @ self.e  # o elipsoide no mundo: (p − centro)ᵀ·A·(p − centro) ≤ 1
+        centro = self.inv @ np.array([s.cu - self.pu, s.cv - self.pv, s.dc])
+        semi = np.sqrt(np.maximum(np.diag(np.linalg.inv(a_mundo)), 0.0))  # a caixa dele no mundo
+        cantos = [self.ponto(*(self.e @ (centro + semi * np.array([i, j, k]))) + np.array([self.pu, self.pv, 0]))
+                  for i in (-1, 1) for j in (-1, 1) for k in (-1, 1)]
+        us, vs = [p[0] for p in cantos], [p[1] for p in cantos]
+        x0, x1 = max(0, (min(us) >> 8) + MARGIN - 1), min(w, (max(us) >> 8) + MARGIN + 2)
+        y0, y1 = max(0, (min(vs) >> 8) + MARGIN - 1), min(h, (max(vs) >> 8) + MARGIN + 2)
+        out = np.zeros((h, w), dtype=bool)
+        if x1 <= x0 or y1 <= y0:
+            return out
+        uu = (np.arange(x0, x1, dtype=np.float64) - MARGIN) * 256 + 128 - self.pu
+        vv = (np.arange(y0, y1, dtype=np.float64) - MARGIN) * 256 + 128 - self.pv
+        tela = np.linalg.inv(self.e[:2, :2])  # o chão (z = 0) na tela é o par (u, v) → (x, y)
+        gx = tela[0, 0] * uu[None, :] + tela[0, 1] * vv[:, None]
+        gy = tela[1, 0] * uu[None, :] + tela[1, 1] * vv[:, None]
+        wv = np.stack([gx - centro[0], gy - centro[1], np.full_like(gx, -centro[2])], axis=-1)
+        al = a_mundo @ self.lw
+        qa = float(self.lw @ al)
+        qb = wv @ al
+        qc = np.einsum("...i,ij,...j->...", wv, a_mundo, wv) - 1
+        disc = qb * qb - qa * qc
+        out[y0:y1, x0:x1] = (disc >= 0) & (-qb + np.sqrt(np.maximum(disc, 0.0)) >= 0)
+        return out
+
+
 def _ground_projection(scene: Scene2D, light: tuple[float, float, float], w: int, h: int) -> Mascara:
     out = np.zeros((h, w), dtype=bool)
-    a, e = math.radians(scene.azimuth_mdeg / 1000), math.radians(ELEVACAO_MDEG / 1000)
-    sa, ca, se, ce = math.sin(a), math.cos(a), math.sin(e), math.cos(e)
-    sd = PROFUNDIDADE_PERMILLE / 1000
-    eu, ev, ed = np.array([ca, -sa, 0.0]), np.array([sa * sd, ca * sd, -ce]), np.array([sa * ce, ca * ce, se])
-    inv = np.linalg.inv(np.array([eu, ev, ed]))
-    lw = light[0] * eu + light[1] * np.array([sa * se, ca * se, -ce]) + light[2] * ed  # a luz no mundo
-    if lw[2] <= 1e-6:  # luz rasante ou de baixo: sem sombra no chão
+    chao = _Chao(scene, light)
+    if chao.lw[2] <= 1e-6:  # luz rasante ou de baixo: sem sombra no chão
         return out
-    pu, pv = scene.pivot_q8
-
-    def chao(u: float, v: float, d: float) -> tuple[int, int]:
-        p: npt.NDArray[np.float64] = inv @ np.array([u - pu, v - pv, d])
-        g = p - lw * (max(p[2], 0.0) / lw[2])
-        return round(float(g @ eu)) + pu, round(float(g @ ev)) + pv
-
     for c in scene.commands:
         if not {"detail", "no_cast"} & set(c.tags):
             out |= _lancada(c, chao, w, h)
     return out
 
 
-def _lancada(c: DrawCommand, chao: Callable[[float, float, float], tuple[int, int]], w: int, h: int) -> Mascara:
-    """A peça lançada no chão, com ``chao`` levando um ponto (u, v, profundidade) em q8 ao chão sob a luz."""
+def _lancada(c: DrawCommand, chao: _Chao, w: int, h: int) -> Mascara:
+    """A peça lançada no chão sob a luz."""
     if isinstance(c.prim, RevolutionPrim):
-        eixo = [chao(s[0] * 256, s[1] * 256, s[2] * 256) for s in c.prim.stations]
+        eixo = [chao.ponto(s[0] * 256, s[1] * 256, s[2] * 256) for s in c.prim.stations]
         return raster_tapered(w, h, MARGIN, tuple(eixo), tuple(round(s[3] * 256) for s in c.prim.stations))
     if isinstance(c.surface, SupLeque):
-        pts = [chao(*p) for p in c.surface.pts]
+        pts = [chao.ponto(*p) for p in c.surface.pts]
         out = np.zeros((h, w), dtype=bool)
         for b, d in zip(pts[1:], pts[2:], strict=False):
             out |= raster_polygon(w, h, MARGIN, (pts[0], b, d))
         return out
     if isinstance(c.surface, SupTubo):
-        return raster_tapered(w, h, MARGIN, tuple(chao(*p) for p in c.surface.pts), c.surface.radii)
+        return raster_tapered(w, h, MARGIN, tuple(chao.ponto(*p) for p in c.surface.pts), c.surface.radii)
     if isinstance(c.surface, SupElipsoide) and isinstance(c.prim, EllipsePrim):
-        s = c.surface
-        return raster_ellipse(w, h, MARGIN, chao(s.cu, s.cv, s.dc), (c.prim.hu, max(1, c.prim.hv // 2)))
+        if FOLHAGEM & set(c.tags):  # o volume de folhagem se lança inteiro: a copa alta, comprida e de uma mancha
+            return chao.elipsoide(c.surface, w, h)
+        s = c.surface  # os outros, como a elipse deles na tela com metade da altura (a do motor antigo)
+        return raster_ellipse(w, h, MARGIN, chao.ponto(s.cu, s.cv, s.dc), (c.prim.hu, max(1, c.prim.hv // 2)))
     return np.zeros((h, w), dtype=bool)
 
 
