@@ -618,6 +618,19 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   da copa na tela), o galho tem de metade a três quartos do tronco onde sai o mais alto, o tronco entra na copa. A
   composição pelos traços tem um quarto ou menos do tamanho da escrita peça por peça, e a prévia devolve os nós
   derivados. O campo novo não entra no id do build de quem não o usa.
+- A medição de fora (um agente sem contexto, os mesmos dez pedidos da primeira prova, só pela skill, em
+  `~/.pixel-forge/acervo-prova-habito`): 153 mil tokens contra 188 mil, 69 chamadas de ferramenta contra 86, 54 de
+  `pfe` contra 65 (22 prévias contra 32) e 9,9 min contra 12,2. Só 4 das 10 plantas saíram pelos traços; o que a
+  medição achou foi corrigido na causa: a conífera derivada caía em `LUZ_SEM_DIRECAO` (a medida vai de 0,03 a 0,19
+  na conífera: o limite desceu a 0,02) e soltava pixels (o recorte da beira guarda só o que toca o miolo da
+  máscara); no hábito aberto as nuvens se fundiam e a copa não ia com o tronco inclinado (as pontas dos galhos
+  abrem em volta do alto do tronco; a nuvem tem 0,15 da largura; o vento desvia 18 % da altura); a moita alta
+  saía em dois ovos (o número de massas vem da largura sobre a altura, e as massas se sobrepõem); o fuste não
+  dizia onde a folhagem começa (o elipsoide desce até o fundo dos lóbulos cair nele); e as plantas de lâmina não
+  tinham hábito (a `touceira`). O miolo da copa desceu de 0,6 a 0,5 da copa, e a copa alta e estreita conta os
+  lóbulos pela altura (o miolo chapado aparecia em 16 % da copa do decurrente e em 34 % da do excurrente estreito;
+  ficou em 6 % e 17 %). Depois das correções a medição não foi repetida, e as plantas derivadas não passaram por
+  revisor de fora.
 - O que o agente lê (pedido do dono: gastar menos tokens): a skill e as regras estão em inglês (os identificadores
   ficam como estão: mudá-los quebra as composições do acervo); o catálogo tem dois níveis, o resumo e um arquivo por
   família (`pfe catalogo flora`: 19 mil caracteres no lugar dos 85 mil do kit inteiro), em JSON sem espaço a mais; a

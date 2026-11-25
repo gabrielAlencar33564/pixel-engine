@@ -112,15 +112,18 @@ foliage, branches thinner than the trunk they leave), so nothing floats and the 
 | `pendente` | a dome with a curtain of hanging twigs (the weeping tree) |
 | `guarda_sol` | a flat crown on a tall clear trunk |
 | `seco` | trunk and forking branches, no leaves |
-| `moita` | no trunk: one to three masses on the ground, by width |
+| `moita` | no trunk: one mass on the ground; two when it is 1.6× wider than tall, three from 2.6× |
+| `touceira` | blades from one foot: thin (upright when tall and narrow, arching when low and wide); with `folha: larga`, a rosette of feathered fronds |
 
-`altura` and `largura` are the real measurements. Optional: `folha` (`larga`, `miuda`, `agulha`), `idade` (`jovem`,
-`adulta`, `velha`: changes trunk, roots and crown), `casca` (a bark material), and, only when the species departs from
-its habit, `fuste` (the share of the height with no crown, 0.05 to 0.8), `esbeltez` (height over trunk diameter, 4 to
-40) and `vento` (-1 to 1: leans the trunk and the crown). The derived nodes are `tronco`, `galhos` and `copa` (a wide
-`moita`: `copa`, `copa_b`, `copa_c`); nodes you add in `nos` come after and can cite their anchors (a `salpico` on
-`copa.superficie`). The preview returns the derived nodes in `nos`: to change one argument, copy them into `nos` and
-drop `planta`. Vary a set by habit, proportions, age, wind and seed.
+`altura` and `largura` are the real measurements. Every value is a string (`"fuste": "0.3"`). Optional: `folha`
+(`larga`: dark green; `miuda`: light green; `agulha`: dark blue-green), `idade` (`jovem`, `adulta`, `velha`: changes
+trunk, roots and crown), `casca` (a bark material), and, only when the species departs from its habit, `fuste` (the
+share of the height with no crown, 0.05 to 0.8), `esbeltez` (height over trunk diameter, 4 to 40) and `vento` (-1 to
+1: leans the trunk and carries the crown with it). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto`
+and `seco` (a wide `moita`: `copa`, `copa_b`, `copa_c`; a `touceira`: `folhas`). Nodes you add in `nos` come after
+and can cite their anchors: a `salpico` on `copa.superficie` (one node per mass) or on `folhas.pontas`. The preview
+returns the derived nodes in `nos`, with lengths in px (1 m = 32.7 px): to change one argument, copy them into `nos`
+and drop `planta`. Vary a set by habit, proportions, age, wind and seed.
 
 **A plant node by node** (when the traits do not cover it). Choose the construction from the species sheet:
 
@@ -220,7 +223,8 @@ agent. `pfe critica <build> --json` (only the build path: the store is the build
   the reviewer's eye. A defect you believe is measured wrong is an engine defect: stop and report it, do not work
   around it.
 - `irmas`: the three compositions of the same category in the store (built or not) with the closest silhouette, and
-  how close (0 to 1; from `parecida_a_partir_de` up it is a defect). A clump has no mass measurement: only its
+  how close (0 to 1; from `parecida_a_partir_de` up it is a defect). They are read when the critique runs: for a set,
+  save every composition first and critique each build once. A clump has no mass measurement: only its
   silhouette is compared.
 - `prancha` (`criticas/<build>.png`): on top, the sprite and its silhouette; below, the siblings and their silhouettes.
 - `perguntas` and `ficha`: what only the eye can answer.
@@ -247,8 +251,8 @@ its own critique). The critique does not approve the art: that stays with the ow
 A revision is immutable: the build refuses (`IDENTIDADE`) the same revision with another drawing. So is a build: its
 id carries the composition, the style, the engine version and the pixels, so the same id is always the same drawing; if
 the engine changes a pixel, the same request gives another build, and the old package stays valid for the old build.
-To complete or fix, edit the composition and run `pfe atualizar <composition> --json`: it becomes the next revision in
-the store; follow the path with the file it returns.
+To complete or fix, edit a copy of the composition (any path, same `id`) and run `pfe atualizar <composition> --json`:
+it becomes the next revision in the store; follow the path with the file it returns.
 
 ## 8. Delivery
 

@@ -99,7 +99,7 @@ class Planta(Strict):
     copa. O fuste (a parte da altura sem copa), a esbeltez (a altura sobre o diâmetro do pé) e o vento (de −1 a 1)
     só se dizem quando a espécie foge do hábito."""
 
-    habito: Literal["decurrente", "excurrente", "aberto", "pendente", "guarda_sol", "seco", "moita"]
+    habito: Literal["decurrente", "excurrente", "aberto", "pendente", "guarda_sol", "seco", "moita", "touceira"]
     altura: Expr
     largura: Expr
     folha: Literal["larga", "miuda", "agulha"] = "larga"

@@ -39,6 +39,8 @@ def _u(mask: Mascara) -> Floats:
     sl, sr = left.copy(), right.copy()
     for row in range(lo, hi + 1):
         a, b = max(lo, row - SMOOTH_ROWS), min(hi, row + SMOOTH_ROWS)
+        if np.isnan(left[a:b + 1]).all():  # um vão de fileiras vazias na máscara (duas massas, uma sobre a outra)
+            continue
         sl[row], sr[row] = np.nanmean(left[a:b + 1]), np.nanmean(right[a:b + 1])
     c = ((sl + sr) / 2)[:, None]
     hw = np.maximum(1.0, (sr - sl) / 2)[:, None]

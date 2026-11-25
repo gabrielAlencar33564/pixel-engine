@@ -58,8 +58,22 @@ def _recortada(m: Mascara, faixa: int, parte: int) -> Mascara:
     ys, xs = np.nonzero(m)
     yy, xx = np.indices(m.shape)
     sorteada = h32((xx - int(xs.min())) // faixa, (yy - int(ys.min())) // faixa, 7) % 1000 < parte
-    res: Mascara = m & ~(~dentro & sorteada)
-    return res
+    return _ligada(m & ~(~dentro & sorteada), dentro, faixa)
+
+
+def _ligada(m: Mascara, dentro: Mascara, faixa: int) -> Mascara:
+    """A parte da máscara recortada que ainda toca o miolo dela (``dentro``): o recorte tira a folha da beira, não
+    solta um pedaço dela no ar. A máscara sem miolo (mais fina que a faixa) fica como está."""
+    if not dentro.any():
+        return m
+    alcanca = dentro
+    for _ in range(faixa + 1):
+        perto = alcanca.copy()
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                perto |= shift(alcanca, dx, dy)
+        alcanca = perto & m
+    return alcanca
 
 
 def _mascara(c: DrawCommand, w: int, h: int) -> Mascara:

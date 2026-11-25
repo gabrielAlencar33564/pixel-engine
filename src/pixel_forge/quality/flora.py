@@ -24,7 +24,9 @@ MASSA_MINIMA = 200  # a folhagem menor que isto (px) é de lâminas ou de detalh
 # os limites dos achados (o controle de cada um está em tests/test_critica.py)
 LISA = 0.985  # a folhagem enche tanto o fecho convexo dela: é um ovo ou um cone
 ESPELHADA = 0.95  # a folhagem e o espelho dela coincidem tanto
-SEM_DIRECAO = 0.05  # o claro fica a menos disto (em frações da copa) do escuro, para o lado da luz
+# o claro fica a menos disto (em frações da copa) do escuro, para o lado da luz. Na conífera, em que cada saia
+# sombreia a de baixo, a medida vai de 0,03 a 0,19; na folhagem chapada é zero
+SEM_DIRECAO = 0.02
 TRONCO_SUMIDO = 0.015  # o lenho à mostra é menos disto da figura
 PARECIDA = 0.88  # a assinatura coincide tanto com a de uma irmã
 IRMAS_NA_PRANCHA = 3

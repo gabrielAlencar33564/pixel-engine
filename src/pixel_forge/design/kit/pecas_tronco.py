@@ -177,7 +177,8 @@ def _galhos(c: Ctx, a: dict[str, Any]) -> None:
         grosso = a["largura"][0] + (a["largura"][1] - a["largura"][0]) * st.randint(0, 100) / 100
         sai_a = a["base"] + a["sobe"] * u
         p0 = (_no_eixo(c, eixo, sai_a, grosso), 0.0, sai_a)  # o galho nasce no eixo do tronco, onde ele estiver
-        p1 = (math.sin(az) * alcance, math.cos(az) * alcance * a["fundo"], cz + v * meia_a)
+        # as pontas abrem em volta do alto do tronco: no tronco inclinado a copa vai com ele
+        p1 = (eixo[-1][0] + math.sin(az) * alcance, math.cos(az) * alcance * a["fundo"], cz + v * meia_a)
         ctrl = (p0[0] + (p1[0] - p0[0]) * ABRE_NO_ALTO[0], p1[1] * ABRE_NO_ALTO[0],
                 p0[2] + (p1[2] - p0[2]) * ABRE_NO_ALTO[1])
         _rolico(c, f"{c.pid}_{j}", [_no_caminho(p0, ctrl, p1, i / TRECHOS) for i in range(TRECHOS + 1)],
