@@ -35,6 +35,12 @@ TRONCO_DO_ANTIGO = ((humano, "OMBRO_CAI", 0.0), (humano, "R_PESCOCO", 0.024), (h
                     (humano, "ANTEBRACO", 0.146), (humano, "CINTURA", (0.30, 0.16)),
                     (roupa, "JAQUETA_CINTURA", (0.22, 0.26)), (roupa, "MANGA_DE", -0.05))
 LINHA_DO_OMBRO = ("trap_", "jacket_yoke_")  # as partes que o `pixel-engine` não tem
+# os membros do `pixel-engine`, nas medidas do corpo real: a esfera saliente em cada junta, a canela que afina até
+# 0,021 da estatura, a mão fina e comprida, o pé de 0,152 e alto, e cada parte sombreada sozinha
+MEMBROS_DO_ANTIGO = ((humano, "R_JUNTAS", (1.15, 1.0, 0.95, 1.1, 1.1)), (humano, "DEPOIS_DA_JUNTA", (0.95, 0.92)),
+                     (humano, "MAO_FORMA", (0.6, 1.5, 0.45)), (humano, "PE_ALTO", (0.72, 0.45)),
+                     (roupa, "PE_ALTO", (0.72, 0.45)), (humano, "MASSA_DO_MEMBRO", ()), (humano, "PE", 0.152),
+                     (humano, "R_COXA", 0.047), (humano, "R_CANELA_BAIXO", 0.021))
 # a bola do peito dele: o centro e a meia altura em frações do tronco (a do corpo e a da jaqueta, que tem folga), e
 # o grupo de contorno de cada massa do tronco (na engine o peito e a cintura são uma massa só)
 BOLA_DO_PEITO, BOLA_DA_JAQUETA = (0.70, 0.32), (0.68, 0.36)
@@ -49,6 +55,13 @@ def abertura_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     afastados que as juntas do quadril. A engine os põe sob elas (mudança intencional), e o oráculo compara o resto
     do humano na abertura dele."""
     monkeypatch.setattr(humano, "TORNOZELO_X", ABERTURA_DO_ANTIGO)
+
+
+def membros_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Os braços, as pernas, as mãos e os pés nas formas do `pixel-engine` (as do corpo real): na engine são formas
+    simples, para a câmera de cima (mudança intencional), e o oráculo compara o resto do humano nos membros dele."""
+    for modulo, nome, valor in MEMBROS_DO_ANTIGO:
+        monkeypatch.setattr(modulo, nome, valor)
 
 
 def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:

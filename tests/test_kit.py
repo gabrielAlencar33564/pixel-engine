@@ -27,6 +27,7 @@ from .oraculo import (
     abertura_do_antigo,
     braco_do_antigo,
     cabeca_do_antigo,
+    membros_do_antigo,
     no_canvas_antigo,
     tronco_do_antigo,
 )
@@ -50,6 +51,7 @@ def test_cada_variacao_monta(peca: str, nome: str, args: dict[str, Any], monkeyp
         tronco_do_antigo(monkeypatch)  # e o tronco e os ombros mudaram de forma: compara-se no tronco do antigo
         cabeca_do_antigo(monkeypatch)  # a cabeça, os olhos e o cabelo também
         abertura_do_antigo(monkeypatch)  # e as pernas, que abriam para fora
+        membros_do_antigo(monkeypatch)  # e as juntas, as mãos e os pés nas formas do corpo real
     quer = ESPERADO[f"{peca}/{nome}"]["S"]
     feito = rgba_da_variacao(peca, args, quer["tamanho"])
     chave = "sem_chao_sha256" if PECAS[peca].tipo == "quadrupede" else "rgba_sha256"  # a pegada do quadrúpede mudou

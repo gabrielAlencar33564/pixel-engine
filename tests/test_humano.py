@@ -1,6 +1,6 @@
 """O humano: o corpo vestido dá o mesmo pixel que o `pixel-engine` no parado e no andar, nas 8 direções, quadro a
-quadro (no tronco, na cabeça, na abertura das pernas e do braço, no balanço e no apoio dele: os da engine mudaram de
-propósito);
+quadro (no tronco, na cabeça, nos membros, na abertura das pernas e do braço, no balanço e no apoio dele: os da engine
+mudaram de propósito);
 cada peça de roupa veste o corpo; o peito e a cintura são uma massa só, sem linha entre os dois; a saia segue a coxa
 ao andar; e quem anda tem as 8 direções."""
 
@@ -41,6 +41,7 @@ from .oraculo import (
     balanco_do_antigo,
     braco_do_antigo,
     cabeca_do_antigo,
+    membros_do_antigo,
     no_canvas_antigo,
     sem_as_partes,
     tronco_do_antigo,
@@ -86,6 +87,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
     tronco_do_antigo(monkeypatch)
     cabeca_do_antigo(monkeypatch)
+    membros_do_antigo(monkeypatch)
     abertura_do_antigo(monkeypatch)
     braco_do_antigo(monkeypatch)
     balanco_do_antigo(monkeypatch)
@@ -166,6 +168,22 @@ def test_controle_o_tronco_do_antigo_tem_a_linha_do_busto(monkeypatch: pytest.Mo
     uma, linha = _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "chest", "waist")
     assert not uma and linha >= 4  # a linha sob a bola do peito, de um braço ao outro
     assert not _tronco_numa_massa(_comp("vestido"), "jacket_chest", "jacket_waist")[0]
+
+
+def _membros_numa_massa() -> bool:
+    """De frente, a coxa e a canela sombreiam como um volume só, e o braço e o antebraço também."""
+    massa = _camadas(de_uma_peca("corpo_humano", {}))[0].massa
+    return all(a in massa and b in massa and bool(np.array_equal(massa[a], massa[b]))
+               for a, b in (("thigh_l", "shin_l"), ("upper_arm_r", "forearm_r"), ("shin_r", "j_knee_r")))
+
+
+def test_cada_membro_sombreia_como_uma_massa() -> None:
+    assert _membros_numa_massa()
+
+
+def test_controle_os_membros_do_antigo_sombreiam_parte_a_parte(monkeypatch: pytest.MonkeyPatch) -> None:
+    membros_do_antigo(monkeypatch)
+    assert not _membros_numa_massa()
 
 
 def _na_cabeca(com: str = "") -> Composicao:

@@ -1,4 +1,5 @@
-"""As medidas do corpo humano tiradas do próprio modelo: a máscara inteira de cada parte (sem a oclusão), de frente e
+"""As medidas do corpo humano tiradas do próprio modelo (as do corpo real e, onde a figura é feita para a câmera de
+cima, as da leitura na tela): a máscara inteira de cada parte (sem a oclusão), de frente e
 de perfil, na elevação da radiografia. Cada medida vem com a faixa de um corpo real (o cânone de desenho e a
 antropometria, com folga): fora dela, a forma lê errada antes de qualquer pixel, e não há roupa nem pose que a conserte.
 
@@ -116,6 +117,36 @@ def _pernas(c: _Corpo) -> list[Medida]:
                    "tela e parece flutuar")]
 
 
+def _a(m: Mascara, onde: float) -> int:
+    """A largura da parte na fileira a ``onde`` (0 = o alto, 1 = o baixo) da altura dela."""
+    alto, baixo = _fileiras(m)
+    return _largura(m, round(alto + onde * (baixo - alto)))
+
+
+def _maior(m: Mascara) -> int:
+    return max(_largura(m, y) for y in range(_fileiras(m)[0], _fileiras(m)[1] + 1))
+
+
+def _membros(c: _Corpo, perfil: Mascaras) -> list[Medida]:
+    """As formas simples dos membros: a figura é para a câmera de cima, e o que se mede é a leitura na tela."""
+    ms = c.ms
+    juntas = max(_maior(ms["j_knee_l"]) / _a(ms["shin_l"], 0.15), _maior(ms["j_ankle_l"]) / _a(ms["shin_l"], 0.95),
+                 _maior(ms["j_elbow_l"]) / _a(ms["forearm_l"], 0.15))
+    pe = _uniao(perfil, "foot_l", "toe_l")
+    xs = np.nonzero(pe.any(axis=0))[0]
+    return [Medida("juntas_sobre_os_membros", juntas, (0.9, 1.1),
+                   "a maior esfera de junta (o joelho, o tornozelo, o cotovelo) sobre a largura do membro ao lado "
+                   "dela; acima da faixa, a junta lê como uma bola no meio do membro"),
+            Medida("tornozelo_sobre_a_coxa", _a(ms["shin_l"], 0.95) / _a(ms["thigh_l"], 0.15), (0.48, 1.0),
+                   "a largura da perna no tornozelo sobre a do alto da coxa; abaixo da faixa, a canela afina até "
+                   "virar um palito de 2 px na tela"),
+            Medida("pe_sobre_a_estatura", (int(xs.max()) - int(xs.min()) + 1) / c.estatura, (0.08, 0.13),
+                   "o comprimento do pé, de perfil, sobre a estatura (o real é 0,15); acima da faixa, na câmera de "
+                   "cima o pé aponta para baixo como um bloco, maior que a mão"),
+            Medida("mao_sobre_o_punho", _maior(ms["hand_l"]) / _maior(ms["j_wrist_l"]), (0.8, 1.25),
+                   "a largura da mão sobre a do punho; abaixo da faixa, a mão é um risco de 1 px na tela")]
+
+
 def _ombros(c: _Corpo) -> list[Medida]:
     esfera = _uniao(c.ms, "j_shoulder_l", "j_shoulder_r")
     alto, baixo = _fileiras(esfera)
@@ -161,4 +192,5 @@ def medidas_do_humano(frente: Mascaras, perfil: Mascaras) -> list[dict[str, Any]
     topo, queixo = _fileiras(_uniao(frente, *CABECA))
     chao = _fileiras(_uniao(frente, "foot_l", "foot_r"))[1]
     corpo = _Corpo(frente, topo, queixo, chao - topo + 1)
-    return [m.dado() for m in (*_rosto(corpo), *_perfil(perfil), *_tronco(corpo), *_ombros(corpo), *_pernas(corpo))]
+    return [m.dado() for m in (*_rosto(corpo), *_perfil(perfil), *_tronco(corpo), *_ombros(corpo), *_pernas(corpo),
+                               *_membros(corpo, perfil))]

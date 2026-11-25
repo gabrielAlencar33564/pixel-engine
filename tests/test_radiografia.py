@@ -26,7 +26,7 @@ from pixel_forge.quality.anatomia import medidas_do_humano
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.grade import Mascara
 
-from .oraculo import abertura_do_antigo, cabeca_do_antigo, tronco_do_antigo
+from .oraculo import abertura_do_antigo, cabeca_do_antigo, membros_do_antigo, tronco_do_antigo
 
 EXEMPLOS = Path(__file__).parent / "fixtures" / "exemplos"
 # as medidas que saíam da faixa do corpo real no modelo do `pixel-engine`, medidas em 2026-11-24: as da cabeça e as
@@ -95,10 +95,11 @@ def _sintetico(**muda: int) -> dict[str, Any]:
     """As medidas de um corpo de proporções reais (240 px de estatura, 40 de cabeça, o centro na coluna 100), com
     os defeitos pedidos: ``olho`` (a fileira dos olhos), ``vao`` e ``sobe`` (o ombro para fora e para cima),
     ``focinho`` (a mandíbula à frente), ``cabelo`` (o fundo do cabelo), ``estreita`` e ``fino`` (o rosto, o pescoço)
-    ``aperta`` (a cintura), ``bola`` (as fileiras do peito, de baixo para cima, com os cantos comidos) e ``abre``
-    (cada tornozelo para fora da junta do quadril)."""
+    ``aperta`` (a cintura), ``bola`` (as fileiras do peito, de baixo para cima, com os cantos comidos), ``abre``
+    (cada tornozelo para fora da junta do quadril), ``joelho`` (a esfera do joelho mais larga), ``palito`` (a metade
+    de baixo da canela e o tornozelo mais finos), ``risco`` (a mão mais fina) e ``pe`` (o pé mais comprido)."""
     d = {"olho": 29, "vao": 0, "sobe": 0, "focinho": 0, "cabelo": 118, "estreita": 0, "fino": 0, "aperta": 0,
-         "bola": 0, "abre": 0, **muda}
+         "bola": 0, "abre": 0, "joelho": 0, "palito": 0, "risco": 0, "pe": 0, **muda}
     e, ombro = d["estreita"], 61 - d["sobe"]
     frente = _caixas(skull=(10, 34, 86, 113), jaw=(30, 46, 88 + e, 111 - e), chin=(44, 49, 94, 105),
                      eye_l=(d["olho"], d["olho"] + 1, 104, 106), eye_r=(d["olho"], d["olho"] + 1, 93, 95),
@@ -107,14 +108,20 @@ def _sintetico(**muda: int) -> dict[str, Any]:
                      j_shoulder_l=(ombro, ombro + 12, 126 + d["vao"], 138 + d["vao"]),
                      j_shoulder_r=(ombro, ombro + 12, 61 - d["vao"], 73 - d["vao"]),
                      j_hip_l=(140, 150, 108, 118), j_hip_r=(140, 150, 82, 92),
-                     j_ankle_l=(232, 240, 109 + d["abre"], 117 + d["abre"]),
+                     j_ankle_l=(232, 240, 109 + d["abre"] + d["palito"], 117 + d["abre"] - d["palito"]),
                      j_ankle_r=(232, 240, 83 - d["abre"], 91 - d["abre"]),
+                     thigh_l=(150, 190, 104, 116), shin_l=(190, 232, 104, 115),
+                     j_knee_l=(184, 196, 104 - d["joelho"], 116 + d["joelho"]), j_elbow_l=(96, 104, 131, 137),
+                     forearm_l=(100, 140, 131, 137), j_wrist_l=(137, 143, 131, 137),
+                     hand_l=(140, 152, 131 + d["risco"], 136 - d["risco"]),
                      foot_l=(240, 249, 104, 114), foot_r=(240, 249, 85, 95))
+    frente["shin_l"][212:233, 104:104 + d["palito"]] = False
+    frente["shin_l"][212:233, 116 - d["palito"]:116] = False
     for colunas in (slice(70, 78), slice(122, 130)):  # os cantos de baixo do peito, até a largura da cintura
         frente["chest"][111 - d["bola"]:111, colunas] = False
     nariz = (31, 35, 80, 80) if d["focinho"] else (31, 35, 76, 80)
     perfil = _caixas(skull=(10, 34, 80, 113), jaw=(30, 46, 80 - d["focinho"], 105), chin=(44, 49, 82, 95),
-                     nose=nariz, hair_cap=(8, 30, 84, d["cabelo"]))
+                     nose=nariz, hair_cap=(8, 30, 84, d["cabelo"]), foot_l=(240, 249, 70 - d["pe"], 96))
     perfil["skull"] = perfil["skull"] | perfil.pop("nose")
     return {m["medida"]: m for m in medidas_do_humano(frente, perfil)}
 
@@ -127,7 +134,9 @@ def test_a_regua_aceita_o_corpo_de_proporcoes_reais() -> None:
     ({"olho": 16}, "olhos_na_cabeca"), ({"vao": 12}, "vao_no_ombro"), ({"sobe": 12}, "ombro_sobre_o_queixo"),
     ({"focinho": 3}, "ponta_do_perfil"), ({"cabelo": 126}, "cabelo_sobre_o_cranio"),
     ({"estreita": 4}, "rosto_sobre_o_cranio"), ({"fino": 3}, "pescoco"), ({"aperta": 8}, "cintura_sobre_o_peito"),
-    ({"bola": 36}, "peito_na_caixa"), ({"abre": 8}, "pes_sobre_o_quadril")])
+    ({"bola": 36}, "peito_na_caixa"), ({"abre": 8}, "pes_sobre_o_quadril"),
+    ({"joelho": 2}, "juntas_sobre_os_membros"), ({"palito": 4}, "tornozelo_sobre_a_coxa"),
+    ({"risco": 2}, "mao_sobre_o_punho"), ({"pe": 10}, "pe_sobre_a_estatura")])
 def test_controle_a_regua_acusa_cada_defeito(defeito: dict[str, int], medida: str) -> None:
     assert [m["medida"] for m in _sintetico(**defeito).values() if not m["ok"]] == [medida]
 
@@ -157,6 +166,12 @@ def test_controle_o_tronco_do_antigo_sai_da_faixa(monkeypatch: pytest.MonkeyPatc
 def test_controle_a_abertura_do_antigo_sai_da_faixa(monkeypatch: pytest.MonkeyPatch) -> None:
     abertura_do_antigo(monkeypatch)
     assert _defeitos_do_kit() == {"pes_sobre_o_quadril"}
+
+
+def test_controle_os_membros_do_antigo_saem_da_faixa(monkeypatch: pytest.MonkeyPatch) -> None:
+    membros_do_antigo(monkeypatch)
+    assert _defeitos_do_kit() == {"juntas_sobre_os_membros", "tornozelo_sobre_a_coxa", "pe_sobre_a_estatura",
+                                  "mao_sobre_o_punho"}
 
 
 def test_controle_a_cabeca_do_antigo_sai_da_faixa(monkeypatch: pytest.MonkeyPatch) -> None:

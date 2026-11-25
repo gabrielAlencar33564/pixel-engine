@@ -338,6 +338,27 @@ A regra entrou em `docs/regras.md`.
   dele). Os esperados não foram regerados (I11).
 - O que sobra: o alto do ovo sai com 1 px de ponta em algumas estaturas e vistas (o polo do elipsoide na grade).
 
+## O humano: os membros em formas simples (decisão do dono, 2026-11-25)
+
+O dono pediu o resto do corpo pela regra da cabeça em ovo: formas simples, para a câmera de cima.
+
+- A esfera de cada junta tem o raio do membro (`R_JUNTAS`; o cotovelo tinha 1,15, o joelho e o tornozelo 1,1), e o
+  antebraço e a canela começam com o raio da junta (`DEPOIS_DA_JUNTA`): não há mais a bola no meio do membro. No
+  boneco de madeira as esferas do cotovelo e do joelho deixam de aparecer; o catálogo diz.
+- A perna é um tubo que afina pouco: a coxa 0,045 e o tornozelo 0,025 da estatura de raio (eram 0,047 e 0,021: a
+  canela virava um palito de 2 px).
+- O pé tem 0,12 da estatura (`PE`; o real, 0,152) e é mais baixo (`PE_ALTO`): comprido, de frente apontava para
+  baixo como um bloco maior que a mão, e de perfil lia como sapato de palhaço. O calçado segue o pé.
+- A mão é uma forma curta da largura do punho (`MAO_FORMA`): era um elipsoide de 0,6 do punho de largura, um risco
+  de 1 px na tela. A mão do raio do punho vezes 1,15 foi medida e não veio: lia como luva.
+- Cada membro sombreia como uma massa só (`MASSA_DO_MEMBRO`), como o tronco.
+- A régua ganha quatro medidas de leitura (`juntas_sobre_os_membros`, `tornozelo_sobre_a_coxa`,
+  `pe_sobre_a_estatura`, `mao_sobre_o_punho`); os membros do antigo saem da faixa nas quatro. O oráculo os repõe
+  (`membros_do_antigo`): as formas viraram constantes do kit antes de mudar de valor, com os pixels conferidos
+  iguais. Os esperados não foram regerados (I11).
+- O que mudou de visibilidade (seis composições): as esferas do cotovelo e do joelho somem em todas as vistas; de
+  costas, com a saia, as mãos (mais curtas) ficam atrás do quadril.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..construtor import AssetBuilder, Junta, Parte, ellipse, polyline, q, qv
-from .humano import R_OMBRO, SIDES, cranio, frente_da_cabeca, frente_do_peito, peito, taper, trapezio
+from .humano import PE_ALTO, R_OMBRO, SIDES, cranio, frente_da_cabeca, frente_do_peito, peito, taper, trapezio
 
 Regra = dict[str, str]
 # a jaqueta sobre o tronco: a folga do peito dela na profundidade e na largura (vezes, mais), o centro e a meia
@@ -228,8 +228,8 @@ def sandalia(v: Veste) -> Vista:
     for side, _ in SIDES:
         v.part(f"sole_{side}", ellipse(qv(0, 0.18 * pe, -1.05 * az - 0.1), qv(rc * 1.6, 0.52 * pe, 0.35)),
                (f"foot_{side}", f"sandal_{side}"))
-        v.part(f"strap_{side}", ellipse(qv(0, 0.20 * pe, -0.55 * az), qv(rc * 1.45, 0.10 * pe, 0.72 * az * 0.6 + 0.3)),
-               (f"foot_{side}", f"sandal_{side}"), v.mat2)
+        tira = qv(rc * 1.45, 0.10 * pe, PE_ALTO[0] * az * 0.6 + 0.3)
+        v.part(f"strap_{side}", ellipse(qv(0, 0.20 * pe, -0.55 * az), tira), (f"foot_{side}", f"sandal_{side}"), v.mat2)
     return Vista(rules=[regra(f"strap_{s}", f"foot_{s}") for s, _ in SIDES])
 
 
@@ -238,10 +238,10 @@ def tabi(v: Veste) -> Vista:
     pe, az, rc = v.c["pe"], v.c["tornozelo_z"], v.c["r_canela"]
     for side, _ in SIDES:
         v.part(f"tabi_{side}", ellipse(qv(0, 0.02 * pe, -0.40 * az),
-                                       qv(rc * 1.4 + 0.2, 0.30 * pe + 0.2, 0.72 * az + 0.5)),
+                                       qv(rc * 1.4 + 0.2, 0.30 * pe + 0.2, PE_ALTO[0] * az + 0.5)),
                (f"foot_{side}", f"tabi_{side}"))
         v.part(f"tabi_toe_{side}", ellipse(qv(0, 0.42 * pe, -0.60 * az), qv(rc * 1.3 + 0.2, 0.28 * pe + 0.2,
-                                                                             0.45 * az + 0.3)),
+                                                                             PE_ALTO[1] * az + 0.3)),
                (f"foot_{side}", f"tabi_{side}"))
     return Vista(cobre=[f"{p}_{s}" for s, _ in SIDES for p in ("foot", "toe", "j_ankle")])
 

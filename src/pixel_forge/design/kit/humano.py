@@ -14,14 +14,26 @@ from ..construtor import AssetBuilder, Parte, ellipse, q, qv
 from ..escala import PX_POR_M
 from .esqueleto import monta
 
-PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.167, 0.131, 0.108, 0.039, 0.152
+# o pé tem 0,12 da estatura (o real, 0,152): na câmera de cima o pé comprido aponta para baixo como um bloco, e de
+# perfil lê como sapato de palhaço
+PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.167, 0.131, 0.108, 0.039, 0.12
 # o tornozelo fica sob a junta do quadril (a perna desce reta): mais aberto, de frente as canelas passam da largura
 # do tronco, e de perfil a câmera a 45° sobe o pé de lá na tela (a 0,080 ele flutuava no meio da canela)
 OMBRO_X, QUADRIL_X, TORNOZELO_X = 0.105, 0.050, 0.050
 PEITO_X, CINTURA_X, QUADRIL_LARG_X, PEITO_Y = 0.090, 0.075, 0.095, 0.060
 COXA_DA_PERNA = 0.499
-R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.047, 0.034, 0.021, 0.027, 0.023, 0.018,
+# a perna é um tubo que afina pouco (a canela real afina até 0,021 da estatura: na tela, um palito de 2 px)
+R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.045, 0.034, 0.025, 0.027, 0.023, 0.018,
                                                                            0.032)
+# as juntas e os membros são formas simples, para a câmera de cima. A esfera de cada junta tem o raio do segmento
+# (o cotovelo, o punho, o quadril, o joelho, o tornozelo): maior, vira uma bola no meio do membro. O antebraço e a
+# canela começam com o raio da junta. A mão é uma forma curta da largura do punho (os raios x e y sobre o do punho
+# e a meia altura sobre o comprimento dela): mais fina, na tela é um risco de 1 px. O pé é baixo (a meia altura do
+# calcanhar e a da ponta, sobre a altura do tornozelo). Cada membro sombreia como uma massa só
+R_JUNTAS = (1.0, 1.0, 0.95, 1.0, 1.0)
+DEPOIS_DA_JUNTA, MAO_FORMA, PE_ALTO = (1.0, 1.0), (0.9, 1.2, 0.34), (0.55, 0.40)
+MASSA_DO_MEMBRO: tuple[str, ...] = ("shade_group",)
+QUADRIL: tuple[str, tuple[str, ...]] = ("pelvis", ())  # o grupo de contorno e as marcas do quadril
 # o ombro: a junta fica OMBRO_CAI abaixo da base do pescoço (o alto do ombro, 3 % da estatura abaixo do queixo), e
 # a esfera dela tem R_OMBRO vezes o raio do braço
 OMBRO_CAI, R_OMBRO = 0.035, 1.25
@@ -150,7 +162,7 @@ def _tronco(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
     t = c["tronco"]
     b.part("pelvis_block", pele, ellipse(qv(0, -0.2, 0.9), qv(c["quadril_larg_x"], c["peito_y"] * 0.85,
                                                              0.11 * c["estatura"] * 0.5)),
-           Parte(bone="pelvis_tilt", group="pelvis"))
+           Parte(bone="pelvis_tilt", group=QUADRIL[0], tags=QUADRIL[1]))
     massa = Parte(bone="torso", group="torso", tags=("shade_group",))  # o peito e a cintura: uma massa só
     b.part("waist", pele, ellipse(qv(0, 0, CINTURA[0] * t), qv(c["cintura_x"], c["peito_y"] * 0.75, CINTURA[1] * t)),
            massa)
@@ -170,32 +182,35 @@ def _cabeca(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
 
 
 def _membros(b: AssetBuilder, c: dict[str, float], pele: str, side: str) -> None:
+    def em(osso: str, grupo: str) -> Parte:
+        return Parte(bone=f"{osso}_{side}", group=f"{grupo}_{side}", tags=MASSA_DO_MEMBRO)
+
     b.part(f"upper_arm_{side}", pele, taper((0.08, 1.0), c["braco"], (c["r_braco"], c["r_cotovelo"])),
-           Parte(bone=f"upper_arm_{side}", group=f"arm_{side}"))
-    b.part(f"forearm_{side}", pele, taper((0.08, 1.0), c["antebraco"], (c["r_cotovelo"] * 0.95, c["r_punho"])),
-           Parte(bone=f"forearm_{side}", group=f"arm_{side}"))
-    b.part(f"hand_{side}", pele, ellipse(qv(0, 0.1, -0.45 * c["mao"]), qv(c["r_punho"] * 0.6, c["r_punho"] * 1.5,
-                                                                           0.45 * c["mao"])),
-           Parte(bone=f"hand_{side}", group=f"hand_{side}"))
-    b.part(f"thigh_{side}", pele, taper((0.06, 1.0), c["coxa"], (c["r_coxa"], c["r_joelho"])),
-           Parte(bone=f"thigh_{side}", group=f"leg_{side}"))
-    b.part(f"shin_{side}", pele, taper((0.06, 1.0), c["canela"], (c["r_joelho"] * 0.92, c["r_canela"])),
-           Parte(bone=f"shin_{side}", group=f"leg_{side}"))
+           em("upper_arm", "arm"))
+    b.part(f"forearm_{side}", pele, taper((0.08, 1.0), c["antebraco"], (c["r_cotovelo"] * DEPOIS_DA_JUNTA[0],
+                                                                       c["r_punho"])), em("forearm", "arm"))
+    mx, my, mz = MAO_FORMA
+    b.part(f"hand_{side}", pele, ellipse(qv(0, 0.1, -mz * c["mao"]), qv(c["r_punho"] * mx, c["r_punho"] * my,
+                                                                         mz * c["mao"])), em("hand", "hand"))
+    b.part(f"thigh_{side}", pele, taper((0.06, 1.0), c["coxa"], (c["r_coxa"], c["r_joelho"])), em("thigh", "leg"))
+    b.part(f"shin_{side}", pele, taper((0.06, 1.0), c["canela"], (c["r_joelho"] * DEPOIS_DA_JUNTA[1], c["r_canela"])),
+           em("shin", "leg"))
     pe, az, rc = c["pe"], c["tornozelo_z"], c["r_canela"]
-    b.part(f"foot_{side}", pele, ellipse(qv(0, 0.02 * pe, -0.40 * az), qv(rc * 1.4, 0.30 * pe, 0.72 * az + 0.3)),
-           Parte(bone=f"foot_{side}", group=f"foot_{side}"))
-    b.part(f"toe_{side}", pele, ellipse(qv(0, 0.42 * pe, -0.60 * az), qv(rc * 1.3, 0.28 * pe, 0.45 * az + 0.15)),
-           Parte(bone=f"foot_{side}", group=f"foot_{side}"))
+    b.part(f"foot_{side}", pele, ellipse(qv(0, 0.02 * pe, -0.40 * az), qv(rc * 1.4, 0.30 * pe, PE_ALTO[0] * az + 0.3)),
+           em("foot", "foot"))
+    b.part(f"toe_{side}", pele, ellipse(qv(0, 0.42 * pe, -0.60 * az), qv(rc * 1.3, 0.28 * pe, PE_ALTO[1] * az + 0.15)),
+           em("foot", "foot"))
 
 
 def _juntas(b: AssetBuilder, c: dict[str, float], junta: str, side: str) -> None:
     for jid, bone, r, grp in ((f"j_shoulder_{side}", f"upper_arm_{side}", c["r_braco"] * R_OMBRO, f"arm_{side}"),
-                              (f"j_elbow_{side}", f"forearm_{side}", c["r_cotovelo"] * 1.15, f"arm_{side}"),
-                              (f"j_wrist_{side}", f"hand_{side}", c["r_punho"] * 1.0, f"hand_{side}"),
-                              (f"j_hip_{side}", f"thigh_{side}", c["r_coxa"] * 0.95, f"leg_{side}"),
-                              (f"j_knee_{side}", f"shin_{side}", c["r_joelho"] * 1.1, f"leg_{side}"),
-                              (f"j_ankle_{side}", f"foot_{side}", c["r_canela"] * 1.1, f"foot_{side}")):
-        b.part(jid, junta, ellipse(qv(0, 0, 0), qv(r, r, r)), Parte(bone=bone, group=grp, tags=("joint",)))
+                              (f"j_elbow_{side}", f"forearm_{side}", c["r_cotovelo"] * R_JUNTAS[0], f"arm_{side}"),
+                              (f"j_wrist_{side}", f"hand_{side}", c["r_punho"] * R_JUNTAS[1], f"hand_{side}"),
+                              (f"j_hip_{side}", f"thigh_{side}", c["r_coxa"] * R_JUNTAS[2], f"leg_{side}"),
+                              (f"j_knee_{side}", f"shin_{side}", c["r_joelho"] * R_JUNTAS[3], f"leg_{side}"),
+                              (f"j_ankle_{side}", f"foot_{side}", c["r_canela"] * R_JUNTAS[4], f"foot_{side}")):
+        b.part(jid, junta, ellipse(qv(0, 0, 0), qv(r, r, r)),
+               Parte(bone=bone, group=grp, tags=("joint", *MASSA_DO_MEMBRO)))
 
 
 def corpo(b: AssetBuilder, c: dict[str, float], pele: str, junta: str) -> None:
