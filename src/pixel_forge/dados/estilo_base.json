@@ -441,6 +441,46 @@
     74,
     255
    ]
+  },
+  {
+   "index": 50,
+   "id": "cinza_fundo",
+   "rgba": [
+    44,
+    42,
+    40,
+    255
+   ]
+  },
+  {
+   "index": 51,
+   "id": "cinza_escuro",
+   "rgba": [
+    74,
+    71,
+    66,
+    255
+   ]
+  },
+  {
+   "index": 52,
+   "id": "cinza",
+   "rgba": [
+    112,
+    108,
+    99,
+    255
+   ]
+  },
+  {
+   "index": 53,
+   "id": "cinza_claro",
+   "rgba": [
+    158,
+    153,
+    140,
+    255
+   ]
   }
  ],
  "materials": [
@@ -1071,25 +1111,65 @@
   {
    "id": "casca_cinzenta",
    "ramp": [
-    27,
-    20,
-    21,
-    26
+    50,
+    51,
+    52,
+    53
    ],
    "outline_index": 1,
    "texture": {
-    "density_permille": 600,
-    "depth_permille": 330,
+    "density_permille": 700,
+    "depth_permille": 500,
     "grain": "along",
     "jitter_permille": 60,
     "kind": "dashes",
     "length_px": [
      3,
-     7
+     8
     ],
-    "lift_permille": 0,
+    "lift_permille": 400,
     "period_px": 3,
     "seed": 53
+   }
+  },
+  {
+   "id": "cinza",
+   "ramp": [
+    51,
+    52,
+    53
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "cinza_fundo",
+   "ramp": [
+    50,
+    50
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "copa_cinzenta",
+   "ramp": [
+    50,
+    51,
+    52,
+    53
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 350,
+    "depth_permille": 330,
+    "jitter_permille": 100,
+    "kind": "dashes",
+    "length_px": [
+     1,
+     2
+    ],
+    "lift_permille": 300,
+    "period_px": 2,
+    "seed": 59
    }
   }
  ],
