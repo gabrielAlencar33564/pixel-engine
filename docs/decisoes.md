@@ -287,9 +287,10 @@ Depois da mudança 12 o dono ainda viu o cabelo como um gorro e a cabeça sem fo
   dois lados. Os controles: a face de 0,62, o nariz a 42 %, o nariz rente à face e o cabelo sem as mechas.
 - O que mudou de visibilidade: de perfil a mecha de lá fica escondida, e o queixo passa a aparecer. Olho e chapéu
   não mudaram.
-- O que sobra: a ponta do perfil fica a 0,32 da cabeça, perto do piso da faixa (0,30); em duas estaturas de cada
-  dez o nariz ainda cai na fileira do olho, por arredondamento; no corpo de 1,68 m e 105 % de largura o pescoço
-  mede 0,059 (a faixa começa em 0,060), e já media antes desta mudança.
+- O que sobra: a ponta do perfil fica a 0,32 da cabeça, perto do piso da faixa (0,30); abaixo de 1,50 m e em
+  algumas estaturas acima (1,64 e 1,74 m, entre as medidas) o nariz ainda acaba na fileira do olho, por
+  arredondamento; no corpo de 1,68 m e 105 % de largura o pescoço mede 0,059 (a faixa começa em 0,060), e já
+  media antes desta mudança.
 
 ## O remoto (pedido do dono, 2026-11-23)
 
