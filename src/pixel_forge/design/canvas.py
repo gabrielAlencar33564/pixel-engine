@@ -25,7 +25,8 @@ def projeta(part: dict[str, Any]) -> bool:
 
 
 class _Caixa:
-    def __init__(self) -> None:
+    def __init__(self, folga: int) -> None:
+        self.folga = folga  # a margem do canvas em px
         self.us: list[float] = []
         self.vs: list[float] = []
         self.projeta = False  # a parte da vez projeta sombra no chão
@@ -63,8 +64,13 @@ class _Caixa:
             self.elipse(g, rot)
             return
         if t == "bound_polygon" or "points_q8" in g:
-            raio = g.get("thickness_px", 1) / 2 if "points_q8" in g else 0.0
-            for p in pontos(g):
+            pts = pontos(g)
+            # o fino conta a meia espessura e a face, nada; o traço roliço conta o raio de cada ponto no que ele
+            # passa da margem do canvas (o que cabe nela fica como estava: o tronco grosso deitado saía cortado)
+            fino = g.get("thickness_px", 1) / 2 if "points_q8" in g else 0.0
+            raios = ([max(fino, r / 256 - self.folga) for r in g["radii_q8"]] if "radii_q8" in g
+                     else [fino] * len(pts))
+            for p, raio in zip(pts, raios, strict=True):
                 self.ponto(p, raio, rot)
             return
         estacoes = g.get("stations", [])
@@ -77,7 +83,7 @@ class _Caixa:
 
 
 def canvas_do_prop(parts: list[dict[str, Any]], margem: int, azimutes: tuple[int, ...]) -> dict[str, Any]:
-    caixa = _Caixa()
+    caixa = _Caixa(margem)
     for az in azimutes:
         rot = (round(math.cos(math.radians(az / 1000))), round(math.sin(math.radians(az / 1000))))
         caixa.ponto((0.0, 0.0, 0.0), 0.5, rot)  # o pixel do pivô (e o ponto logo acima dele) cabe no canvas

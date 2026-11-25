@@ -505,3 +505,6 @@ O dono pediu variações de tronco, para ele não ser simples e só cilíndrico.
   tom calculado na peça (o verde não tem família de degraus). O teste mede o ovo: a pedra cobre até 90 % do ovo
   inscrito na caixa dela, e o elipsoide, 93 % ou mais (o controle).
 
+- O canvas do prop conta o raio do traço roliço no que ele passa da margem (o tronco grosso deitado, de 18 cm de
+  raio, saía cortado: o canvas contava só a meia espessura do traço fino). O que já cabia na margem fica igual (o
+  oráculo não muda); o controle em tests/test_canvas_rolico.py recusa o tronco do jeito antigo.
