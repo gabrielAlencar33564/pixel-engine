@@ -298,8 +298,9 @@ O dono pediu a análise do quadril, das pernas e dos pés, e escolheu começar p
 
 - O tornozelo fica sob a junta do quadril (`TORNOZELO_X` 0,050 da estatura; eram 0,080). A perna desce reta. Antes
   os tornozelos ficavam a 26 cm um do outro, com as juntas do quadril a 17 cm: de frente as canelas passavam da
-  largura do tronco (os pés a 8,9 px um do outro), e de perfil a câmera a 45° punha o pé de lá 5,3 px acima do de
-  cá, no meio da canela. Agora são 5,4 px e 3,2 px. O andar usa a mesma abertura e muda junto.
+  largura do tronco (os pés a 8,6 px um do outro, no corpo de 1,65 m), e de perfil a câmera a 45° punha o pé de
+  lá 5,2 px acima do de cá, no meio da canela. Agora são 5,4 px e 3,2 px. O andar usa a mesma abertura e muda
+  junto.
 - A medida nova `pes_sobre_o_quadril` (a distância entre os tornozelos sobre a das juntas do quadril, de 0,6 a
   1,15) entra na radiografia: dava 1,56 e dá 1,0. O teste na câmera do jogo confere os pés de frente e de perfil;
   o controle é a abertura do antigo, que o oráculo repõe (`abertura_do_antigo`). Os esperados não foram regerados
