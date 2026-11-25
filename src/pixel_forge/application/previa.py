@@ -1,7 +1,8 @@
 """A prévia, o checar e o conjunto: o que a prévia aceita, o build aceita (I8). A prévia confere o repouso de cada
 vista com as recusas do build (o porte, o quadro cortado, as cores, o traço que não lê), grava a prancha e diz, por
-vista, as partes que ninguém vê e os pixels de cada traço; o checar confere todos os quadros do build sem gravar nada;
-o conjunto põe assets lado a lado, na mesma escala, com o humano de 1,65 m de régua."""
+vista, as partes que ninguém vê e os pixels de cada traço (e, da flora, as medidas e os achados da crítica); o checar
+confere todos os quadros do build sem gravar nada; o conjunto põe assets lado a lado, na mesma escala, com o humano
+de 1,65 m de régua."""
 
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from ..export.imagem import salvar_png
 from ..quality.quadro import conferir_quadro, conferir_tracos, leitura_dos_tracos
 from ..raster.estilo import estilo_render
 from ..raster.renderer import Quadro
+from . import critica
 from .build import renderizar
 from .estilo import estilo_base
 from .prancha import amplia_para, grade
@@ -42,19 +44,23 @@ def previa(comp: Composicao, acervo: Path) -> dict[str, Any]:
     por_vista: dict[str, list[Quadro]] = {d: [q] for d, q in quadros.items()}
     conferir_tracos(comp.tracos, por_vista)
     imagens = [q.to_rgba(pal) for q in quadros.values()]
-    # as partes que a vista desenha (a peça não as escondeu) e que não ganham pixel: outra as cobre
-    escondidas = {d: [p.id for p in ir.parts if p.id not in ir.views[d].visibility and p.id not in q.visiveis]
+    # as partes que a vista desenha (a peça não as escondeu) e que não ganham pixel: outra as cobre. O volume de
+    # uma massa de folhagem não conta: o lado de lá da copa fica sempre escondido
+    soltas = [p.id for p in ir.parts if not any(t.startswith("massa_") for t in p.tags)]
+    escondidas = {d: [p for p in soltas if p not in ir.views[d].visibility and p not in q.visiveis]
                   for d, q in quadros.items()}
     amplia = amplia_para(ir.canvas.height)
     alvo = acervo / "previas" / f"{comp.id}.r{comp.revision}.png"
     salvar_png(alvo, grade([imagens], amplia))
     alt = altura_m(ir)
-    return {"prancha": str(alvo), "amplia": amplia, "vistas": list(ir.views),
-            "canvas": [ir.canvas.width, ir.canvas.height], "altura_m": round(alt, 2),
-            "porte": f"{alt / ESTATURA_M:.2f}× o humano ({comp.categoria})", "partes": [p.id for p in ir.parts],
-            "escondidas": {d: ps for d, ps in escondidas.items() if ps},
-            "tracos": leitura_dos_tracos(comp.tracos, por_vista),
-            "segundos": round(time.perf_counter() - t0, 2)}
+    out = {"prancha": str(alvo), "amplia": amplia, "vistas": list(ir.views),
+           "canvas": [ir.canvas.width, ir.canvas.height], "altura_m": round(alt, 2),
+           "porte": f"{alt / ESTATURA_M:.2f}× o humano ({comp.categoria})", "partes": [p.id for p in ir.parts],
+           "escondidas": {d: ps for d, ps in escondidas.items() if ps},
+           "tracos": leitura_dos_tracos(comp.tracos, por_vista)}
+    if critica.e_flora(comp):  # a flora já sai medida: os achados da crítica, sem as irmãs do acervo
+        out["critica"] = critica.da_previa(comp, ir, quadros.get("S", next(iter(quadros.values()))))
+    return {**out, "segundos": round(time.perf_counter() - t0, 2)}
 
 
 def checar(comp: Composicao) -> dict[str, Any]:

@@ -37,6 +37,8 @@ class Quadro:
     part_table: list[str] = field(default_factory=list)
     visiveis: dict[str, int] = field(default_factory=dict)  # os pixels de que cada parte é dona, já com a oclusão
     na_silhueta: dict[str, int] = field(default_factory=dict)  # deles, os que tocam o vazio (a borda da figura)
+    # o dono de cada pixel da figura: o número da parte em ``part_table`` mais 1 (0 = vazio ou a sombra no chão)
+    dono: Buf16 = field(default_factory=lambda: np.zeros((0, 0), np.uint16))
 
     def to_rgba(self, palette: dict[int, tuple[int, int, int, int]]) -> npt.NDArray[np.uint8]:
         lut = np.zeros((65536, 4), dtype=np.uint8)
@@ -88,6 +90,7 @@ def _recorte(est: EstiloRender, cam: Camadas, scene: Scene2D,
     limpar_isolados(est, q.index, np.where(chao[crop], 0, q.alpha), material[crop], lut[cam.part[crop]])
     figura = cam.part != 0
     q.visiveis, q.na_silhueta = _contar(cam, inside & figura), _contar(cam, inside & _borda(figura))
+    q.dono = cam.part[crop].copy()
     return q
 
 

@@ -102,6 +102,10 @@ class Peca:
     vistas: tuple[str, ...] = ("S",)
     ancoras: tuple[str, ...] = ()
     tipo: Literal["prop", "humanoide", "quadrupede"] = "prop"
+    # os nós de antes de que a peça precisa na prancha e no teste (a âncora que ela pede): (id, peça, argumentos)
+    apoio: tuple[tuple[str, str, dict[str, Any]], ...] = ()
+    # o papel da peça na planta, que a crítica mede: a massa de folhas, a lâmina (o capim, a palma) ou o lenho
+    flora: Literal["", "folhagem", "lamina", "lenho"] = ""
 
 
 def _erro(peca: str, msg: str, onde: str) -> Recusa:

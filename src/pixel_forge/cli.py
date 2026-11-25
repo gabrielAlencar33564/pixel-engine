@@ -4,6 +4,7 @@
     checar <composição>        todos os quadros do build conferidos, sem gravar nada
     build <composição>         os quadros no acervo (a composição entra em composicoes/, identidade imutável)
     exportar <build>           o pacote do jogo (pfe-jogo/1); --verificar relê e confere; --publicar pede a revisão
+    critica <build>            a flora medida e comparada com as irmãs, e a prancha de quem revisa; --parecer registra
     olhar <build>              a prancha de todos os quadros do pacote e os números
     radiografia <composição>   o modelo ampliado, de frente, de perfil e de costas, e as medidas do corpo
     catalogo                   as peças do kit: para que servem, os argumentos e a prancha
@@ -24,7 +25,7 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
-from .application import acervo, previa, revisao
+from .application import acervo, critica, previa, revisao
 from .application.build import construir
 from .application.catalogo import catalogo
 from .application.exportar import exportar, verificar
@@ -59,6 +60,7 @@ def _exportar(a: argparse.Namespace) -> dict[str, Any]:
             raise Recusa("EXPORT_DIVERGE", f"O pacote relido diverge do build: {'; '.join(problemas[:5])}.",
                          "Exporte de novo com `pfe exportar <build>`.")
         return {"verificado": True}
+    critica.conferir_entrega(build)
     return {"atlas": str(revisao.publicar(build) if a.publicar else exportar(build))}
 
 
@@ -66,6 +68,13 @@ def _catalogo(a: argparse.Namespace) -> dict[str, Any]:
     destino = acervo.pasta_do_acervo(a.acervo) / "catalogo"
     destino.mkdir(parents=True, exist_ok=True)
     return {"index": str(catalogo(destino))}
+
+
+def _critica(a: argparse.Namespace) -> dict[str, Any]:
+    build = Path(a.build)
+    if a.parecer is None:
+        return critica.criticar(build)
+    return critica.registrar_parecer(build, Path(a.parecer), a.por or "")
 
 
 def _revisar(a: argparse.Namespace) -> dict[str, Any]:
@@ -82,6 +91,8 @@ COMANDOS: dict[str, tuple[str, Comando, tuple[str, ...]]] = {
                ("composicao",)),
     "build": ("os quadros da composição, no acervo", _build, ("composicao", "--acervo")),
     "exportar": ("o pacote do jogo (pfe-jogo/1) de um build", _exportar, ("build", "--verificar", "--publicar")),
+    "critica": ("a flora medida e comparada com as irmãs do acervo, e a prancha de quem revisa", _critica,
+                ("build", "--parecer", "--por")),
     "olhar": ("a prancha de todos os quadros do pacote e os números", lambda a: olhar(Path(a.build)), ("build",)),
     "radiografia": ("o modelo ampliado, de frente, de perfil e de costas, e as medidas do corpo",
                     lambda a: radiografia(_comp(a), acervo.pasta_do_acervo(a.acervo)), ("composicao", "--acervo")),

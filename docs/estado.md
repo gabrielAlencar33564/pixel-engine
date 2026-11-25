@@ -7,13 +7,15 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 
 - **Núcleo** igual ao `pixel-engine` pixel a pixel (oráculo por `git archive`): q8, IR, FK/IK de 2 e de N segmentos,
   a câmera 3/4 oblíqua (profundidade 0,6, os dois), a projeção, o raster e o pacote `pfe-jogo/1`. Motor 0.2.0.
-- **Kit vigente** (37 peças): construção, telhados, carpintaria, vãos, formas, a flora em volumes (`tronco_em_pe`,
-  `galhos`, `copa`, `copa_conica`), o humano com as roupas (e as novas saia e lenço) e a espada, o penedo, o corpo canino.
-  Composição num formato só, com o porte.
+- **Kit vigente** (40 peças): construção, telhados, carpintaria, vãos, formas, a flora em sete construções
+  (`tronco_em_pe`, `galhos`, `copa`, `copa_aberta`, `copa_conica`, `touceira`, `salpico`), o humano com as roupas (e as
+  novas saia e lenço) e a espada, o penedo, o corpo canino. Composição num formato só, com o porte.
 - **Movimento:** o parado, a passada e o golpe de espada (sem laço) do humano, o parado e o passo do quadrúpede, o
   balanço e o giro do prop.
 - **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `radiografia`, `checar`, `build`,
-  `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de pedido e 4 exemplos.
+  `critica`, `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de
+  pedido e 5 exemplos. A planta só sai com a crítica: medida, comparada com as irmãs do acervo e revisada por outro
+  agente.
 
 ## Números contra a linha de base
 
@@ -78,6 +80,9 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
     `19c`, as peças.
 20. O tronco com forma de tronco: o pé que abre, o fuste que engrossa e afina, a curva, as raízes e os nós, e a
     casca com veio (`casca_sulcada`, `casca_anelada`). Na `20`, as três variações; na `20b`, nas árvores.
+21. A flora variada: a copa em lóbulos desencontrados numa massa de luz só (com a gota, o guarda-sol e os ramos
+    que caem), a copa aberta nos galhos, a conífera de saias recortadas, a touceira e o salpico. Na `21`, as peças,
+    antes em cima; na `21b`, as construções novas; na `21c`, as plantas de prova lado a lado.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -100,6 +105,10 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   (`carvalho_roble.r4.89fc47c82e08`, na `20b`); a `r1` e a `r2` usam as peças que saíram e não se leem mais. Os braços dele não leem como braços à mostra: somem na copa, e a linha de pasto não tem peça.
 - O tronco (mudança 20): o perfil irregular não se lê abaixo de 40 cm, a curva é só de lado, e não há forquilha
   nem toco cortado.
+- A flora variada (mudança 21): a copa de poucos lóbulos grandes ainda lê lisa; a folha larga é roliça e o tom das
+  lâminas é sorteado; o capim baixo lê como rabisco; a crítica não mede o brócolis (fica na pergunta de quem
+  revisa) e compara só a silhueta. As plantas antigas do acervo não foram refeitas: as de `copa` dão outro desenho
+  e as de `copa_conica` com `saia` não se leem mais (em `docs/decisoes.md`).
 
 ## Espera o dono
 

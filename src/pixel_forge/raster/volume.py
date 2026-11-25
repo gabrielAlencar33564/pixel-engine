@@ -12,6 +12,8 @@ from .textura import Floats, Indices, quantize, texture_at
 
 SPH_LIGHT = (-0.42, -0.45, 0.79)  # (lado, cima, frente); o sinal do lado vem do estilo
 SMOOTH_ROWS = 2  # a largura de cada fileira é a média de ±2 fileiras: um degrau de 1 px no contorno não vira emenda
+RELEVO = 0.55  # na massa com relevo, quanto da luz é a da própria peça (o resto é a da massa inteira)
+PENUMBRA = 0.18  # e a luz mínima da massa: o lado da sombra não vira uma mancha do tom mais fundo
 
 
 def _bordas(mask: Mascara, eixo: int) -> tuple[Floats, Floats]:
@@ -57,10 +59,16 @@ def lambert_esfera(mask: Mascara, side: int) -> Floats:
     return res
 
 
-def volume_indices(pj: NaJanela, origem: tuple[int, int], mat: MaterialDef, side: int) -> Indices:
+def volume_indices(pj: NaJanela, origem: tuple[int, int], mat: MaterialDef, side: int,
+                   relevo: tuple[Floats, Mascara] | None = None) -> Indices:
     """A luz da esfera mais a textura contada do canto ``origem`` (x, y) da massa, cortadas na rampa; o pixel com a
-    sombra de cima desce um tom."""
+    sombra de cima desce um tom. Com ``relevo`` (a luz da massa inteira na janela e a máscara da própria peça), a
+    luz é a da massa com a da peça por cima: a massa tem um lado claro e um escuro, e cada peça é um relevo nela."""
     h, w = pj.mask.shape
     yy, xx = np.mgrid[0:h, 0:w]
-    s = lambert_esfera(pj.mask, side) + texture_at(xx - origem[0], yy - origem[1], mat.texture)
-    return quantize(s, list(mat.ramp), pj.cast)
+    if relevo is None:
+        s = lambert_esfera(pj.mask, side)
+    else:
+        massa = PENUMBRA + (1 - PENUMBRA) * relevo[0]
+        s = (1 - RELEVO) * massa + RELEVO * lambert_esfera(relevo[1], side)
+    return quantize(s + texture_at(xx - origem[0], yy - origem[1], mat.texture), list(mat.ramp), pj.cast)

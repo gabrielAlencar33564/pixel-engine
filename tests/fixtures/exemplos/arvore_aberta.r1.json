@@ -1,0 +1,24 @@
+{
+ "id": "arvore_aberta", "revision": 1,
+ "description": "Árvore velha de galhos abertos: o tronco torto, os galhos escalonados à mostra e uma nuvem de folhas em cada ponta",
+ "reference": "Árvore velha de beira de campo, de copa rala: 3,2 m de altura, o tronco de 30 cm que ondula e segue até o alto, seis galhos que saem escalonados de 1,1 m a 2,1 m e abrem até 1,3 m para os lados, cada um com uma nuvem chata de folhas de 1,1 m; a vida está nos galhos à mostra entre as nuvens, no tronco torto com raízes e na sombra em manchas no chão",
+ "tipo": "prop", "categoria": "arvore_pequena", "semente": 208,
+ "medidas": {"h": "3.2m", "a": "1.3m", "galho0": "1.1m", "cz": "2.4m"},
+ "nos": [
+  {"id": "tronco", "peca": "tronco_em_pe", "grupo": "lenho",
+   "args": {"altura": "$cz + 20cm", "base": "30cm", "topo": "10cm", "curva": "7cm", "raizes": "3",
+            "casca": "casca_sulcada"}},
+  {"id": "galhos", "peca": "galhos", "grupo": "lenho",
+   "args": {"base": "$galho0", "copa": ["$a", "60cm", "$cz"], "n": "6", "alcance": "0.95", "sobe": "1m",
+            "ponta_v": ["-0.5", "0.5"], "largura": ["9cm", "13cm"], "ponta": "4cm", "bifurca": "0"}},
+  {"id": "copa", "peca": "copa_aberta", "grupo": "copa",
+   "args": {"pontas": "galhos.pontas", "raio": "55cm"}}
+ ],
+ "vistas": {"S": {}}, "landmarks": {"sort_front": ["0", "0", "0"]},
+ "movimento": ["static"],
+ "tracos": [{"id": "galhos_a_mostra", "description": "Os galhos aparecem entre as nuvens de folhas",
+             "parts": ["galhos_0", "galhos_1", "galhos_2", "galhos_3", "galhos_4", "galhos_5"],
+             "verification": "observable"},
+            {"id": "tronco_torto", "description": "O tronco ondula do pé ao alto", "parts": ["tronco"],
+             "verification": "observable", "reads_in_silhouette": true}]
+}

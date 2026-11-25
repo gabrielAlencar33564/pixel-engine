@@ -2,8 +2,8 @@
 
 - plana: profundidade constante;
 - elipsoide: a superfície frontal de ``[x y d]·A·[x y d]ᵀ = 1`` (o maior ``d``);
-- leque: os triângulos a partir do vértice 0, cada um plano pelos três vértices; o pixel da borda fora deles fica com
-  o vértice mais perto.
+- leque: os triângulos a partir do vértice 0, cada um plano pelos três vértices (onde o leque se dobra sobre si, o
+  triângulo da frente); o pixel da borda fora deles fica com o vértice mais perto.
 
 Só operações IEEE corretamente arredondadas (+ − × ÷ √), quantizadas a 1/16 px antes de qualquer comparação.
 """
@@ -18,6 +18,7 @@ from .grade import MARGIN, Mascara
 from .textura import Floats
 
 DEPTH_QUANT = 16  # unidades por pixel
+DOBRA = 256 / (2 * DEPTH_QUANT)  # meio passo do z-buffer (q8): o plano que se repete no leque não troca de dono
 
 
 def _grid(w: int, h: int) -> tuple[Floats, Floats]:
@@ -67,8 +68,9 @@ def _leque(s: SupLeque, mask: Mascara, px: Floats, py: Floats) -> Floats:
         l0 = ((y1 - y2) * (px - x2) + (x2 - x1) * (py - y2)) / den
         l1 = ((y2 - y0) * (px - x2) + (x0 - x2) * (py - y2)) / den
         l2 = 1.0 - l0 - l1
-        inside = (l0 >= 0) & (l1 >= 0) & (l2 >= 0) & ~done
-        d = np.where(inside, l0 * z0 + l1 * z1 + l2 * z2, d)
+        inside = (l0 >= 0) & (l1 >= 0) & (l2 >= 0)
+        zt = l0 * z0 + l1 * z1 + l2 * z2
+        d = np.where(inside & (~done | (zt > d + DOBRA)), zt, d)  # na dobra do leque, vence o triângulo da frente
         done |= inside
     if (mask & ~done).any():
         near = np.full(mask.shape, np.inf)

@@ -508,3 +508,50 @@ O dono pediu variações de tronco, para ele não ser simples e só cilíndrico.
 - O canvas do prop conta o raio do traço roliço no que ele passa da margem (o tronco grosso deitado, de 18 cm de
   raio, saía cortado: o canvas contava só a meia espessura do traço fino). O que já cabia na margem fica igual (o
   oráculo não muda); o controle em tests/test_canvas_rolico.py recusa o tronco do jeito antigo.
+
+## A flora variada e a crítica (pedido do dono, 2026-11-25)
+
+O dono pediu a correção do motor da flora, construções variadas (sem um padrão só) e um jeito de os agentes
+revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
+
+- O que a análise achou nas 37 plantas que os agentes fizeram no acervo: toda folhosa era `tronco_em_pe` + `copa` e
+  toda conífera, `tronco_em_pe` + `copa_conica`. A `copa` punha os tufos em 4 anéis fixos, cada um com a luz de uma
+  bola (lia como brócolis; a pendente, como pinha); a saia da conífera era torneada (lia como funil); a flora baixa
+  era improvisada com `fios`, `traco` e `elipsoide` (a flor lia como dente). Nada media a entrega nem a comparava
+  com as outras plantas do cenário.
+- A `copa` põe os lóbulos numa espiral em volta do eixo (o passo é o ângulo áureo, o giro é da semente), cada um
+  com o tamanho, o lugar e o recuo sorteados, e raminhos na borda. Tudo fica por dentro do elipsoide da copa, e o
+  raminho do alto encosta nele (a altura é a pedida). `tufos` passou a ser o total de lóbulos (era o do anel do
+  meio). `perfil` faz a gota (1) e o guarda-sol (−1); `pende` solta ramos finos de comprimentos desencontrados (os
+  tufos não esticam mais). A peça deixa a âncora `superficie`.
+- A folhagem de um nó é uma massa de luz: a parte com a marca `massa_<nó>` toma 45 % da luz da união das partes da
+  marca (com 0,18 de penumbra) e 55 % da luz dela (`raster/tons.py`, `raster/volume.py`). Vale entre grupos de
+  contorno: na conífera cada saia tem a linha dela e a árvore inteira tem um lado claro.
+- A `copa_aberta` põe uma copa pequena e chata em cada ponta de uma âncora; os `galhos` ganharam `sobe` (saem
+  escalonados do tronco: o de baixo vai mais longe). É a construção de galhos à mostra.
+- A `copa_conica` faz cada andar como um leque pregueado (uma parte por saia): as pontas caem abaixo da barra e a
+  saia entra entre elas (`pontas`, `recorte`, `cai`). O argumento `saia` saiu. Na dobra do leque o z-buffer fica
+  com o triângulo da frente (o de mais de meio passo à frente); o plano que se repete não troca, e o oráculo não muda.
+- A `touceira` (lâminas em arco a partir de um pé: finas ou, com `largura`, roliças) e o `salpico` (pontos de cor
+  numa âncora; na composição de vista única, só do lado da câmera) fazem a flora baixa, a palma, a flor e o fruto.
+- A crítica (`pfe critica`, `quality/flora.py`, `application/critica.py`): mede no quadro da vista S a solidez da
+  folhagem (os pixels dela sobre os do fecho convexo), a simetria (contra o espelho), a luz (o claro do lado da
+  luz), o lenho à mostra, as ilhas e a assinatura (a silhueta na grade de 32, do pé para cima), e compara a
+  assinatura com a das outras plantas do acervo da mesma categoria. O papel de cada parte vem da peça (`Peca.flora`)
+  ou, na peça genérica, do material. Os limites: lisa 0,985, espelhada 0,95, sem direção 0,05, parecida 0,88; nas
+  copas do kit as medidas dão 0,92 a 0,97, 0,77 a 0,92, 0,17 a 0,37, e entre sementes da mesma árvore 0,66 a 0,84.
+- O pacote da planta só sai com a crítica que passa neste build: sem defeito medido e com o parecer de quem revisou
+  (as seis perguntas, cada uma com nota). O registro fica em `criticas/` do acervo. Vale só para a planta (a
+  categoria de árvore ou arbusto, ou uma peça de folhagem); a crítica não aprova a arte, que segue com o dono.
+- A prévia já devolve as medidas e os achados (sem as irmãs), e as `escondidas` não listam os volumes de uma massa.
+- O que a medida não vê: o brócolis. As bolas soltas com a luz de cada uma dão a mesma medida de luz da massa (o
+  conjunto ainda clareia para o alto); isso fica na pergunta `massa_de_luz`, e no motor o jeito não existe mais.
+- Os testes (`tests/test_flora.py`, `test_ervas.py`, `test_critica.py`), com o jeito de antes como controle: a
+  nuvem do lado da luz tem 1,23 da luminância da do lado da sombra (1,04 com cada tufo sombreado sozinho); a
+  conífera enche 0,72 do fecho dela (a saia lisa, 0,90); os galhos aparecem 123 px sob a copa aberta; o ovo, a copa
+  em anel e o polígono são acusados; a mesma árvore em outro tamanho é acusada como irmã (a de outra construção,
+  não); o export da planta é recusado sem o parecer.
+- O que sobra: a copa de poucos lóbulos grandes ainda lê lisa (0,96 a 0,97); a folha larga é roliça, não chata, e o
+  tom das lâminas é sorteado (sem lado da luz); o capim de 20 a 40 cm tem 6 a 13 px e lê como rabisco; a palma com
+  `cai` alto lê murcha; a semelhança compara só a silhueta (duas plantas de silhuetas iguais e cores diferentes
+  são acusadas). As composições antigas do acervo com `saia` não se leem mais, e as de `copa` dão outro desenho.

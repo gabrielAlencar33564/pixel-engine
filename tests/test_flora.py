@@ -1,7 +1,11 @@
 """A flora em volumes, para a câmera de cima (mudança 19): a copa da folhosa é uma massa só de tufos, mostra o alto,
 cobre o tronco pela frente e lança a sombra dela no chão; a conífera também; os galhos abrem em volta do tronco; a
 árvore desenha as 4 vistas e balança. Os controles: a copa do jeito antigo (discos chapados no plano da frente,
-espalhados) é acusada em cada medida, e a engine recusa o pontilhado, o polígono plano e as peças que saíram."""
+espalhados) é acusada em cada medida, e a engine recusa o pontilhado, o polígono plano e as peças que saíram.
+
+A flora variada (mudança 21): a copa é uma massa de luz só, em lóbulos desencontrados que a semente muda; o perfil
+faz a gota e o guarda-sol; a copa aberta deixa os galhos à mostra; a saia da conífera é recortada; os galhos saem
+escalonados. O controle de cada uma é o jeito de antes (cada tufo com a sua luz, a saia lisa, a copa fechada)."""
 
 from __future__ import annotations
 
@@ -13,6 +17,7 @@ from typing import Any
 import numpy as np
 import pytest
 
+from pixel_forge.application import critica
 from pixel_forge.application.build import instantes
 from pixel_forge.application.catalogo import de_uma_peca
 from pixel_forge.application.estilo import estilo_base
@@ -24,9 +29,11 @@ from pixel_forge.core.recusa import Recusa
 from pixel_forge.core.rng import Stream
 from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.escala import PPM
+from pixel_forge.design.kit import pecas_copa
 from pixel_forge.design.kit.pecas_copa import tufos
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.porte import altura_m
+from pixel_forge.quality import flora
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.renderer import mascaras
 from pixel_forge.rig.fk import Skeleton
@@ -82,6 +89,10 @@ def leitura(comp: Composicao, copa: str = "copa") -> dict[str, float]:
             "sombra_px": int((chao & (q.alpha == 255)).sum()), "figura_px": int(((q.alpha == 255) & ~chao).sum())}
 
 
+COPA_DE_TESTE: dict[str, Any] = {"copa": (40.0, 30.0, 60.0), "fundo": 1.0, "tufos": 7, "tamanho": 0.45,
+                                 "irregular": 0.14, "perfil": 0.0, "raminhos": 2, "pende": 0.0}
+
+
 def _exemplo(**args: Any) -> Composicao:
     dado = json.loads(EXEMPLO.read_text(encoding="utf-8"))
     dado["nos"][1]["args"] |= args
@@ -104,38 +115,43 @@ def _copa_de_discos() -> Composicao:
 
 
 def test_a_copa_e_uma_massa_so() -> None:
-    """Uma massa cheia, com poucas partes, que mostra o alto (a altura na tela soma o fundo visto de cima)."""
+    """Uma massa só, com poucas partes, que mostra o alto (a altura na tela soma o fundo visto de cima); os lóbulos
+    recuam da borda, e ela não enche mais a elipse como o ovo."""
     m = leitura(ler(EXEMPLO, Composicao))
     a, c = COPA_DO_EXEMPLO
     de_cima = math.hypot(a * SD, c * CE) / a  # o elipsoide da copa na câmera: 0,74 (de frente, chapado: 0,44)
-    assert m["pedacos"] == 1 and m["cheia"] >= 0.9 and m["partes"] <= 30
-    assert abs(m["alto_sobre_largo"] - de_cima) <= 0.05
+    assert m["pedacos"] == 1 and 0.7 <= m["cheia"] < 0.9 and m["partes"] <= 40
+    assert abs(m["alto_sobre_largo"] - de_cima) <= 0.1
 
 
 def test_a_copa_cobre_o_tronco_e_lanca_a_sombra_dela() -> None:
     """O tronco aparece só embaixo da copa, e a sombra no chão é uma mancha do fundo da copa, não uma tira."""
     m = leitura(ler(EXEMPLO, Composicao))
     so_o_tronco = leitura(_exemplo(copa=["10cm", "10cm", "$cz"]))["tronco"]
-    assert 0 < m["tronco"] < 0.6 * so_o_tronco
+    assert 0 < m["tronco"] < 0.8 * so_o_tronco
     assert m["sombra_sobre_largo"] >= 0.35
 
 
 def test_controle_a_copa_de_discos_chapados_e_acusada() -> None:
     m = leitura(_copa_de_discos())
     a, c = COPA_DO_EXEMPLO
-    assert m["pedacos"] > 1 and m["cheia"] < 0.9
-    assert abs(m["alto_sobre_largo"] - math.hypot(a * SD, c * CE) / a) > 0.05
+    assert m["pedacos"] > 1 and m["cheia"] < 0.7
+    assert abs(m["alto_sobre_largo"] - math.hypot(a * SD, c * CE) / a) > 0.1
     assert m["sombra_sobre_largo"] < 0.35
 
 
 @pytest.mark.parametrize("semente", range(12))
 def test_o_tufo_nao_passa_da_copa(semente: int) -> None:
-    """O tufo encosta por dentro no elipsoide da copa: a altura e a largura do asset são as da copa pedida."""
-    a = {"copa": (40.0, 30.0, 60.0), "fundo": 0.8, "tufos": 7, "tamanho": 0.45, "irregular": 0.3, "pende": 0.0}
+    """Nenhum lóbulo nem raminho passa do elipsoide da copa, com qualquer perfil, e o raminho do alto encosta
+    nele: a altura do asset é a da copa pedida."""
     eixos = (40.0, 32.0, 30.0)
-    for (cx, cy, cz), raios in tufos(Stream(semente), a):
-        d = [abs(v) / e for v, e in zip((cx, cy, cz - 60.0), eixos, strict=True)]
-        assert math.hypot(*d) + raios[0] / eixos[0] <= 1 + 1e-9
+    for perfil in (-1.0, 0.0, 1.0):
+        a = {**COPA_DE_TESTE, "fundo": 0.8, "irregular": 0.3, "perfil": perfil}
+        volumes = tufos(Stream(semente), a)
+        for (cx, cy, cz), raios in volumes:
+            d = [abs(v) / e for v, e in zip((cx, cy, cz - 60.0), eixos, strict=True)]
+            assert math.hypot(*d) + raios[0] / eixos[0] <= 1 + 1e-9
+        assert max(c[2] + r[2] for c, r in volumes) == pytest.approx(90.0)
 
 
 def test_a_altura_da_copa_e_a_pedida() -> None:
@@ -145,11 +161,14 @@ def test_a_altura_da_copa_e_a_pedida() -> None:
 
 
 def test_controle_o_tufo_que_pende_desce_da_copa() -> None:
-    """Com ``pende``, os tufos de baixo descem do elipsoide (o ramo que cai) sem entrar no chão."""
-    a = {"copa": (40.0, 30.0, 60.0), "fundo": 1.0, "tufos": 7, "tamanho": 0.3, "irregular": 0.0}
-    reto = min(c[2] - r[2] for c, r in tufos(Stream(1), {**a, "pende": 0.0}))
-    cai = min(c[2] - r[2] for c, r in tufos(Stream(1), {**a, "pende": 2.0}))
-    assert 0 <= cai < reto - 5
+    """Com ``pende``, ramos finos caem dos lóbulos de baixo, abaixo do elipsoide, sem entrar no chão; os lóbulos
+    ficam onde estavam."""
+    a = {**COPA_DE_TESTE, "tamanho": 0.3, "irregular": 0.0}
+    sem, com = tufos(Stream(1), a), tufos(Stream(1), {**a, "pende": 2.0})
+    reto = min(c[2] - r[2] for c, r in sem)
+    assert com[:len(sem)] == sem and len(com) > len(sem)
+    assert 0 <= min(c[2] - r[2] for c, r in com[len(sem):]) < reto - 5
+    assert max(r[0] for _, r in com[len(sem):]) < min(r[0] for _, r in sem[:7])
 
 
 def _conifera_chapada() -> Composicao:
@@ -163,14 +182,14 @@ def test_a_conifera_lanca_a_sombra_dela() -> None:
     for _, args in PECAS["copa_conica"].variacoes:
         comp = de_uma_peca("copa_conica", args)
         m = leitura(comp, "n_")
-        assert m["sombra_px"] >= 0.2 * m["figura_px"], args
+        assert m["sombra_px"] >= 0.1 * m["figura_px"], args
     alta = PECAS["copa_conica"].variacoes[0][1]
     assert altura_m(ir_da_composicao(de_uma_peca("copa_conica", alta))) == pytest.approx(4.0, abs=1 / PPM)
 
 
 def test_controle_a_conifera_chapada_lanca_uma_linha() -> None:
     m = leitura(_conifera_chapada(), "n")
-    assert m["sombra_px"] < 0.2 * m["figura_px"]
+    assert m["sombra_px"] < 0.1 * m["figura_px"]
 
 
 def _pontas(fundo: str, fase: str = "0.5") -> list[tuple[float, float]]:
@@ -271,6 +290,131 @@ def test_controle_a_peca_que_saiu_e_recusada_com_a_que_ficou(antiga: str, nova: 
     with pytest.raises(Recusa) as e:
         ir_da_composicao(validar({**dado, "tracos": []}, Composicao, "teste"))
     assert e.value.codigo == "PECA" and nova in e.value.dica
+
+
+# --- a flora variada (mudança 21): o controle de cada propriedade é o jeito de antes
+
+ABERTA = PECAS["copa_aberta"].variacoes[0][1]
+
+
+def _lados_da_folhagem(comp: Composicao) -> tuple[float, float]:
+    """A luminância média da folhagem no terço do lado da luz (a esquerda) e no terço do lado da sombra."""
+    ir, style = ir_da_composicao(comp), estilo_base()
+    q = quadro_de_repouso(ir, estilo_render(style), "S")
+    brilho = {p.index: 0.299 * p.rgba[0] + 0.587 * p.rgba[1] + 0.114 * p.rgba[2] for p in style.palette}
+    folhas = [i + 1 for i, p in enumerate(q.part_table) if p.startswith("n_")]
+    ys, xs = np.nonzero(np.isin(q.dono, folhas))
+    v = np.array([brilho[int(i)] for i in q.index[ys, xs]])
+    terco = (xs.max() - xs.min() + 1) / 3
+    return float(v[xs < xs.min() + terco].mean()), float(v[xs > xs.max() - terco].mean())
+
+
+def test_a_folhagem_tem_a_luz_de_uma_massa() -> None:
+    """As nuvens da copa aberta são uma massa de luz só: a do lado da luz é clara e a do lado da sombra, escura."""
+    luz, sombra = _lados_da_folhagem(de_uma_peca("copa_aberta", ABERTA))
+    assert luz >= 1.15 * sombra
+
+
+def test_controle_cada_tufo_com_a_sua_luz_nao_tem_lado(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: cada volume sombreado sozinho, como uma bola (o brócolis)."""
+    monkeypatch.setattr(pecas_copa, "_na_massa", lambda _c: ("volume_sphere",))
+    luz, sombra = _lados_da_folhagem(de_uma_peca("copa_aberta", ABERTA))
+    assert luz < 1.08 * sombra
+
+
+def _com_a_semente(semente: int) -> flora.Leitura:
+    dado = json.loads(EXEMPLO.read_text(encoding="utf-8"))
+    return critica.medir(validar({**dado, "semente": semente, "tracos": []}, Composicao, "teste"))[0]
+
+
+def test_outra_semente_da_outra_copa_da_mesma_especie() -> None:
+    """A semente muda os lóbulos: as silhuetas diferem, sem deixar de ser a mesma árvore."""
+    lidas = [_com_a_semente(s) for s in range(77, 83)]
+    pares = [flora.semelhanca(a.assinatura, b.assinatura) for i, a in enumerate(lidas) for b in lidas[:i]]
+    assert max(pares) < flora.PARECIDA and min(pares) > 0.5
+    assert all(m.simetria < flora.ESPELHADA and m.solidez < flora.LISA for m in lidas)
+
+
+def test_controle_a_mesma_semente_da_a_mesma_copa() -> None:
+    assert flora.semelhanca(_com_a_semente(77).assinatura, _com_a_semente(77).assinatura) == 1.0
+
+
+def _larguras_da_copa(perfil: float) -> tuple[float, float, float]:
+    """Dos lóbulos (sem os raminhos): o alcance para os lados no terço de cima e no de baixo, e o ponto mais baixo."""
+    a = {**COPA_DE_TESTE, "tufos": 12, "tamanho": 0.3, "irregular": 0.0, "raminhos": 0, "perfil": perfil}
+    lobulos = tufos(Stream(3), a)
+
+    def alcance(de: float, ate: float) -> float:
+        return max((math.hypot(c[0], c[1]) + r[0] for c, r in lobulos if de <= c[2] - 60.0 < ate), default=0.0)
+
+    return alcance(8.0, 31.0), alcance(-31.0, -8.0), min(c[2] - r[2] for c, r in lobulos)
+
+
+def test_o_perfil_faz_a_gota_e_o_guarda_sol() -> None:
+    em_cima, embaixo, _ = _larguras_da_copa(1.0)
+    assert em_cima < 0.75 * embaixo  # a gota: fina no alto
+    _, embaixo, fundo = _larguras_da_copa(-1.0)
+    assert embaixo == 0.0 and fundo > 45.0  # o guarda-sol: nada abaixo do meio da copa
+
+
+def test_controle_a_copa_redonda_nao_afina_nem_perde_a_metade_de_baixo() -> None:
+    em_cima, embaixo, fundo = _larguras_da_copa(0.0)
+    assert em_cima >= 0.75 * embaixo > 0 and fundo < 45.0
+
+
+def _aberta_e_fechada() -> tuple[int, int]:
+    """Os pixels dos galhos à mostra sob a copa aberta e, nos mesmos galhos, sob a copa em massa."""
+    out = []
+    for nome, args in (("copa_aberta", ABERTA), ("copa", {"copa": ["1.3m", "70cm", "2.3m"]})):
+        comp = de_uma_peca(nome, args)
+        if nome == "copa":
+            dado = de_uma_peca("copa_aberta", ABERTA).model_dump(mode="json")
+            comp = validar({**dado, "nos": [*dado["nos"][:-1], {"id": "n", "peca": nome, "args": args}]}, Composicao,
+                           "controle")
+        q = quadro_de_repouso(ir_da_composicao(comp), estilo_render(estilo_base()), "S")
+        out.append(sum(n for p, n in q.visiveis.items() if p.startswith("galhos_")))
+    return out[0], out[1]
+
+
+def test_a_copa_aberta_deixa_os_galhos_a_mostra() -> None:
+    aberta, _ = _aberta_e_fechada()
+    m = critica.medir(de_uma_peca("copa_aberta", ABERTA))[0]
+    assert aberta >= 60 and m.solidez < 0.8
+
+
+def test_controle_a_copa_em_massa_cobre_os_galhos() -> None:
+    aberta, fechada = _aberta_e_fechada()
+    assert fechada < 0.5 * aberta
+
+
+def _solidez_da_conifera(**args: str) -> float:
+    alta = PECAS["copa_conica"].variacoes[0][1]
+    return critica.medir(de_uma_peca("copa_conica", {**alta, **args}))[0].solidez
+
+
+def test_a_saia_da_conifera_e_recortada() -> None:
+    """As pontas recortam a silhueta: a conífera enche pouco do fecho convexo dela."""
+    assert _solidez_da_conifera() < 0.78
+
+
+def test_controle_a_saia_lisa_e_um_cone() -> None:
+    assert _solidez_da_conifera(recorte="0", cai="0", irregular="0") > 0.84
+
+
+def _saidas(sobe: str) -> list[float]:
+    """A altura de onde sai cada galho (px)."""
+    args = {**PECAS["galhos"].variacoes[0][1], "bifurca": "0", "sobe": sobe}
+    ir = ir_da_composicao(de_uma_peca("galhos", args))
+    return sorted(p.geometry.points_q8[0][2] / 256 for p in ir.parts if p.geometry.type == "tapered_polyline")
+
+
+def test_os_galhos_saem_escalonados() -> None:
+    saidas = _saidas("90cm")
+    assert saidas[-1] - saidas[0] == pytest.approx(0.9 * PPM, abs=1) and len(set(saidas)) == len(saidas)
+
+
+def test_controle_sem_sobe_os_galhos_saem_do_mesmo_ponto() -> None:
+    assert len(set(_saidas("0"))) == 1
 
 
 # --- o tronco com forma de tronco (mudança 20): o controle é o tronco liso, o cone do `pixel-engine`

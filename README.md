@@ -39,6 +39,7 @@ uv run pfe previa  composicoes/poco.r1.json --json   # o repouso de cada vista, 
 uv run pfe radiografia composicoes/poco.r1.json --json   # o modelo ampliado, sem a câmera, e as medidas do corpo
 uv run pfe checar  composicoes/poco.r1.json --json   # todos os quadros conferidos, sem gravar
 uv run pfe build   composicoes/poco.r1.json --json   # os quadros no acervo; devolve o build
+uv run pfe critica  <build> --json                   # a planta medida e comparada com as irmãs; o parecer de outro agente
 uv run pfe exportar <build> --json                   # o pacote do jogo (pfe-jogo/1: atlas e JSON)
 uv run pfe exportar <build> --verificar --json       # relê o pacote e confere contra o build
 uv run pfe olhar    <build> --json                   # a prancha de todos os quadros e os números
@@ -55,7 +56,8 @@ registra o veredito; só o build aprovado sai com `exportar --publicar`). O form
   [`.claude/skills/pixel-asset-engine/SKILL.md`](.claude/skills/pixel-asset-engine/SKILL.md) (espelho em `.agents/`).
 - As regras de desenho e de trabalho são uma fonte só: [`docs/regras.md`](docs/regras.md).
 - O agente do jogo pede um asset pelo formulário [`docs/pedido.md`](docs/pedido.md).
-- Há quatro exemplos de composição em `tests/fixtures/exemplos/` (um banco, uma árvore folhosa, um viajante, um canino).
+- Há cinco exemplos de composição em `tests/fixtures/exemplos/` (um banco, uma árvore folhosa, uma árvore de galhos
+  abertos, um viajante, um canino).
 
 ## Desenvolvimento
 

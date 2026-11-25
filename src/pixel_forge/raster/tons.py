@@ -11,11 +11,12 @@ from .estilo import EstiloRender
 from .grade import Janela, Mascara, NaJanela, part_window, shift
 from .montagem import Buf16, Camadas
 from .revolucao import revolution_indices, surface
-from .textura import Indices, flat_texture_indices
-from .volume import volume_indices
+from .textura import Floats, Indices, flat_texture_indices
+from .volume import lambert_esfera, volume_indices
 
 # o tom mais escuro da rampa só entra na peça lisa com o canvas mais largo que isto
 DEEP_SHADOW_WIDTH_PX = 32
+MASSA = "massa_"  # o começo da marca que põe a peça numa massa de luz
 
 
 def _chapada(est: EstiloRender, c: DrawCommand, full: Mascara, win: Janela) -> Indices:
@@ -44,11 +45,26 @@ def _revolucao(est: EstiloRender, c: DrawCommand, cam: Camadas, win: Janela, cas
     return revolution_indices(sf, prim.ce, NaJanela(win, fw, cast[win] & fw), est.materials[c.material], est.side)
 
 
-def _volume(est: EstiloRender, c: DrawCommand, massa: Mascara, win: Janela, cast: Mascara) -> Indices:
+def _volume(est: EstiloRender, c: DrawCommand, cam: Camadas, pj: tuple[Janela, Mascara],
+            massas: dict[str, tuple[Mascara, Floats]]) -> Indices:
+    """O volume de esfera da peça ou, com ``shade_group``, da massa do grupo. A peça com a marca ``massa_<nome>``
+    é um relevo na massa de luz desse nome (a união das peças com a marca, de qualquer grupo de contorno, medida
+    uma vez em ``massas``): a luz é a da massa inteira com a da própria peça por cima."""
+    win, cast = pj
+    marca = next((t for t in c.tags if t.startswith(MASSA)), None)
+    relevo = None
+    if marca is None:
+        massa = cam.massa.get(c.part_id, cam.full[c.part_id])
+    else:
+        if marca not in massas:
+            uniao: Mascara = np.logical_or.reduce([cam.full[p] for p, k in cam.cmds.items() if marca in k.tags])
+            massas[marca] = (uniao, lambert_esfera(uniao, est.side))
+        massa = massas[marca][0]
+        relevo = (massas[marca][1][win], cam.full[c.part_id][win])
     ys, xs = np.nonzero(massa)
     fw = massa[win]
     origem = (int(xs.min()) - win[1].start, int(ys.min()) - win[0].start)
-    return volume_indices(NaJanela(win, fw, cast[win] & fw), origem, est.materials[c.material], est.side)
+    return volume_indices(NaJanela(win, fw, cast[win] & fw), origem, est.materials[c.material], est.side, relevo)
 
 
 def _faixas(est: EstiloRender, c: DrawCommand, cam: Camadas, win: Janela, cast: Mascara) -> Indices:
@@ -84,6 +100,7 @@ def sombrear(est: EstiloRender, cam: Camadas, index: Buf16, cast: Mascara) -> No
     """Escreve em ``index`` o tom de cada pixel visível. Cada peça é processada só na janela da máscara dela mais a
     largura das faixas: fora dela nada muda."""
     band = max(est.doc.shading.shadow_band_px, est.doc.shading.highlight_band_px)
+    massas: dict[str, tuple[Mascara, Floats]] = {}
     for p in cam.part_ids:
         win = part_window(cam.full[p], band)
         if win is None:
@@ -97,7 +114,7 @@ def sombrear(est: EstiloRender, cam: Camadas, index: Buf16, cast: Mascara) -> No
         elif isinstance(c.prim, RevolutionPrim):
             region = _revolucao(est, c, cam, win, cast)
         elif "volume_sphere" in c.tags:
-            region = _volume(est, c, cam.massa.get(p, cam.full[p]), win, cast)
+            region = _volume(est, c, cam, (win, cast), massas)
         else:
             region = _faixas(est, c, cam, win, cast)
         index[win][vis] = region[vis]

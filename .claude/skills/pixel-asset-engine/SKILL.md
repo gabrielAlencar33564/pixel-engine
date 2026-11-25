@@ -78,14 +78,31 @@ tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à
 
 **A pedra solta** é o `penedo`, não o `elipsoide` (que lê como ovo): um poliedro sorteado pela semente, com faces, quinas e o tom pela normal; `agudo` fecha a ponta, `inclina` deita o topo, `irregular` lasca, `musgo` cobre as faces de cima, `fendas` racha as maiores, e `material` é a família (`alvenaria`, o granito; `palha`, o arenito, com `tom` -1). Outra semente dá outra pedra do mesmo tipo: para variar o cenário, varie a semente e a forma, não só o tamanho.
 
-**A árvore e a moita** são volumes: `tronco_em_pe` e a copa, que é `copa` (a folhosa, em tufos redondos; no chão e
-sem tronco é a moita; com `pende`, os ramos caem) ou `copa_conica` (a conífera, em andares). A copa mostra o alto e
-cobre o tronco pela frente: do tronco sobra na tela a altura do centro da copa × 0,71 menos
-√((meio fundo × 0,6)² + (meia altura × 0,71)²); para ele aparecer mais, suba a copa ou diminua o `fundo`. A sombra
-da copa cai no chão à direita e entra no canvas. Os `galhos` são opcionais (a copa cobre quase todos; sozinhos, são
-a árvore seca) e deixam as pontas para a copa pôr um tufo em cada uma. O tronco não é um cilindro: por padrão o pé
-abre no chão e o fuste engrossa e afina; dê a ele o que a espécie tem (a `curva` do tronco novo, as `raizes` e os
-`nos` do velho, a casca `casca_sulcada` com o veio em pé ou `casca_anelada` com os anéis deitados).
+**A planta** não tem uma receita só. Escolha a construção pela ficha da espécie; num conjunto, use mais de uma:
+
+| Construção | Nós | O que dá |
+|---|---|---|
+| a massa | `tronco_em_pe` + `copa` | a folhosa de copa fechada. `perfil`: 0 a redonda, 1 a gota (fina no alto), -1 o guarda-sol (só a metade de cima). `tufos` e `tamanho`: a copa pesada (6 de 0.45) ou a leve (14 de 0.22). `pende`: os ramos finos que caem |
+| a aberta | `tronco_em_pe` + `galhos` com `sobe` + `copa_aberta` | os galhos à mostra e uma nuvem de folhas em cada ponta: a árvore velha, a de copa rala, a de copa em nuvens |
+| os andares | `tronco_em_pe` + `copa_conica` | a conífera de saias recortadas; `pontas`, `recorte` e `cai` dão a saia cheia ou a magra |
+| a roseta no alto | `tronco_em_pe` + `touceira` com o `pe` no alto do tronco e `largura` | a palma, a folha em espada |
+| a seca | `tronco_em_pe` + `galhos` | a árvore sem folha |
+| a moita | `copa` no chão, sem tronco | o arbusto; com `salpico` na `superficie` dela, a flor e o fruto |
+| a touceira | `touceira` | lâminas: finas, o capim e o junco; com `largura`, a samambaia; com `salpico` nas `pontas`, a flor do campo e a espiga |
+
+A folhagem de um nó é uma massa de luz só (o claro em cima e à esquerda), e cada lóbulo é um relevo nela. Tudo é
+sorteado pela semente: outra semente dá outra planta da mesma espécie. **Para variar o cenário,** duas plantas do
+mesmo conjunto não saem da mesma receita com outra semente e outro tamanho: varie a construção, o `perfil`, a
+proporção da copa, o tronco (a `curva`, a `inclinacao`, as `raizes`, dois troncos) e a folhagem; dentro da mesma
+espécie, a semente e o `irregular`. A crítica (seção 6) mede a silhueta contra as irmãs do acervo e acusa a parecida.
+A planta não se faz de `elipsoide`, `poligono` nem `fios`: a crítica acusa o ovo, o cone liso e o tom chapado.
+
+A copa em massa mostra o alto e cobre o tronco pela frente: do tronco sobra na tela a altura do centro da copa × 0,71
+menos √((meio fundo × 0,6)² + (meia altura × 0,71)²); para ele aparecer mais, suba a copa ou diminua o `fundo`. A
+sombra da copa cai no chão à direita e entra no canvas. Sob a copa em massa os `galhos` quase não aparecem (deixam as
+pontas para ela pôr um tufo em cada uma). O tronco não é um cilindro: por padrão o pé abre no chão e o fuste engrossa
+e afina; dê a ele o que a espécie tem (a `curva` do tronco novo, as `raizes` e os `nos` do velho, a casca
+`casca_sulcada` com o veio em pé ou `casca_anelada` com os anéis deitados).
 
 **Porte por categoria** (em humanos de 1,65 m):
 
@@ -104,8 +121,8 @@ abre no chão e o fuste engrossa e afina; dê a ele o que a espécie tem (a `cur
 <!-- /portes -->
 
 **Exemplos feitos pelo padrão vigente** (leia o que for do mesmo tipo antes de compor; não copie: o asset nasce da
-ficha dele): `tests/fixtures/exemplos/banco.r1.json` (estático de vista única), `arvore_folhosa.r1.json` (árvore com a
-`copa` em volumes), `viajante.r1.json` (humano, 8 direções) e `canino.r1.json` (quadrúpede, 8 direções).
+ficha dele): `tests/fixtures/exemplos/banco.r1.json` (estático de vista única), `arvore_folhosa.r1.json` (árvore de copa em
+massa), `arvore_aberta.r1.json` (árvore de galhos à mostra, com a `copa_aberta`), `viajante.r1.json` (humano, 8 direções) e `canino.r1.json` (quadrúpede, 8 direções).
 
 ## 5. O caminho
 
@@ -113,9 +130,11 @@ O acervo é `~/.pixel-forge/acervo` (ou `--acervo`, ou `PFE_ACERVO`). Grave a co
 
 1. `pfe previa <composição> --json`: o repouso de cada vista com as mesmas recusas do build, a prancha
    (`previas/<id>.r<n>.png`, recorte real ampliado até 4×) e os números: vistas, canvas, altura, porte, os ids das
-   `partes` (que os traços citam), as `escondidas` (por vista, as partes que a vista desenha e nenhum pixel mostra) e
-   os pixels de cada traço em cada vista (`tracos`). Leia os números, depois a prancha; ajuste a composição e
-   repita. A parte escondida que devia aparecer (o olho sob a aba, a mão de lá) é defeito: não siga com ela.
+   `partes` (que os traços citam), as `escondidas` (por vista, as partes que a vista desenha e nenhum pixel mostra;
+   os volumes de uma copa não entram: o lado de lá dela fica sempre escondido), os pixels de cada traço em cada vista
+   (`tracos`) e, da planta, a `critica` (as medidas e os achados da seção 6, sem as irmãs). Leia os números, depois a
+   prancha; ajuste a composição e repita. A parte escondida que devia aparecer (o olho sob a aba, a mão de lá) é
+   defeito, e o achado `defeito` também: não siga com eles.
 2. `pfe radiografia <composição> --json`: o modelo ampliado até 4× pela geometria, de frente, de perfil e de costas
    em elevação (sem a câmera do jogo) e, na fileira de baixo, na câmera do jogo (`radiografias/<id>.r<n>.png`). É
    onde a forma se analisa: no tamanho do jogo um rosto tem 5 px, e o defeito da forma se confunde com a perda da
@@ -124,15 +143,44 @@ O acervo é `~/.pixel-forge/acervo` (ou `--acervo`, ou `PFE_ACERVO`). Grave a co
 3. `pfe conjunto <composição> ... --json`: os assets lado a lado pelo chão, com o humano de 1,65 m de régua.
 4. `pfe checar <composição> --json`: todos os quadros do build conferidos (os clipes de quem anda), sem gravar.
 5. `pfe build <composição> --json`: os quadros no acervo; devolve o `build`.
-6. `pfe exportar <build> --json` e `pfe exportar <build> --verificar --json`: o pacote do jogo (`pfe-jogo/1`, atlas e
+6. Da planta, `pfe critica <build> --json` e o parecer de outro agente (seção 6): sem a crítica que passa, o pacote
+   é recusado (`CRITICA_PENDENTE`).
+7. `pfe exportar <build> --json` e `pfe exportar <build> --verificar --json`: o pacote do jogo (`pfe-jogo/1`, atlas e
    JSON) e a releitura dele contra o build.
-7. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números (uma fileira por clipe e direção,
+8. `pfe olhar <build> --json`: a prancha de todos os quadros do pacote e os números (uma fileira por clipe e direção,
    na ordem de `clipes` e, dentro do clipe, das direções em ordem alfabética: E, N, NE, NW, S, SE, SW, W).
 
 Toda recusa vem como `{"ok": false, "errors": [{"code", "message", "hint", "path"}]}`, com o caminho na composição:
 siga a dica e corrija. A recusa `MOTOR` é defeito da engine, não seu: pare e registre.
 
-## 6. Completar e corrigir
+## 6. A crítica da planta
+
+A planta (a árvore, o arbusto, qualquer asset com `copa` ou `touceira`) só sai depois de medida e revisada por outro
+agente. `pfe critica <build> --json` devolve:
+
+- `medidas` e `achados`: cada achado tem o `codigo`, a `gravidade`, a `medida` e a `dica`. O `defeito` (a folhagem
+  lisa, espelhada ou sem lado claro; a silhueta igual à de uma irmã) impede a crítica de passar: corrija a composição
+  e volte ao passo 1 com `pfe atualizar`. O `aviso` (o tronco que sumiu, o pedaço solto) pede o olho de quem revisa. O
+  defeito que você acha medido errado é defeito da engine: pare e registre, não contorne.
+- `irmas`: as três plantas da mesma categoria no acervo com a silhueta mais parecida, e o quanto (de 0 a 1).
+- `prancha` (`criticas/<build>.png`): em cima, o sprite e a silhueta dele; embaixo, as irmãs e as silhuetas delas.
+- `perguntas` e `ficha`: o que só o olho responde.
+
+Quem responde às perguntas não é quem compôs. Passe a outro agente (um subagente sem a sua conversa) só a prancha, a
+ficha e as perguntas, sem a sua explicação; ele olha a imagem e responde cada pergunta com `ok` e uma nota do que
+viu. Grave as respostas dele num arquivo e registre:
+
+```json
+{"respostas": {"silhueta": {"ok": true, "nota": "copa larga e baixa sobre um tronco curto: lê como árvore de quintal"},
+               "massa_de_luz": {"ok": false, "nota": "o lado direito é uma mancha escura sem relevo"}}}
+```
+
+`pfe critica <build> --parecer <arquivo.json> --por <quem revisou> --json` (todas as perguntas, cada nota com 12
+caracteres ou mais). O `veredito` é `passa` sem defeito medido e com todas as respostas boas; senão é `corrigir`, e
+`a_corrigir` lista o que falta: mude a composição, rode `pfe atualizar` e refaça o caminho (o build novo pede a
+crítica dele). A crítica não aprova a arte: isso segue com o dono (seção 8).
+
+## 7. Completar e corrigir
 
 A revisão é imutável: o build recusa (`IDENTIDADE`) a mesma revisão com outro desenho. O build também: o id dele leva
 a composição, o estilo, a versão do motor e os pixels, então o mesmo id é sempre o mesmo desenho; se o motor mudar o
@@ -140,8 +188,9 @@ pixel, o mesmo pedido dá outro build, e o pacote antigo segue valendo para o bu
 edite a composição e rode `pfe atualizar <composição> --json`: ela vira a revisão seguinte no acervo; siga o caminho
 com o arquivo que ele devolve.
 
-## 7. A entrega
+## 8. A entrega
 
-Entregue o caminho do pacote (`exports/<build>/atlas.json`), a prancha do `olhar` e os números. O pacote sai como
+Entregue o caminho do pacote (`exports/<build>/atlas.json`), a prancha do `olhar` e os números; da planta, também a
+prancha da crítica, as irmãs e quem revisou. O pacote sai como
 prévia, com a arte pendente: só o dono a revisa (`pfe revisar <build> --veredito ... --nota ... --por ...`), e só o
 build aprovado sai com `pfe exportar <build> --publicar`.

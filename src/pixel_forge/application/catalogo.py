@@ -36,10 +36,11 @@ def de_uma_peca(peca: str, args: dict[str, Any]) -> Composicao:
                         "semente": 11,
                         "nos": [{"id": "corpo", "peca": peca, "args": args}], "vistas": dict.fromkeys(DIRECOES, {}),
                         "movimento": ["idle"], "tracos": []}, Composicao, f"variação de {peca}")
+    apoio = [{"id": i, "peca": p, "args": a} for i, p, a in PECAS[peca].apoio]
     return validar({"id": "kit_peca", "revision": 1, "description": f"A peça {peca} sozinha",
                     "reference": "o catálogo do kit", "tipo": "prop", "categoria": "objeto", "semente": 11,
-                    "nos": [{"id": "n", "peca": peca, "args": args}], "vistas": {"S": {}}, "movimento": ["static"],
-                    "tracos": []}, Composicao, f"variação de {peca}")
+                    "nos": [*apoio, {"id": "n", "peca": peca, "args": args}], "vistas": {"S": {}},
+                    "movimento": ["static"], "tracos": []}, Composicao, f"variação de {peca}")
 
 
 def _prancha(peca: str, destino: Path) -> Path:

@@ -1,6 +1,7 @@
-"""O caminho curto de um asset pelo `pfe`, no acervo e sem projeto: prévia, checar, build, exportar, verificar, olhar,
-revisar e publicar; a prévia recusa o que o build recusa (I8); a identidade é imutável e a mudança é a revisão seguinte;
-o mesmo id de build é sempre o mesmo desenho; o estático sai em menos de 1 min de máquina."""
+"""O caminho curto de um asset pelo `pfe`, no acervo e sem projeto: prévia, checar, build, a crítica da flora,
+exportar, verificar, olhar, revisar e publicar; a prévia recusa o que o build recusa (I8); a identidade é imutável e
+a mudança é a revisão seguinte; o mesmo id de build é sempre o mesmo desenho; o estático sai em menos de 1 min de
+máquina."""
 
 from __future__ import annotations
 
@@ -40,6 +41,12 @@ def test_o_caminho_curto_do_estatico_em_menos_de_1_min(tmp_path: Path, capsys: p
     assert pfe(capsys, "previa", str(ARVORE), "--acervo", acervo)[0] == 0
     _, b = pfe(capsys, "build", str(ARVORE), "--acervo", acervo)
     build = b["result"]["build"]
+    feita = pfe(capsys, "critica", build)[1]["result"]  # a árvore é flora: o pacote pede a crítica e o parecer
+    parecer = tmp_path / "parecer.json"
+    parecer.write_text(json.dumps({"respostas": {k: {"ok": True, "nota": "olhei a prancha da crítica"}
+                                                 for k in feita["perguntas"]}}), encoding="utf-8")
+    dado = pfe(capsys, "critica", build, "--parecer", str(parecer), "--por", "revisor")[1]["result"]
+    assert dado["veredito"] == "passa"
     assert pfe(capsys, "exportar", build)[0] == 0
     assert pfe(capsys, "exportar", build, "--verificar")[1]["result"] == {"verificado": True}
     assert time.process_time() - t0 < 60

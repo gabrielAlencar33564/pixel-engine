@@ -1,0 +1,91 @@
+"""A flora de lâminas e de pontos (mudança 21): a touceira lê como lâminas e não como massa, a folha larga é mais
+que um traço, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê. Os controles: a moita em massa, a
+lâmina fina, o pé no chão e o salpico sorteado na volta toda."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from pixel_forge.application.catalogo import de_uma_peca
+from pixel_forge.application.estilo import estilo_base
+from pixel_forge.application.quadros import quadro_de_repouso
+from pixel_forge.contracts.carregar import validar
+from pixel_forge.contracts.composicao import Composicao
+from pixel_forge.design.asset import ir_da_composicao
+from pixel_forge.design.escala import PPM
+from pixel_forge.design.kit.registro import PECAS
+from pixel_forge.quality import flora
+from pixel_forge.raster.estilo import estilo_render
+from pixel_forge.raster.renderer import Quadro
+
+CAPIM = PECAS["touceira"].variacoes[0][1]
+FLORES = PECAS["salpico"].variacoes[0][1]
+
+
+def _quadro(comp: Composicao) -> Quadro:
+    return quadro_de_repouso(ir_da_composicao(comp), estilo_render(estilo_base()), "S")
+
+
+def test_a_touceira_e_de_laminas() -> None:
+    """A silhueta é de lâminas: enche pouco do fecho convexo dela, e cada lâmina é uma parte."""
+    for nome, args in PECAS["touceira"].variacoes:
+        comp = de_uma_peca("touceira", args)
+        assert flora.solidez(_quadro(comp).dono != 0) < 0.8, nome
+        assert len(ir_da_composicao(comp).parts) == int(args["n"])
+
+
+def test_controle_a_moita_em_massa_enche_o_fecho() -> None:
+    moita = PECAS["copa"].variacoes[-1][1]
+    assert flora.solidez(_quadro(de_uma_peca("copa", moita)).dono != 0) > 0.85
+
+
+def _pixels(**args: Any) -> int:
+    return int((_quadro(de_uma_peca("touceira", {**CAPIM, "altura": ["50cm", "80cm"], **args})).dono != 0).sum())
+
+
+def test_a_folha_larga_e_mais_que_um_traco() -> None:
+    assert _pixels(largura="20cm") >= 1.5 * _pixels()
+
+
+def _pes(pe: list[str]) -> set[float]:
+    ir = ir_da_composicao(de_uma_peca("touceira", {**CAPIM, "raio": "0", "pe": pe}))
+    return {p.geometry.points_q8[0][2] / 256 for p in ir.parts if p.geometry.type == "polyline"}
+
+
+def test_a_touceira_nasce_no_alto_de_um_tronco() -> None:
+    """Com o pé no alto (a palma), toda lâmina sai de lá."""
+    assert _pes(["0", "0", "2m"]) == {round(2 * PPM * 256) / 256}
+
+
+def test_controle_por_padrao_a_touceira_nasce_no_chao() -> None:
+    assert _pes(["0", "0", "0"]) == {0.0}
+
+
+def _do_lado_de_la(vistas: tuple[str, ...]) -> tuple[int, int]:
+    """Os pontos do salpico, e deles os que caem na metade de trás da moita (longe da câmera da vista S)."""
+    dado = de_uma_peca("salpico", FLORES).model_dump(mode="json")
+    ir = ir_da_composicao(validar({**dado, "vistas": dict.fromkeys(vistas, {})}, Composicao, "teste"))
+    pontos = [p.geometry.center_q8 for p in ir.parts if p.id.startswith("n_") and p.geometry.type == "ellipse"]
+    return len(pontos), sum(1 for p in pontos if p[1] < -5 * 256)
+
+
+def test_o_salpico_cai_do_lado_da_camera() -> None:
+    """Na composição de vista única, nenhum ponto cai atrás da moita, e a câmera vê quase todos."""
+    assert _do_lado_de_la(("S",)) == (int(FLORES["n"]), 0)
+    q = _quadro(de_uma_peca("salpico", FLORES))
+    assert sum(1 for p in q.part_table if p.startswith("n_") and q.visiveis.get(p, 0)) >= 0.75 * int(FLORES["n"])
+
+
+def test_controle_na_volta_toda_ha_pontos_do_lado_de_la() -> None:
+    """Com as 4 vistas os pontos se espalham pela volta: cada vista mostra os dela."""
+    assert _do_lado_de_la(("S", "E", "N", "W"))[1] >= 2
+
+
+def test_o_salpico_na_ponta_das_laminas() -> None:
+    """A âncora das pontas da touceira leva a flor e a espiga."""
+    comp = validar({**de_uma_peca("touceira", CAPIM).model_dump(mode="json"), "nos": [
+        {"id": "pe", "peca": "touceira", "args": {**CAPIM, "n": "6"}},
+        {"id": "flor", "peca": "salpico", "args": {"em": "pe.pontas", "material": "ambar", "n": "6"}}]},
+        Composicao, "teste")
+    q = _quadro(comp)
+    assert sum(1 for p in q.part_table if p.startswith("flor_") and q.visiveis.get(p, 0)) >= 4

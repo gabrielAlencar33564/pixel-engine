@@ -28,6 +28,9 @@ TRECHOS = 6  # os trechos do galho roliço
 ABRE_NO_ALTO = (0.25, 0.75)  # o ponto de controle: a 25 % da abertura já subiu 75 % (sobe a prumo e depois abre)
 SAIDA_DO_FINO = 0.6  # o galho fino sai a 60 % do grosso
 DESVIO_NA_FATIA = 15  # quanto o galho sai do meio da fatia dele (% da fatia, para cada lado)
+PULA = 3  # os galhos escalonados: o vizinho na volta sai 3 degraus acima (ou abaixo), não o seguinte
+CURTO_NO_ALTO = 0.4  # o galho que sai do alto alcança 40 % menos
+ALTO_NO_ALTO = 0.6  # e a ponta dele sobe até 60 % do que falta da faixa
 RAIO_MINIMO = 32  # o menor raio do galho roliço na IR (q8): 1/8 px
 Vec = tuple[float, float, float]
 
@@ -127,15 +130,21 @@ def _rolico(c: Ctx, pid: str, pts: list[Vec], diametros: tuple[float, float], ma
 def _galhos(c: Ctx, a: dict[str, Any]) -> None:
     """``n`` galhos em volta do tronco, um a cada fatia da volta a partir da frente (``fase``, em fatias: com 0,5 a
     frente fica livre, e nenhum galho aponta para a câmera): cada um sobe quase a prumo e só então abre até a ponta,
-    dentro da copa. Com ``bifurca``, um galho fino sai a 60 % dele. Deixa a âncora ``pontas`` (x, y, z)."""
+    dentro da copa. Com ``bifurca``, um galho fino sai a 60 % dele; com ``sobe``, os galhos saem escalonados do
+    tronco. Deixa a âncora ``pontas`` (x, y, z)."""
     meia_l, meia_a, cz = a["copa"]
     st, n = c.st, a["n"]
+    degrau = st.randint(0, n - 1) if a["sobe"] > 0 else 0
     pontas: list[Vec] = []
     for j in range(n):
         az = 2 * math.pi * (j + a["fase"] + st.randint(-DESVIO_NA_FATIA, DESVIO_NA_FATIA) / 100) / n
-        alcance = meia_l * a["alcance"] * st.randint(80, 100) / 100
-        v = a["ponta_v"][0] + (a["ponta_v"][1] - a["ponta_v"][0]) * st.randint(0, 100) / 100
-        p0 = (0.0, 0.0, a["base"])
+        # com ``sobe``, cada galho sai de uma altura (a ordem delas na volta é da semente): o de baixo vai mais
+        # longe e fica mais baixo, o de cima sai mais curto e mais alto
+        u = ((j * PULA + degrau) % n) / max(1, n - 1) if a["sobe"] > 0 else 0.0
+        alcance = meia_l * a["alcance"] * st.randint(80, 100) / 100 * (1 - CURTO_NO_ALTO * u)
+        r = st.randint(0, 100) / 100
+        v = a["ponta_v"][0] + (a["ponta_v"][1] - a["ponta_v"][0]) * (r + ALTO_NO_ALTO * u * (1 - r))
+        p0 = (0.0, 0.0, a["base"] + a["sobe"] * u)
         p1 = (math.sin(az) * alcance, math.cos(az) * alcance * a["fundo"], cz + v * meia_a)
         ctrl = (p1[0] * ABRE_NO_ALTO[0], p1[1] * ABRE_NO_ALTO[0], p0[2] + (p1[2] - p0[2]) * ABRE_NO_ALTO[1])
         grosso = a["largura"][0] + (a["largura"][1] - a["largura"][0]) * st.randint(0, 100) / 100
@@ -174,7 +183,7 @@ PECAS_TRONCO = [
                   ("velho", {"altura": "1.8m", "base": "70cm", "topo": "45cm", "pe": "0.5", "irregular": "0.18",
                              "curva": "6cm", "raizes": "5", "nos": "2", "casca": "casca_sulcada"})),
         "tests/test_flora.py::test_o_pe_do_tronco_abre", (_tronco, _perfil, _no_perfil, _raizes, _nos),
-        vistas=QUATRO),
+        vistas=QUATRO, flora="lenho"),
     Peca("galhos", "Os galhos em volta do tronco, roliços: sobem do tronco e abrem até a ponta, dentro da copa (a "
          "copa em volumes cobre quase todos; sem copa, é a árvore seca). Deixa as pontas", (
         X("base", "comprimento", "a altura de onde saem (o alto do tronco)"), COPA,
@@ -185,6 +194,8 @@ PECAS_TRONCO = [
         X("ponta_v", "faixa", "a altura das pontas na copa (de -1 a 1), sorteada na faixa", ["-0.4", "0.2"]),
         X("largura", "faixa", "o diâmetro na saída"), X("ponta", "comprimento", "o diâmetro na ponta"),
         X("bifurca", "escalar", "a chance de um galho fino a 60 % do grosso", "0.5"),
+        X("sobe", "comprimento", "os galhos saem escalonados ao longo desta altura do tronco, a partir da base "
+          "(0 = todos do mesmo ponto)", "0"),
         X("material", "material", "a casca", "casca")),
         _galhos, (("em volta", {"base": "1m", "copa": COPA_V, "n": "5", "largura": ["12cm", "16cm"], "ponta": "4cm"}),
                   ("abertos", {"base": "80cm", "copa": COPA_V, "n": "7", "alcance": "0.95", "ponta_v": ["-0.7", "-0.2"],
@@ -193,5 +204,5 @@ PECAS_TRONCO = [
                              "largura": ["10cm", "14cm"], "ponta": "3cm", "bifurca": "1",
                              "material": "casca_clara"})),
         "tests/test_flora.py::test_os_galhos_abrem_em_volta_do_tronco", (_galhos, _rolico, _no_caminho),
-        vistas=QUATRO, ancoras=("pontas",)),
+        vistas=QUATRO, flora="lenho", ancoras=("pontas",)),
 ]

@@ -37,7 +37,7 @@ ESPERADO: dict[str, Any] = json.loads((CASOS / "kit.esperado.json").read_text(en
 # as peças que nasceram na engine nova: sem oráculo, com teste (a saia e o lenço gerais; a flora em volumes, que
 # trocou a de cachos pontilhados, galhos em pena e cortinas do `pixel-engine`: tests/test_flora.py; a espada do
 # golpe: tests/test_golpe.py; o penedo: tests/test_penedo.py)
-NOVAS = {"saia", "lenco", "copa", "copa_conica", "galhos", "espada", "penedo"}
+NOVAS = {"saia", "lenco", "copa", "copa_aberta", "copa_conica", "galhos", "touceira", "salpico", "espada", "penedo"}
 # o tronco ganhou forma (mudança 20): o oráculo compara o tronco liso, o cone do `pixel-engine`, nas variações que a
 # peça tinha, com o pé e o perfil irregular em zero (``scripts/oraculo.py``)
 DO_ANTIGO: dict[str, Any] = script("oraculo").VARIACOES_DO_ANTIGO
