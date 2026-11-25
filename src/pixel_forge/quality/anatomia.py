@@ -90,9 +90,14 @@ def _rosto(c: _Corpo) -> list[Medida]:
 def _tronco(c: _Corpo) -> list[Medida]:
     larguras = _uniao(c.ms, "chest", "waist", "pelvis_block").sum(axis=1)
     peito, quadril = (int(np.argmax(c.ms[p].sum(axis=1))) for p in ("chest", "pelvis_block"))
+    alto, baixo = _fileiras(c.ms["chest"])
+    caixa = (baixo - alto + 1) * max(_largura(c.ms["chest"], y) for y in range(alto, baixo + 1))
     return [Medida("cintura_sobre_o_peito", larguras[peito:quadril + 1].min() / larguras[peito], (0.70, 1.0),
                    "a largura mais estreita do tronco, do mais largo do peito ao mais largo do quadril, sobre a do "
-                   "peito; abaixo da faixa, o tronco lê como duas bolas, uma sobre a outra")]
+                   "peito; abaixo da faixa, o tronco lê como duas bolas, uma sobre a outra"),
+            Medida("peito_na_caixa", c.ms["chest"].sum() / caixa, (0.83, 1.0),
+                   "a área do peito sobre a da caixa que o contém; abaixo da faixa, o peito é uma bola (a elipse "
+                   "enche 0,79 da caixa) e lê como busto")]
 
 
 def _ombros(c: _Corpo) -> list[Medida]:

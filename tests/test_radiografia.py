@@ -2,7 +2,7 @@
 sem a câmera do jogo; as medidas do corpo acertam num corpo sintético de proporções reais e acusam cada defeito posto
 nele; e o corpo do kit tem, hoje, uma lista conhecida de medidas fora da faixa (a lista encolhe quando o modelo é
 corrigido, e nenhuma medida nova pode sair da faixa sem aparecer aqui). O tronco e os ombros já foram corrigidos: as
-medidas deles estão na faixa, e o tronco do `pixel-engine` volta a sair dela."""
+medidas deles estão na faixa, e o tronco do `pixel-engine` (com o peito em bola) volta a sair dela."""
 
 from __future__ import annotations
 
@@ -32,7 +32,8 @@ EXEMPLOS = Path(__file__).parent / "fixtures" / "exemplos"
 # as medidas do corpo do kit que hoje saem da faixa do corpo real: os defeitos do modelo (os da cabeça), medidos em
 # 2026-11-24; e as do tronco e dos ombros, que saíam dela até a correção do mesmo dia
 DEFEITOS_DO_MODELO = {"rosto_sobre_o_cranio", "olhos_na_cabeca", "ponta_do_perfil", "cabelo_sobre_o_cranio"}
-DEFEITOS_DO_TRONCO_ANTIGO = {"cintura_sobre_o_peito", "vao_no_ombro", "ombro_sobre_o_queixo", "pescoco"}
+DEFEITOS_DO_TRONCO_ANTIGO = {"cintura_sobre_o_peito", "peito_na_caixa", "vao_no_ombro", "ombro_sobre_o_queixo",
+                             "pescoco"}
 
 
 def _ir(nome: str) -> AssetIR:
@@ -94,8 +95,9 @@ def _sintetico(**muda: int) -> dict[str, Any]:
     """As medidas de um corpo de proporções reais (240 px de estatura, 40 de cabeça, o centro na coluna 100), com
     os defeitos pedidos: ``olho`` (a fileira dos olhos), ``vao`` e ``sobe`` (o ombro para fora e para cima),
     ``focinho`` (a mandíbula à frente), ``cabelo`` (o fundo do cabelo), ``estreita`` e ``fino`` (o rosto, o pescoço)
-    e ``aperta`` (a cintura)."""
-    d = {"olho": 29, "vao": 0, "sobe": 0, "focinho": 0, "cabelo": 118, "estreita": 0, "fino": 0, "aperta": 0, **muda}
+    ``aperta`` (a cintura) e ``bola`` (as fileiras do peito, de baixo para cima, com os cantos comidos)."""
+    d = {"olho": 29, "vao": 0, "sobe": 0, "focinho": 0, "cabelo": 118, "estreita": 0, "fino": 0, "aperta": 0,
+         "bola": 0, **muda}
     e, ombro = d["estreita"], 61 - d["sobe"]
     frente = _caixas(skull=(10, 34, 86, 113), jaw=(30, 46, 88 + e, 111 - e), chin=(44, 49, 94, 105),
                      eye_l=(d["olho"], d["olho"] + 1, 104, 106), eye_r=(d["olho"], d["olho"] + 1, 93, 95),
@@ -104,6 +106,8 @@ def _sintetico(**muda: int) -> dict[str, Any]:
                      j_shoulder_l=(ombro, ombro + 12, 126 + d["vao"], 138 + d["vao"]),
                      j_shoulder_r=(ombro, ombro + 12, 61 - d["vao"], 73 - d["vao"]),
                      foot_l=(240, 249, 104, 114), foot_r=(240, 249, 85, 95))
+    for colunas in (slice(70, 78), slice(122, 130)):  # os cantos de baixo do peito, até a largura da cintura
+        frente["chest"][111 - d["bola"]:111, colunas] = False
     nariz = (31, 35, 80, 80) if d["focinho"] else (31, 35, 76, 80)
     perfil = _caixas(skull=(10, 34, 80, 113), jaw=(30, 46, 80 - d["focinho"], 105), chin=(44, 49, 82, 95),
                      nose=nariz, hair_cap=(8, 30, 84, d["cabelo"]))
@@ -118,7 +122,8 @@ def test_a_regua_aceita_o_corpo_de_proporcoes_reais() -> None:
 @pytest.mark.parametrize(("defeito", "medida"), [
     ({"olho": 16}, "olhos_na_cabeca"), ({"vao": 12}, "vao_no_ombro"), ({"sobe": 12}, "ombro_sobre_o_queixo"),
     ({"focinho": 3}, "ponta_do_perfil"), ({"cabelo": 126}, "cabelo_sobre_o_cranio"),
-    ({"estreita": 4}, "rosto_sobre_o_cranio"), ({"fino": 3}, "pescoco"), ({"aperta": 8}, "cintura_sobre_o_peito")])
+    ({"estreita": 4}, "rosto_sobre_o_cranio"), ({"fino": 3}, "pescoco"), ({"aperta": 8}, "cintura_sobre_o_peito"),
+    ({"bola": 36}, "peito_na_caixa")])
 def test_controle_a_regua_acusa_cada_defeito(defeito: dict[str, int], medida: str) -> None:
     assert [m["medida"] for m in _sintetico(**defeito).values() if not m["ok"]] == [medida]
 

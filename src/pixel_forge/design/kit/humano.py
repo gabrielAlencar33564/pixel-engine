@@ -23,9 +23,10 @@ R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.0
 # o ombro: a junta fica OMBRO_CAI abaixo da base do pescoço (o alto do ombro, 3 % da estatura abaixo do queixo), e
 # a esfera dela tem R_OMBRO vezes o raio do braço
 OMBRO_CAI, R_OMBRO = 0.035, 1.25
-# a cintura e o peito: o centro e a meia altura de cada massa, em frações do tronco (uma entra na outra, e o tronco
-# não afina entre elas)
-CINTURA, PEITO = (0.28, 0.30), (0.64, 0.36)
+# a cintura: o centro e a meia altura da massa, em frações do tronco. O peito é uma cunha, não uma bola: o alto e o
+# baixo dela, cada um com a altura no tronco e o raio (a meia profundidade) sobre o fundo do peito, e a meia largura
+# de baixo sobre a da cintura. O baixo fica a 0,43 do tronco: mais baixo, a cunha da jaqueta cobre a faixa
+CINTURA, PEITO_ALTO, PEITO_BAIXO, PEITO_NA_CINTURA = (0.28, 0.30), (0.78, 0.95), (0.43, 0.80), 1.05
 SIDES = (("l", 1), ("r", -1))
 FRONT_VIEWS = ("S", "SW", "W", "E", "SE")
 CANVAS, PIVOT, TALL_EXTRA = 96, (48, 60), 16
@@ -85,6 +86,35 @@ def trapezio(c: dict[str, float], sx: int, folga: float = 0.0, ate: float = 1.0)
             "radii_q8": [q(r0 + folga), q(r0 + ate * (r1 - r0) + folga)]}
 
 
+def _raios_do_peito(c: dict[str, float], folga: float) -> tuple[float, float]:
+    return c["peito_y"] * PEITO_ALTO[1] + folga, c["peito_y"] * PEITO_BAIXO[1] + folga
+
+
+def peito(c: dict[str, float], folga: float = 0.0, larg: tuple[float, float] = (1.0, 0.0)) -> dict[str, Any]:
+    """O peito em cunha: um fuso de cada lado, do alto do peito à cintura, fechado em cima e embaixo. A seção é um
+    estádio (a frente e as costas chapadas) e os lados e a frente são retas: não há a bola que lia como busto.
+    ``folga`` é a da roupa na profundidade, e ``larg`` (vezes, mais) a dela na largura."""
+    t = c["tronco"]
+    ra, rb = _raios_do_peito(c, folga)
+    xa = max(0.2, c["peito_x"] * larg[0] + larg[1] - ra)
+    xb = max(0.2, c["cintura_x"] * PEITO_NA_CINTURA * larg[0] + larg[1] - rb)
+    za, zb = PEITO_ALTO[0] * t, PEITO_BAIXO[0] * t
+    volta = ((xb, zb, rb), (xa, za, ra), (-xa, za, ra), (-xb, zb, rb), (xb, zb, rb))
+    return {"type": "tapered_polyline", "points_q8": [qv(x, 0, z) for x, z, _ in volta],
+            "radii_q8": [q(r) for _, _, r in volta]}
+
+
+def frente_do_peito(c: dict[str, float], z: float, folga: float = 0.0) -> float:
+    """A frente (+y) do peito no meio do corpo, na altura ``z`` (onde a roupa põe a gola); abaixo da cunha, a do
+    baixo dela."""
+    t = c["tronco"]
+    ra, rb = _raios_do_peito(c, folga)
+    za, zb = PEITO_ALTO[0] * t, PEITO_BAIXO[0] * t
+    if z >= za:
+        return math.sqrt(max(0.0, ra * ra - (z - za) ** 2))
+    return rb + (ra - rb) * max(0.0, z - zb) / (za - zb)
+
+
 def neck_len(c: dict[str, float]) -> float:
     return c["pescoco"] + 0.25 * c["cabeca"]  # a base do crânio fica um quarto da cabeça acima do queixo
 
@@ -102,10 +132,10 @@ def _tronco(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
     b.part("pelvis_block", pele, ellipse(qv(0, -0.2, 0.9), qv(c["quadril_larg_x"], c["peito_y"] * 0.85,
                                                              0.11 * c["estatura"] * 0.5)),
            Parte(bone="pelvis_tilt", group="pelvis"))
+    massa = Parte(bone="torso", group="torso", tags=("shade_group",))  # o peito e a cintura: uma massa só
     b.part("waist", pele, ellipse(qv(0, 0, CINTURA[0] * t), qv(c["cintura_x"], c["peito_y"] * 0.75, CINTURA[1] * t)),
-           Parte(bone="torso", group="waist"))
-    b.part("chest", pele, ellipse(qv(0, 0.1, PEITO[0] * t), qv(c["peito_x"], c["peito_y"], PEITO[1] * t)),
-           Parte(bone="torso", group="chest"))
+           massa)
+    b.part("chest", pele, peito(c), massa)
     for side, sx in SIDES:  # no grupo do braço e sem linha interna: o ombro lê como uma forma só, do pescoço ao braço
         b.part(f"trap_{side}", pele, trapezio(c, sx),
                Parte(bone="torso", group=f"arm_{side}", tags=("no_inner_outline",)))
@@ -150,8 +180,8 @@ def _juntas(b: AssetBuilder, c: dict[str, float], junta: str, side: str) -> None
 
 
 def corpo(b: AssetBuilder, c: dict[str, float], pele: str, junta: str) -> None:
-    """A sombra de contato, as massas do corpo em ``pele`` (com a linha do ombro de cada lado) e uma esfera em cada
-    junta em ``junta``."""
+    """A sombra de contato, as massas do corpo em ``pele`` (o tronco numa massa só, sem linha nem sombra entre o
+    peito e a cintura, e a linha do ombro de cada lado) e uma esfera em cada junta em ``junta``."""
     b.part("ground_shadow", "sombra", ellipse(qv(0, 0.3, 0), qv(c["quadril_larg_x"] * 1.1, 3.6, 0.3)),
            Parte(tags=("ground_shadow",), priority=-100))
     _tronco(b, c, pele)

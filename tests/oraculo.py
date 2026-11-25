@@ -5,6 +5,8 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -16,7 +18,7 @@ from pixel_forge.application.quadros import quadro_de_repouso
 from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.estilo import StyleDoc
 from pixel_forge.contracts.ir import AssetIR
-from pixel_forge.design.construtor import PARTE, AssetBuilder, Parte
+from pixel_forge.design.construtor import PARTE, AssetBuilder, Parte, ellipse, qv
 from pixel_forge.design.kit import humano, roupa
 from pixel_forge.motion.receita import carregar
 from pixel_forge.raster.estilo import estilo_render
@@ -25,12 +27,16 @@ CASOS = Path(__file__).parent / "fixtures" / "oraculo"
 ABRE_BRACO_DO_ANTIGO = 15_000.0  # o `pixel-engine` abre o braço a 15° no repouso
 BALANCO_DO_ANTIGO = (23_000, 26_000)  # e, no andar, balança o ombro 23° e dobra o cotovelo 26° (mdeg)
 # o tronco do `pixel-engine`: a junta do ombro na base do pescoço, o pescoço fino, o braço do tamanho real, o peito
-# e a cintura como duas bolas, a jaqueta sobre elas e a manga começando acima da junta; sem a linha do ombro
+# e a cintura como duas bolas (cada uma com a sua sombra e, no corpo, o seu contorno), a jaqueta sobre elas e a manga
+# começando acima da junta; sem a linha do ombro
 TRONCO_DO_ANTIGO = ((humano, "OMBRO_CAI", 0.0), (humano, "R_PESCOCO", 0.024), (humano, "BRACO", 0.186),
-                    (humano, "ANTEBRACO", 0.146), (humano, "CINTURA", (0.30, 0.16)), (humano, "PEITO", (0.70, 0.32)),
-                    (roupa, "JAQUETA_PEITO", (0.68, 0.36)), (roupa, "JAQUETA_CINTURA", (0.22, 0.26)),
-                    (roupa, "MANGA_DE", -0.05))
+                    (humano, "ANTEBRACO", 0.146), (humano, "CINTURA", (0.30, 0.16)),
+                    (roupa, "JAQUETA_CINTURA", (0.22, 0.26)), (roupa, "MANGA_DE", -0.05))
 LINHA_DO_OMBRO = ("trap_", "jacket_yoke_")  # as partes que o `pixel-engine` não tem
+# a bola do peito dele: o centro e a meia altura em frações do tronco (a do corpo e a da jaqueta, que tem folga), e
+# o grupo de contorno de cada massa do tronco (na engine o peito e a cintura são uma massa só)
+BOLA_DO_PEITO, BOLA_DA_JAQUETA = (0.70, 0.32), (0.68, 0.36)
+GRUPO_DO_ANTIGO = {"chest": "chest", "waist": "waist", "jacket_chest": "jacket", "jacket_waist": "jacket"}
 
 
 def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -39,19 +45,43 @@ def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(humano, "ABRE_BRACO_MDEG", ABRE_BRACO_DO_ANTIGO)
 
 
+def _bola(c: dict[str, float], folga: float) -> tuple[float, float, float]:
+    """(a meia profundidade, a altura do centro, a meia altura) da bola do peito; com folga, a da jaqueta."""
+    z, rz = BOLA_DA_JAQUETA if folga else BOLA_DO_PEITO
+    return c["peito_y"] * 1.12 + 0.35 if folga else c["peito_y"], z * c["tronco"], rz * c["tronco"]
+
+
+def _peito_do_antigo(c: dict[str, float], folga: float = 0.0,
+                     larg: tuple[float, float] = (1.0, 0.0)) -> dict[str, Any]:
+    ry, cz, rz = _bola(c, folga)
+    return ellipse(qv(0, 0.1, cz), qv(c["peito_x"] * larg[0] + larg[1], ry, rz))
+
+
+def _frente_do_antigo(c: dict[str, float], z: float, folga: float = 0.0) -> float:
+    ry, cz, rz = _bola(c, folga)
+    u = (z - cz) / rz
+    return 0.1 + ry * math.sqrt(max(0.0, 1 - u * u))
+
+
 def tronco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
-    """O tronco, os ombros, o pescoço e o braço do humano nas medidas do `pixel-engine`, sem a linha do ombro: a
-    engine corrigiu a anatomia (mudança intencional), e o oráculo compara o resto do humano (o rig, a roupa, o
-    movimento e o render) no tronco dele."""
+    """O tronco, os ombros, o pescoço e o braço do humano nas medidas do `pixel-engine`, com o peito em bola (e
+    cada massa do tronco sombreada e contornada sozinha) e sem a linha do ombro: a engine corrigiu a anatomia
+    (mudança intencional), e o oráculo compara o resto do humano (o rig, a roupa, o movimento e o render) no tronco
+    dele."""
     for modulo, nome, valor in TRONCO_DO_ANTIGO:
         monkeypatch.setattr(modulo, nome, valor)
+    for modulo in (humano, roupa):
+        monkeypatch.setattr(modulo, "peito", _peito_do_antigo)
+    monkeypatch.setattr(roupa, "frente_do_peito", _frente_do_antigo)
     parte = AssetBuilder.part
 
-    def sem_a_linha(b: AssetBuilder, id: str, material: str, geometry: dict[str, Any], como: Parte = PARTE) -> None:
+    def do_antigo(b: AssetBuilder, id: str, material: str, geometry: dict[str, Any], como: Parte = PARTE) -> None:
+        if id in GRUPO_DO_ANTIGO:
+            como = replace(como, group=GRUPO_DO_ANTIGO[id], tags=tuple(t for t in como.tags if t != "shade_group"))
         if not id.startswith(LINHA_DO_OMBRO):
             parte(b, id, material, geometry, como)
 
-    monkeypatch.setattr(AssetBuilder, "part", sem_a_linha)
+    monkeypatch.setattr(AssetBuilder, "part", do_antigo)
 
 
 def apoio_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:

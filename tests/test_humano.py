@@ -1,6 +1,7 @@
 """O humano: o corpo vestido dá o mesmo pixel que o `pixel-engine` no parado e no andar, nas 8 direções, quadro a
 quadro (no tronco, na abertura de braço, no balanço e no apoio dele: os da engine mudaram de propósito); cada peça de
-roupa veste o corpo; a saia segue a coxa ao andar; e quem anda tem as 8 direções."""
+roupa veste o corpo; o peito e a cintura são uma massa só, sem linha entre os dois; a saia segue a coxa ao andar; e
+quem anda tem as 8 direções."""
 
 from __future__ import annotations
 
@@ -8,6 +9,7 @@ import hashlib
 import json
 from typing import Any
 
+import numpy as np
 import pytest
 
 from pixel_forge.application.build import instantes
@@ -21,7 +23,13 @@ from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.kit.humano import Corpo, medidas
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
+from pixel_forge.raster.contorno import QUATRO, contorno_interno
 from pixel_forge.raster.estilo import estilo_render
+from pixel_forge.raster.grade import shift
+from pixel_forge.raster.montagem import compor, tabelas
+from pixel_forge.rig.fk import Skeleton
+from pixel_forge.rig.pose import rest_pose
+from pixel_forge.views.projetor import project_view
 
 from .oraculo import (
     CASOS,
@@ -97,6 +105,31 @@ def test_no_repouso_as_maos_caem_junto_do_corpo() -> None:
 def test_controle_o_braco_do_antigo_deixa_as_maos_longe(monkeypatch: pytest.MonkeyPatch) -> None:
     braco_do_antigo(monkeypatch)
     assert _maos_sobre_os_ombros() > MAOS_SOBRE_OS_OMBROS
+
+
+def _tronco_numa_massa(comp: Composicao, peito: str, cintura: str) -> tuple[bool, int]:
+    """De frente: (o peito e a cintura sombreiam como um volume só, os pixels de linha de contorno entre os dois: os
+    da cintura com a linha, vizinhos do peito e de nenhuma outra peça)."""
+    ir, est = ir_da_composicao(comp), estilo_render(estilo_base())
+    cam = compor(project_view(ir, rest_pose(Skeleton(ir.bones)), "S"), est.materials, ir.canvas.width,
+                 ir.canvas.height)
+    linha = contorno_interno(cam, tabelas(cam, est.materials), np.zeros(cam.part.shape, dtype=np.uint16))
+    do_peito, outra = cam.part == cam.num[peito], ~np.isin(cam.part, [0, cam.num[peito], cam.num[cintura]])
+    junto, perto = (np.logical_or.reduce([shift(m, dx, dy) for dx, dy in QUATRO]) for m in (do_peito, outra))
+    uma = {peito, cintura} <= cam.massa.keys() and bool(np.array_equal(cam.massa[peito], cam.massa[cintura]))
+    return uma, int((linha & (cam.part == cam.num[cintura]) & junto & ~perto).sum())
+
+
+def test_o_peito_e_a_cintura_sao_uma_massa_so_sem_linha_entre_os_dois() -> None:
+    assert _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "chest", "waist") == (True, 0)
+    assert _tronco_numa_massa(_comp("vestido"), "jacket_chest", "jacket_waist") == (True, 0)
+
+
+def test_controle_o_tronco_do_antigo_tem_a_linha_do_busto(monkeypatch: pytest.MonkeyPatch) -> None:
+    tronco_do_antigo(monkeypatch)
+    uma, linha = _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "chest", "waist")
+    assert not uma and linha >= 4  # a linha sob a bola do peito, de um braço ao outro
+    assert not _tronco_numa_massa(_comp("vestido"), "jacket_chest", "jacket_waist")[0]
 
 
 def _maos_no_andar_de_perfil() -> float:

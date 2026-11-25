@@ -199,13 +199,41 @@ substituído). O porquê longo vai no commit.
 - A jaqueta segue o tronco: a ombreira (`jacket_yoke_l`, `jacket_yoke_r`) é a linha do ombro com 0,3 px de folga, no
   grupo da manga; a manga começa na junta (começava 5 % acima e fazia um gomo sobre o ombro); o peito e a cintura
   dela entram um no outro. Sem manga, a ombreira é a alça (70 % da linha) e o ombro fica nu.
-- O oráculo do humano compara no tronco do antigo: o teste põe as nove constantes de volta e tira as partes da
+- O oráculo do humano compara no tronco do antigo: o teste põe as constantes de volta e tira as partes da
   linha do ombro, e o rig, a roupa, o movimento e o render seguem iguais a ele pixel a pixel. A forma nova é provada
   pelas medidas da radiografia; o controle é o tronco do antigo, que sai da faixa nas quatro medidas. A lista
   `DEFEITOS_DO_MODELO` ficou com as quatro da cabeça. Os esperados não foram regerados (I11).
 - O que mudou de visibilidade, conferido nas `escondidas` do viajante e do vestido, antes e depois: de perfil a
   manga de lá fica inteira atrás do corpo (o gomo dela aparecia acima do ombro de cá); a aba de cima da gola passa
   a tocar a borda de perfil; no vestido a cintura da jaqueta some sob o peito e a faixa fora da vista S. Olho,
+  chapéu e cabelo não mudaram.
+
+## O humano: o peito em cunha (pedido do dono, 2026-11-24)
+
+O dono viu o busto como uma bola: o personagem masculino parecia ter seios.
+
+- Eram três causas. O peito era um elipsoide (uma bola de 10 px), com o seu próprio grupo de contorno e a sua
+  própria sombra: a engine riscava a linha de contorno sob ele, na cintura, e escurecia a borda de baixo dele. Na
+  jaqueta não havia a linha, mas o peito e a cintura dela sombreavam cada um por si.
+- O peito é uma cunha (`peito`, em `kit/humano.py`): um fuso de cada lado, do alto do peito (0,78 do tronco) à
+  cintura (0,43), fechado em cima e embaixo. A seção é um estádio, e a frente, as costas e os lados são retas. A
+  largura e a profundidade são as de antes (a profundidade, 0,95 e 0,80 do fundo do peito).
+- O peito e a cintura são uma massa só: o mesmo grupo de contorno (`torso`) e a marca `shade_group`, no corpo e
+  na jaqueta. Não há linha nem sombra entre os dois, e a luz e a sombra caem no tronco inteiro.
+- A cunha acaba a 0,43 do tronco: mais baixa, a da jaqueta cobria a faixa. Pôr a faixa por cima do peito por regra
+  foi tentado e descartado: a regra vale na máscara inteira da faixa, e a metade de trás dela aparecia sobre a
+  jaqueta nas diagonais.
+- A gola da jaqueta assenta na frente da cunha (`frente_do_peito`); o `_surface_y` da bola saiu.
+- A medida nova `peito_na_caixa` (a área do peito sobre a da caixa dele, de 0,83 a 1,0) entra na radiografia: a
+  bola dava 0,79 e a cunha dá 0,87. A faixa é uma aproximação, como as outras. `cintura_sobre_o_peito` foi de
+  0,76 a 0,81.
+- O oráculo segue ancorado no tronco do antigo: o teste repõe a bola (a do corpo e a da jaqueta), a frente dela
+  para a gola e cada massa no seu grupo, sem `shade_group`. O teste novo conta, no passe de contorno da engine, os
+  pixels de linha entre o peito e a cintura (0) e confere que os dois sombreiam como um volume; o controle é o
+  tronco do antigo (7 pixels de linha, dois volumes). Os esperados não foram regerados (I11).
+- O que mudou de visibilidade, nas `escondidas` de nove composições, antes e depois: de perfil a aba de baixo da
+  gola passa a aparecer (1 px, na borda) e a de cima fica por dentro; no vestido a cintura da jaqueta aparece nas
+  diagonais e a ombreira de lá some de perfil; sem manga, o braço de lá fica atrás do peito na vista SW. Olho,
   chapéu e cabelo não mudaram.
 
 ## O remoto (pedido do dono, 2026-11-23)

@@ -19,7 +19,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 |---|---|---|
 | Linhas em `src/` | 32 701 | 8 273 |
 | Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~30 s, 260 testes |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~30 s, 263 testes |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
@@ -52,6 +52,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 10. O tronco e os ombros do humano: a junta do ombro 3,5 % da estatura mais baixa, a linha do ombro do pescoço ao
     braço, o peito e a cintura sem o estrangulamento, o pescoço mais largo, o braço a 0,90 e a jaqueta com a
     ombreira. Na `10r`, a radiografia do corpo, antes em cima.
+11. O peito do humano em cunha, numa massa só com a cintura (era uma bola com a sua linha e a sua sombra, e lia
+    como busto), no corpo e na jaqueta. Na `11r`, a radiografia, antes em cima.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -64,7 +66,7 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   altura da cabeça (o real é ~50 %: ficam na testa, na faixa da aba do chapéu); o rosto com 0,63 da largura do
   crânio (lê como uma lâmpada); a mandíbula como o ponto mais à frente do perfil (não há nariz); o cabelo preso
   alongando a cabeça em 25 % para trás. A roupa veste por cima e herda tudo. O tronco e os ombros foram corrigidos
-  (mudança 10); as mudanças 7 a 9 ajustaram a pose sobre o modelo antigo e não foram reafinadas no novo.
+  (mudanças 10 e 11); as mudanças 7 a 9 ajustaram a pose sobre o modelo antigo e não foram reafinadas no novo.
 - O humano na tela: no andar em diagonal as mãos a até 21 px uma da outra; o perfil parado estreito (12 px, um
   braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
 
@@ -72,4 +74,4 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 10 ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 11 ela ainda não foi reconstruída.
