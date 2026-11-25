@@ -1,6 +1,7 @@
-"""A copa: a folhagem em cachos pontilhados (a folhagem de copa vigente), a copa da conífera em galhos em pena e as
-cortinas de ramos pendentes. A copa é a elipse ``[meia largura, meia altura, altura do centro]``; as massas escolhem o
-osso pela altura, e o tom delas vem da posição na copa em relação à luz do alto-esquerda."""
+"""A copa em volumes, para a câmera de cima: a da folhosa em tufos (elipsoides em anéis em volta do centro, por
+dentro do elipsoide da copa) e a da conífera em andares (saias cônicas, sólidos de revolução). São formas simples,
+que se preveem no pixel: a luz, a oclusão e a sombra no chão saem da forma no render, e a peça desenha qualquer
+vista. A copa é ``[meia largura, meia altura, altura do centro]``."""
 
 from __future__ import annotations
 
@@ -8,232 +9,119 @@ import math
 from typing import Any
 
 from ...core.rng import Stream
-from ..construtor import Parte, polygon, q, qv
-from ..escala import K
-from .folhagem import Lugar, Pena, Pontos, Tira, Tons, TonsDaPena, cacho, frond, strand
+from ..construtor import Parte, ellipse, q, qv
 from .peca import Arg, Ctx, Peca
 
-TESTE = "tests/test_kit.py::test_cada_variacao_monta"
-PESO_U, PESO_Y, PESO_SORTE = -0.8, 0.08, 0.15  # o tom pela posição: a esquerda é a luz; a frente, um pouco
-CANDIDATOS = 12  # o sorteio do melhor candidato (a copa sem aglomerados)
-Massa = tuple[float, float, int, float, str, bool, float]  # (y, z, i, x, classe, pende, raio)
+TESTE = "tests/test_flora.py::test_a_copa_e_uma_massa_so"
+QUATRO = ("S", "E", "N", "W")
+# os anéis de tufos: a elevação (graus), os tufos em fração do anel do meio (0 = um só, no alto) e a fase na volta
+ANEIS = ((90.0, 0.0, 0.0), (42.0, 0.7, 0.0), (4.0, 1.0, 0.5), (-32.0, 0.7, 0.0))
+PENDE_ABAIXO_DE = 20.0  # os anéis abaixo desta elevação pendem (o ramo que cai)
+AFINA = 0.4  # quanto o tufo que pende afina (com ``pende`` 1 ou mais)
+MIOLO = 0.62  # o miolo escuro, em fração da copa: fecha os vãos entre os tufos
+TUFO_DO_GALHO = 0.8  # o tufo na ponta de um galho, em fração do tufo da copa
+ESTACOES = 8  # as estações de cada saia da conífera
+CURVA_DA_SAIA = 0.8  # a saia fecha depressa embaixo e devagar em cima (o expoente do perfil)
+SOBE = 1.6  # cada saia sobe 1,6 passo: entra na de cima
+PONTA = 0.3  # o raio da ponta da conífera (px)
+Vec = tuple[float, float, float]
 X = Arg
 
 
-def _classe(st: Stream, uvy: tuple[float, float, float], tom: tuple[float, ...]) -> str:
-    u, v, y = uvy
-    peso_v, claro, escuro = tom[:3]
-    s = PESO_U * u + peso_v * v + PESO_Y * y + PESO_SORTE * st.randint(-100, 100) / 100
-    return "light" if s > claro else "dark" if s < escuro else "mid"
+def _sorte(st: Stream) -> float:
+    """De −1 a 1."""
+    return st.randint(-100, 100) / 100
 
 
-def _pontos_no_oval(st: Stream, n: int, eixos: tuple[float, float]) -> list[tuple[float, float]]:
-    """``n`` pontos no oval, cada um o candidato mais longe dos de antes (a copa sem aglomerado)."""
-    pts: list[tuple[float, float]] = []
-    for _ in range(n):
-        best, best_d = (0.0, 0.0), -1.0
-        for _ in range(CANDIDATOS):
-            while True:
-                u, v = st.randint(-100, 100) / 100, st.randint(-100, 100) / 100
-                if u * u + v * v <= 1.0:
-                    break
-            d = min((math.hypot((u - pu) * eixos[0], (v - pv) * eixos[1]) for pu, pv in pts), default=math.inf)
-            if d > best_d:
-                best, best_d = (u, v), d
-        pts.append(best)
-    return pts
-
-
-def massas(c: Ctx, a: dict[str, Any]) -> list[Massa]:
-    """As massas da copa, cada uma com profundidade, classe de tom, queda (a metade de baixo pende) e raio, e os cachos
-    nas âncoras de ``cachos``; da frente para trás."""
-    st = c.st
+def tufos(st: Stream, a: dict[str, Any]) -> list[tuple[Vec, Vec]]:
+    """O centro e os raios de cada tufo, do alto para baixo. O tufo de tamanho ``f`` fica a ``1 − f`` do centro da
+    copa, na direção dele: encosta por dentro no elipsoide da copa e nunca passa dele (a altura da copa é exata)."""
     meia_l, meia_a, cz = a["copa"]
-    pts = _pontos_no_oval(st, a["n"], (meia_l, meia_a))
-    lo, hi = a["raio"]
-    v_cai, queda = a["caida"]
-    out: list[Massa] = []
-    for i, (u, v) in enumerate(pts):
-        y = st.randint(round(a["profundidade"][0] * 10), round(a["profundidade"][1] * 10)) / 10
-        cls = _classe(st, (u, v, y / K), a["tom"])
-        z = cz + v * meia_a * a["escala_v"] - (queda if v < v_cai else 0.0)
-        out.append((y, z, i, u * meia_l * a["espalha"], cls, v < v_cai, lo + (hi - lo) * st.randint(0, 100) / 100))
-    for j, (tx, tz, ty) in enumerate(c.ancora(a["cachos"])):  # um cacho na ponta de cada galho
-        z = tz + 1.0 * K
-        u = tx / (meia_l * a["espalha"])
-        v = max(-1.0, min(1.0, (z - cz) / (meia_a * a["escala_v"])))
-        cls = _classe(st, (u, v, (ty + 1.0 * K) / K), a["tom"])
-        out.append((ty + 1.0 * K, z, len(pts) + j, tx, cls, False, lo + (hi - lo) * st.randint(0, 100) / 100))
-    return sorted(out)
+    eixos = (meia_l, meia_l * a["fundo"], meia_a)
+    irr = a["irregular"]
+    out: list[tuple[Vec, Vec]] = []
+    for el, fracao, fase in ANEIS:
+        n = max(1, round(a["tufos"] * fracao))
+        for i in range(n):
+            az = 2 * math.pi * (i + fase + irr * _sorte(st)) / n
+            e = math.radians(el) + (0.5 * irr * _sorte(st) if fracao else 0.0)
+            f = min(0.95, a["tamanho"] * (1 + irr * _sorte(st)))
+            d = (math.cos(e) * math.sin(az), math.cos(e) * math.cos(az), math.sin(e))
+            cx, cy, z = (d[k] * eixos[k] * (1 - f) for k in range(3))
+            rz = eixos[2] * f
+            cai = rz * a["pende"] if el < PENDE_ABAIXO_DE else 0.0
+            cai = max(0.0, min(cai, (cz + z - rz) / 2))  # a ponta do ramo não entra no chão
+            fino = 1 - AFINA * min(1.0, cai / rz)  # o ramo que cai é mais fino que o tufo
+            out.append(((cx, cy, cz + z - cai), (eixos[0] * f * fino, eixos[1] * f * fino, rz + cai)))
+    return out
 
 
-def _pontilhado(c: Ctx, a: dict[str, Any]) -> None:
-    """Cachos pontilhados (folha ou flor miúda pixel a pixel); o 4º material da linha do tom é o brilho daquela
-    classe. ``pontos`` = [densidade ‰, achatado (0 = cacho redondo), brilho ‰]."""
-    dens, achata, brilho = a["pontos"]
-    for y, z, i, x, cls, _, r in massas(c, a):
-        bone, zl = c.osso(z)
-        linha = a["tons"][cls]
-        luz = (linha[3], round(brilho)) if len(linha) > 3 and brilho >= 1 else None
-        cacho(c, f"{c.pid}_{i:02d}", Lugar(bone, qv(0, y, zl), x, 0.0), Tons(*linha[:3]),
-              Pontos(r, round(dens), luz, achata or None))
-
-
-def shade_class(tip_x: float, half_w: float, u: float, front: bool, jitter: float) -> str:
-    """O tom do galho em pena: a ponta à esquerda (a luz) e o alto clareiam; à direita e embaixo escurecem; o galho da
-    frente ganha um pouco de luz."""
-    score = -0.75 * tip_x / max(half_w, 1e-6) + 0.55 * (u - 0.35) + (0.2 if front else 0.0) + 0.18 * jitter
-    return "light" if score > 0.6 else "dark" if score < -0.2 else "mid"
-
-
-def _miolo(c: Ctx, a: dict[str, Any]) -> None:
-    """O miolo escuro em cone atrás de todos os galhos (e o fundo dele)."""
-    base, hgt, rad = a["base"], a["altura"], a["raio"]
-    bone0, zl0 = c.osso(base)
-    for nome, frac, mat, alto in (("miolo", 0.55, a["miolo"], 0.96), ("miolo_fundo", 0.2, a["fundo"], 0.32)):
-        pid = f"{c.pid}_{nome}"
-        c.b.part(pid, mat, polygon(qv(0, -1.0 * K, zl0), [[q(-rad * frac), q(1.5 * K)], [q(rad * frac), q(1.5 * K)],
-                                                         [0, q((hgt - base) * alto)]]),
-                 Parte(bone=bone0, group=c.grupo, tags=("flat", "no_inner_outline"),
-                       priority=-5 if nome == "miolo" else -4))
-        c.por_vista.setdefault("S", {}).setdefault("depth_bias", {})[pid] = -65536
-    c.regras.append({"front": f"{c.pid}_miolo_fundo", "back": f"{c.pid}_miolo"})
-
-
-def _andares(a: dict[str, Any]) -> list[float]:
-    base, hgt, n = a["base"], a["altura"], a["andares"]
-    pesos = [(n - t) ** 0.6 for t in range(n)]
-    zs, z = [], base + 2.5 * K
-    for t in range(n):
-        zs.append(z)
-        z += (hgt - 6 * K - base - 2.5 * K) * pesos[t] / sum(pesos)
-    return zs
-
-
-def _andar(c: Ctx, a: dict[str, Any], t: int, zt: float) -> None:
-    """Um galho para cada lado (ângulo, alcance e queda sorteados, nunca espelhados) e, fora o do topo, dois da frente
-    cobrindo o miolo."""
-    st, base, hgt, rad, n = c.st, a["base"], a["altura"], a["raio"], a["andares"]
-    u = (zt - base) / (hgt - base)
-    alcance = rad * (1 - u) ** 0.95 + 4.0 * K
-    topo = t == n - 1
-    bone, zl = c.osso(zt)
-    for lado in (-1, 1):
-        ang = math.radians(90 + lado * -((30 if topo else 100) + st.randint(0, 15 if topo else 25)))
-        ln = alcance * (0.6 + st.randint(0, 20) / 100) + 2 * K if topo else alcance * (0.9 + st.randint(0, 25) / 100)
-        hw = max(2.2 * K, min(6.0 * K, ln * 0.24 * a["_cheio"] * (0.9 + st.randint(0, 20) / 100)))
-        queda = ln * (0.05 if topo else 0.18) * (0.8 + st.randint(0, 40) / 100)
-        cls = shade_class(ln * math.cos(ang), rad, u, False, st.randint(-100, 100) / 100)
-        frond(c, f"{c.pid}_{t}_{'l' if lado < 0 else 'r'}", Lugar(bone, qv(0, 0, zl), lado * 0.6 * K, 0.0),
-              Pena(ang, ln, hw, queda), a["_tons"][cls])
-    if topo:
-        return
-    for lado in (-1, 1):
-        x0 = lado * st.randint(0, 15) / 10 * K
-        ang = math.radians(-90 + lado * (35 + st.randint(0, 30)))
-        ln = alcance * (0.55 + st.randint(0, 20) / 100)
-        cls = shade_class(x0 + ln * math.cos(ang), rad, u, True, st.randint(-100, 100) / 100)
-        frond(c, f"{c.pid}_{t}_f{'l' if lado < 0 else 'r'}", Lugar(bone, qv(0, 1.0 * K, zl), x0, 2.5 * K),
-              Pena(ang, ln, max(2.2 * K, min(5.0 * K, ln * 0.28)), ln * 0.08), a["_tons"][cls])
-
-
-def _galhos_em_pena(c: Ctx, a: dict[str, Any]) -> None:
-    """A copa da conífera: o miolo, os andares (mais juntos para cima, o alcance caindo com a altura) e a guia por
-    cima. O tom de cada galho vem da ponta em relação à luz. Deixa a âncora ``topo``."""
-    st = c.st
-    cheio = a["cheio"][0] + (a["cheio"][1] - a["cheio"][0]) * st.randint(0, 35) / 35
-    a = {**a, "_cheio": cheio, "_tons": {cls: TonsDaPena(*a["tons"][cls][:4]) for cls in ("light", "mid", "dark")}}
-    _miolo(c, a)
-    for t, zt in enumerate(_andares(a)):
-        _andar(c, a, t, zt)
-    bone, zl = c.osso(a["altura"] - a["guia"])
-    frond(c, f"{c.pid}_guia", Lugar(bone, qv(0, 0.5 * K, zl), 0.0, 0.0),
-          Pena(math.radians(90 + st.randint(-6, 6)), a["guia"], 2.0 * K, 0.0), a["_tons"]["mid"])
-    c.deixa("topo", [(0.0, a["altura"], 0.5 * K)])
-
-
-def _faixa(st: Stream, f: tuple[float, float]) -> float:
-    return f[0] + (f[1] - f[0]) * st.randint(0, 100) / 100
-
-
-def _cortinas(c: Ctx, a: dict[str, Any]) -> None:
-    """Cortinas de ramos pendentes espalhadas na largura, presas na metade de baixo da copa (mais baixas na borda),
-    cada uma com comprimento, largura, profundidade, curva e tom pela posição."""
+def _copa(c: Ctx, a: dict[str, Any]) -> None:
+    """O miolo escuro e os tufos, cada um sombreado como um volume e todos no grupo de contorno do nó (sem linha
+    entre eles); mais um tufo na ponta de cada galho de ``pontas``."""
     meia_l, meia_a, cz = a["copa"]
-    st, m = c.st, a["n"]
-    claro, escuro = a["tom"]
-    for j in range(m):
-        u = (-1 + (2 * j + 1) / m + st.randint(-40, 40) / 100 / m) * a["espalha"]
-        z0 = cz + _faixa(st, a["topo_v"]) * meia_a * math.sqrt(max(0.0, 1 - u * u))
-        ln = min(2 * meia_a * _faixa(st, a["comprimento"]), z0 - 2 * K)  # a ponta não entra no chão
-        w, y = _faixa(st, a["largura"]), _faixa(st, a["profundidade"])
-        curva = (1 if u >= 0 else -1) * _faixa(st, a["curva"])
-        s = PESO_U * u + 0.1 * y / K + 0.3 * st.randint(-100, 100) / 100
-        cls = "light" if s > claro else "dark" if s < escuro else "mid"
-        bone, zl = c.osso(z0)
-        strand(c, f"{c.pid}_{j:02d}", Lugar(bone, qv(0, y, zl), u * meia_l, 0.0), Tira(ln, w, curva),
-               Tons(*a["tons"][cls][:3]))
+    eixos = (meia_l, meia_l * a["fundo"], meia_a)
+    c.b.part(f"{c.pid}_miolo", a["miolo"], ellipse(qv(0, 0, cz), qv(*(e * MIOLO for e in eixos))),
+             Parte(group=c.grupo))
+    massas = tufos(c.st, a)
+    f = a["tamanho"] * TUFO_DO_GALHO
+    massas += [((x, y, z), (eixos[0] * f, eixos[1] * f, eixos[2] * f)) for x, y, z in c.ancora(a["pontas"])]
+    for i, (centro, raios) in enumerate(massas):
+        c.b.part(f"{c.pid}_{i:02d}", a["material"], ellipse(qv(*centro), qv(*raios)),
+                 Parte(group=c.grupo, tags=("volume_sphere",)))
+
+
+def _conica(c: Ctx, a: dict[str, Any]) -> None:
+    """Os andares de baixo para cima: cada saia abre no raio do andar (que cai com a altura) e fecha para dentro da
+    de cima; a última fecha na ponta. Cada andar tem o seu grupo de contorno: a linha e a sombra sob a saia separam
+    os andares."""
+    base, n, irr = a["base"], a["andares"], a["irregular"]
+    passo = (a["altura"] - base) / (n - 1 + SOBE)
+    for i in range(n):
+        z0 = base + i * passo
+        topo = i == n - 1
+        r0 = a["raio"] * (1 - i / n) * (1 + irr * _sorte(c.st))
+        r1 = PONTA if topo else r0 * a["saia"]
+        alto = a["altura"] - z0 if topo else passo * SOBE
+        desvio = 0.0 if topo else 0.5 * irr * r0 * _sorte(c.st)  # a saia nunca é um torneado perfeito
+        est = [[q(alto * k / ESTACOES), q(r0 + (r1 - r0) * (k / ESTACOES) ** CURVA_DA_SAIA),
+                q(desvio * (1 - k / ESTACOES))] for k in range(ESTACOES + 1)]
+        c.b.part(f"{c.pid}_{i:02d}", a["material"], {"type": "revolution", "origin_q8": qv(0, 0, z0), "stations": est},
+                 Parte(group=f"{c.grupo}_{i:02d}"))
 
 
 COPA = X("copa", "ponto", "a copa: meia largura, meia altura e a altura do centro")
-COPA_V = ["1.1m", "1.3m", "2.6m"]
-TONS_FOLHA = [["folha_clara", "folha_clara", "folha"], ["folha", "folha_clara", "folha_escura"],
-              ["folha_escura", "folha", "pedra_escura"]]
-TONS_FOLHOSA = [["folhosa_clara", "folhosa_clara", "folhosa"], ["folhosa", "folhosa_clara", "folhosa_escura"],
-                ["folhosa_escura", "folhosa", "folhosa_funda"]]
-TONS_AGULHA = [["agulha_clara", "agulha", "agulha", "agulha_escura"], ["agulha", "agulha_clara", "agulha_escura",
-               "agulha_escura"], ["agulha_escura", "agulha", "pedra_escura", "pedra_escura"]]
-TONS_CAPIM = [["capim_claro", "agulha", "agulha", "capim_escuro"], ["agulha", "capim_claro", "capim_escuro",
-              "capim_escuro"], ["capim_escuro", "agulha", "pedra_escura", "pedra_escura"]]
 PECAS_COPA = [
-    Peca("pontilhado", "A folhagem de copa: cachos pontilhados de folha ou flor miúda, redondos ou em almofada, com um "
-         "cacho na ponta de cada galho", (
-             COPA, X("n", "inteiro", "massas na copa"),
-             X("espalha", "escalar", "fração da largura que elas ocupam", "1"),
-             X("escala_v", "escalar", "fração da altura que elas ocupam", "0.85"),
-             X("raio", "faixa", "o raio de cada massa (sorteado)"),
-             X("profundidade", "faixa", "a profundidade de cada massa", ["-3px", "3px"]),
-             X("tons", "tons", "núcleo, luz e sombra (e o brilho) de cada classe: clara, média e escura"),
-             X("tom", "fracoes", "o tom pela posição: o peso da altura, o limiar do claro e o do escuro",
-               ["0.9", "0.45", "-0.15"]),
-             X("caida", "fracoes", "a metade de baixo pende: abaixo de v, desce tanto", ["-1", "0"]),
-             X("cachos", "ancora", "as pontas dos galhos onde sai um cacho a mais ('<nó>.pontas')", ""),
-             X("pontos", "fracoes", "a densidade ‰ (0 a 1000), o achatado (fator da altura do cacho: 0 = redondo, "
-          "0.52 = almofada) e o brilho ‰ (0 a 1000)", ["660", "0", "70"])),
-        _pontilhado, (("copa de folha", {"copa": COPA_V, "n": "30", "raio": ["19cm", "26cm"], "tons": TONS_FOLHOSA,
-                                         "pontos": ["700", "0", "0"]}),
-                      ("almofada", {"copa": COPA_V, "n": "4", "raio": ["37cm", "44cm"], "tons": TONS_AGULHA,
-                                    "pontos": ["860", "0.52", "90"]}),
-                      ("rala", {"copa": COPA_V, "n": "8", "raio": ["15cm", "20cm"], "tons": TONS_FOLHA,
-                                "pontos": ["500", "0", "0"]})),
-        TESTE, (_pontilhado, massas, _pontos_no_oval, _classe, cacho)),
-    Peca("galhos_em_pena", "A copa da conífera: o miolo escuro e os andares de galhos em pena, a guia no topo", (
-        X("base", "comprimento", "a altura do primeiro andar (o topo do tronco à vista)"),
-        X("altura", "comprimento", "a altura da ponta"), X("raio", "comprimento", "o alcance dos galhos de baixo"),
-        X("andares", "inteiro", "os andares de galhos (verticilos)", "10"),
-        X("cheio", "faixa", "a largura dos galhos (sorteada uma vez: a conífera rala ou cheia)", ["0.85", "1.2"]),
-        X("guia", "comprimento", "o comprimento da guia (a ponta para cima)", "28cm"),
-        X("tons", "tons", "corpo, agulha de cima, agulha de baixo e sombra de cada classe: clara, média e escura"),
-        X("miolo", "material", "o cone escuro atrás dos galhos"), X("fundo", "material", "o fundo do miolo")),
-        _galhos_em_pena, (("alta", {"base": "28cm", "altura": "4m", "raio": "71cm", "andares": "12",
-                                    "tons": TONS_AGULHA, "miolo": "agulha_escura", "fundo": "pedra_escura"}),
-                          ("jovem", {"base": "20cm", "altura": "2.4m", "raio": "50cm", "andares": "8",
-                                     "tons": TONS_CAPIM, "miolo": "capim_escuro", "fundo": "pedra_escura"}),
-                          ("rala", {"base": "40cm", "altura": "3.4m", "raio": "60cm", "cheio": ["0.6", "0.7"],
-                                    "tons": TONS_CAPIM, "miolo": "capim_escuro", "fundo": "pedra_escura"})),
-        TESTE, (_galhos_em_pena, _miolo, _andares, _andar, shade_class, frond), ancoras=("topo",)),
-    Peca("cortinas", "Cortinas de ramos pendentes, presas na metade de baixo da copa (o chorão)", (
-        COPA, X("n", "inteiro", "cortinas"), X("espalha", "escalar", "a fração da largura", "0.95"),
-        X("topo_v", "faixa", "onde ela prende (de -1 a 0)", ["-0.7", "0"]),
-        X("comprimento", "faixa", "o comprimento (fração da altura da copa)", ["0.45", "0.8"]),
-        X("largura", "faixa", "a largura no alto"), X("profundidade", "faixa", "a profundidade", ["-4px", "6px"]),
-        X("curva", "faixa", "a curva para fora no fim", ["0px", "2px"]), X("tons", "tons", "as três classes"),
-        X("tom", "fracoes", "os limiares do claro e do escuro", ["0.35", "-0.3"])),
-        _cortinas, (("cheias", {"copa": ["1.2m", "75cm", "1.9m"], "n": "24", "largura": ["5cm", "8cm"],
-                                "tons": TONS_FOLHA}),
-                    ("poucas", {"copa": ["1.2m", "75cm", "1.9m"], "n": "6", "largura": ["6cm", "9cm"],
-                                "tons": TONS_FOLHA}),
-                    ("curtas", {"copa": ["1m", "60cm", "1.6m"], "n": "14", "comprimento": ["0.2", "0.4"],
-                                "largura": ["4cm", "6cm"], "tons": TONS_FOLHOSA})),
-        TESTE, (_cortinas, _faixa, strand)),
+    Peca("copa", "A copa da folhosa em volumes: tufos redondos em volta do centro, por dentro do elipsoide da copa. "
+         "Cobre o tronco pela frente (a câmera é de cima) e lança a sombra dela no chão; no chão, sem tronco, é a "
+         "moita", (
+             COPA, X("fundo", "escalar", "a meia profundidade, em fração da meia largura (1 = redonda vista de cima)",
+                     "1"),
+             X("tufos", "inteiro", "os tufos do anel do meio (o de cima e o de baixo têm 70 % dele; mais um no alto)",
+               "7"),
+             X("tamanho", "escalar", "o raio do tufo, em fração da copa (maior = menos recortada)", "0.45"),
+             X("irregular", "escalar", "quanto o tamanho e o lugar de cada tufo variam (0 = regular)", "0.12"),
+             X("pende", "escalar", "os tufos de baixo descem tanto, em fração da altura deles (o ramo que cai)", "0"),
+             X("pontas", "ancora", "as pontas dos galhos onde sai um tufo a mais ('<nó>.pontas')", ""),
+             X("material", "material", "a folhagem (copa_folhosa, copa_folha, copa_agulha)", "copa_folhosa"),
+             X("miolo", "material", "o miolo escuro entre os tufos", "folhosa_funda")),
+         _copa, (("redonda", {"copa": ["1.2m", "1m", "1.9m"]}),
+                 ("pendente", {"copa": ["1.3m", "60cm", "2.4m"], "tufos": "12", "tamanho": "0.28", "pende": "2.5",
+                               "material": "copa_folha", "miolo": "folha_escura"}),
+                 ("moita", {"copa": ["70cm", "45cm", "45cm"], "tufos": "5", "tamanho": "0.5"})),
+         TESTE, (_copa, tufos, _sorte), vistas=QUATRO),
+    Peca("copa_conica", "A copa da conífera em volumes: andares em saia, cada um cobrindo o de baixo, e a ponta no "
+         "topo. Com a base baixa a saia de baixo esconde o tronco (a câmera é de cima)", (
+             X("base", "comprimento", "a altura da barra da saia de baixo"),
+             X("altura", "comprimento", "a altura da ponta"), X("raio", "comprimento", "o raio da saia de baixo"),
+             X("andares", "inteiro", "os andares (saias)", "6"),
+             X("saia", "escalar", "quanto cada saia fecha no alto, em fração do raio dela (menor = mais recortada)",
+               "0.4"),
+             X("irregular", "escalar", "quanto o raio e o prumo de cada andar variam (0 = regular)", "0.08"),
+             X("material", "material", "a folhagem (copa_agulha, copa_folhosa)", "copa_agulha")),
+         _conica, (("alta", {"base": "50cm", "altura": "4m", "raio": "90cm", "andares": "8"}),
+                   ("larga", {"base": "30cm", "altura": "2.4m", "raio": "1m", "andares": "5"}),
+                   ("esguia", {"base": "90cm", "altura": "3.6m", "raio": "55cm", "andares": "7", "saia": "0.55",
+                               "material": "copa_folhosa"})),
+         "tests/test_flora.py::test_a_conifera_lanca_a_sombra_dela", (_conica, _sorte), vistas=QUATRO),
 ]

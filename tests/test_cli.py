@@ -18,7 +18,7 @@ from pixel_forge.views import camera
 
 from .oraculo import CASOS
 
-ARVORE = CASOS / "composicoes" / "arvore.r1.json"
+ARVORE = CASOS.parent / "composicoes" / "arvore.r1.json"
 MOURAO = Path(__file__).parent / "fixtures" / "composicoes" / "mourao.r1.json"
 
 

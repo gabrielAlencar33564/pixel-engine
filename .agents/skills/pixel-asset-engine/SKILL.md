@@ -62,7 +62,7 @@ Um JSON `<id>.r<n>.json` (o `<id>` em minúsculas, `_` e dígitos). Campos:
 entre si), `pilha` e `camada` (na mesma pilha, o nó de camada maior cobre o de camada menor que ele toca: o telhado
 numa camada acima da parede cobre o alto dela onde o beiral desce na tela; as faces internas de uma peça ficam entre a
 camada dela e a seguinte; para nada se cobrir, use pilhas diferentes), `osso`
-(`raiz`; com balanço, `tronco` ou `cadeia`; com giro, `giro`). Um argumento pode citar a âncora de um nó de antes: `"cachos": "galhos.pontas"`.
+(`raiz`; com balanço, `tronco` ou `cadeia`; com giro, `giro`). Um argumento pode citar a âncora de um nó de antes: `"pontas": "galhos.pontas"`.
 
 **Limites:** `description` e os textos dos traços até 400 caracteres, `reference` até 2000, até 64 nós, e o sprite até
 512 px de lado (o canvas inclui a sombra no chão, à direita). Passar de um limite é recusa com a medida e a dica.
@@ -75,6 +75,13 @@ tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à
 
 **O humano:** o primeiro nó é `corpo_humano`; a roupa vem depois, cada peça um nó. **O quadrúpede:** um nó
 `corpo_canino`, com as marcas e as orelhas como argumentos.
+
+**A árvore e a moita** são volumes: `tronco_em_pe` e a copa, que é `copa` (a folhosa, em tufos redondos; no chão e
+sem tronco é a moita; com `pende`, os ramos caem) ou `copa_conica` (a conífera, em andares). A copa mostra o alto e
+cobre o tronco pela frente: do tronco sobra na tela a altura do centro da copa × 0,71 menos
+√((meio fundo × 0,6)² + (meia altura × 0,71)²); para ele aparecer mais, suba a copa ou diminua o `fundo`. A sombra
+da copa cai no chão à direita e entra no canvas. Os `galhos` são opcionais (a copa cobre quase todos; sozinhos, são
+a árvore seca) e deixam as pontas para a copa pôr um tufo em cada uma.
 
 **Porte por categoria** (em humanos de 1,65 m):
 
@@ -93,8 +100,8 @@ tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à
 <!-- /portes -->
 
 **Exemplos feitos pelo padrão vigente** (leia o que for do mesmo tipo antes de compor; não copie: o asset nasce da
-ficha dele): `tests/fixtures/exemplos/banco.r1.json` (estático de vista única), `arvore_folhosa.r1.json` (árvore com
-`pontilhado`), `viajante.r1.json` (humano, 8 direções) e `canino.r1.json` (quadrúpede, 8 direções).
+ficha dele): `tests/fixtures/exemplos/banco.r1.json` (estático de vista única), `arvore_folhosa.r1.json` (árvore com a
+`copa` em volumes), `viajante.r1.json` (humano, 8 direções) e `canino.r1.json` (quadrúpede, 8 direções).
 
 ## 5. O caminho
 

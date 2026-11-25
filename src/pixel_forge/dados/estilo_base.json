@@ -951,6 +951,75 @@
     49
    ],
    "outline_index": 1
+  },
+  {
+   "id": "copa_folhosa",
+   "ramp": [
+    46,
+    47,
+    48,
+    49
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 350,
+    "depth_permille": 330,
+    "jitter_permille": 100,
+    "kind": "dashes",
+    "length_px": [
+     1,
+     2
+    ],
+    "lift_permille": 300,
+    "period_px": 2,
+    "seed": 31
+   }
+  },
+  {
+   "id": "copa_folha",
+   "ramp": [
+    23,
+    31,
+    32,
+    33
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 350,
+    "depth_permille": 330,
+    "jitter_permille": 100,
+    "kind": "dashes",
+    "length_px": [
+     1,
+     2
+    ],
+    "lift_permille": 300,
+    "period_px": 2,
+    "seed": 37
+   }
+  },
+  {
+   "id": "copa_agulha",
+   "ramp": [
+    28,
+    29,
+    24,
+    30
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 350,
+    "depth_permille": 330,
+    "jitter_permille": 100,
+    "kind": "dashes",
+    "length_px": [
+     1,
+     2
+    ],
+    "lift_permille": 300,
+    "period_px": 2,
+    "seed": 41
+   }
   }
  ],
  "shading": {

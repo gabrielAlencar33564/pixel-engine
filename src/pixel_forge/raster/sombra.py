@@ -8,8 +8,7 @@ telhado e as pedras de uma parede, do mesmo plano, não se sombreiam.
 No chão: cada peça volta da tela ao mundo pela câmera da vista, é lançada no chão (z = 0) na direção da luz e volta à
 tela, em xadrez (o chão aparece entre os pixels), no material ``sombra`` do estilo. É a única sombra no chão: não há
 sombra de contato (a mancha redonda embaixo do asset), e a do pé nasce no pé, que se lança sobre si mesmo. O tronco
-(o sólido de revolução) se lança como o tubo do eixo dele; o cacho pontilhado da copa é um plano virado para a câmera,
-que a luz pega de lado (no chão ele seria uma linha), e se lança como a almofada redonda que ele desenha.
+(o sólido de revolução) se lança como o tubo do eixo dele, e o elipsoide como a elipse dele no chão.
 """
 
 from __future__ import annotations
@@ -26,7 +25,6 @@ from ..views.primitivas import (
     EllipsePrim,
     RevolutionPrim,
     Scene2D,
-    StipplePrim,
     SupElipsoide,
     SupLeque,
     SupTubo,
@@ -138,20 +136,15 @@ def _ground_projection(scene: Scene2D, light: tuple[float, float, float], w: int
 
     for c in scene.commands:
         if not {"detail", "no_cast"} & set(c.tags):
-            out |= _lancada(c, chao, sd, w, h)
+            out |= _lancada(c, chao, w, h)
     return out
 
 
-def _lancada(c: DrawCommand, chao: Callable[[float, float, float], tuple[int, int]], sd: float, w: int,
-             h: int) -> Mascara:
+def _lancada(c: DrawCommand, chao: Callable[[float, float, float], tuple[int, int]], w: int, h: int) -> Mascara:
     """A peça lançada no chão, com ``chao`` levando um ponto (u, v, profundidade) em q8 ao chão sob a luz."""
     if isinstance(c.prim, RevolutionPrim):
         eixo = [chao(s[0] * 256, s[1] * 256, s[2] * 256) for s in c.prim.stations]
         return raster_tapered(w, h, MARGIN, tuple(eixo), tuple(round(s[3] * 256) for s in c.prim.stations))
-    if isinstance(c.prim, StipplePrim) and isinstance(c.surface, SupLeque):
-        us, vs = zip(*(chao(*p) for p in c.surface.pts), strict=True)
-        meia = (max(us) - min(us)) // 2  # a almofada tem no chão a profundidade da largura
-        return raster_ellipse(w, h, MARGIN, ((max(us) + min(us)) // 2, sum(vs) // len(vs)), (meia, round(meia * sd)))
     if isinstance(c.surface, SupLeque):
         pts = [chao(*p) for p in c.surface.pts]
         out = np.zeros((h, w), dtype=bool)

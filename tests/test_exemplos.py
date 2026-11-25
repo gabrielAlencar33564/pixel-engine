@@ -1,5 +1,6 @@
 """Os quatro exemplos da skill, feitos pelo padrão vigente: passam por todas as recusas do build (I8) e mostram o que
-cada tipo pede (o estático de vista única, a árvore com o ``pontilhado``, o humano e o quadrúpede nas 8 direções)."""
+cada tipo pede (o estático de vista única, a árvore com a ``copa`` em volumes, o humano e o quadrúpede nas 8
+direções)."""
 
 from __future__ import annotations
 
@@ -22,9 +23,9 @@ def test_o_exemplo_passa_pelo_build(nome: str) -> None:
     assert len(r.ir.views) == VISTAS[nome] and all(s.quadros for s in r.sequencias)
 
 
-def test_a_arvore_de_exemplo_usa_o_pontilhado() -> None:
+def test_a_arvore_de_exemplo_usa_a_copa_em_volumes() -> None:
     comp = ler(PASTA / "arvore_folhosa.r1.json", Composicao)
-    assert "pontilhado" in {n.peca for n in comp.nos}
+    assert "copa" in {n.peca for n in comp.nos}
 
 
 def test_os_exemplos_sao_os_quatro() -> None:

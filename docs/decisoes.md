@@ -399,6 +399,51 @@ luz, em xadrez, que já nasce no pé (o ponto no chão se lança sobre si mesmo)
 - O teste (`tests/test_sombra.py`): no banco, na árvore, no humano e no canino a sombra no chão está toda na fase do
   xadrez e encosta na base do asset; o controle pinta a elipse do jeito antigo e é acusado.
 
+## A flora em volumes (pedido do dono, 2026-11-25)
+
+O dono pediu a análise do modelo de árvore e de vegetação e a refatoração dele. Pranchas: `19`, `19b` e `19c`.
+
+- O que a análise mediu no modelo antigo (a árvore de exemplo; o carvalho da prova entre parênteses): a copa era
+  um desenho em elevação, discos pontilhados no plano da frente. Na câmera de cima saía com 0,44 da largura em
+  altura, quando o volume pedido dá 0,74; enchia 57 % (73 %) da elipse dela, em 24 (45) pedaços soltos; 11 % (10 %)
+  dos pixels eram pontos isolados; a sombra no chão era uma tira de 112 × 13 px; a árvore tinha 102 (190) partes.
+  A conífera e os galhos eram polígonos chapados: de lado para a luz, a conífera lançava uma linha pontilhada e os
+  galhos, nada. Toda peça de flora só desenhava a vista S. O tom de cada cacho era sorteado pela posição, não
+  tirado da luz.
+- A copa é feita de volumes, pela regra das formas simples para a câmera de cima. A peça `copa` (a folhosa) põe
+  tufos elipsoides em quatro anéis em volta do centro, mais um miolo escuro. O tufo de tamanho `f` fica a `1 − f`
+  do centro, na direção dele: encosta por dentro no elipsoide da copa, e a altura e a largura do asset são as
+  pedidas. Cada tufo é sombreado como um volume, e todos ficam no grupo de contorno do nó. No chão e sem tronco,
+  a copa é a moita; com `pende`, os tufos de baixo afinam e descem (o ramo que cai).
+- A peça `copa_conica` (a conífera) empilha saias cônicas, sólidos de revolução, cada uma no seu grupo de
+  contorno: a linha e a sombra sob a saia separam os andares.
+- A peça `galhos` põe galhos roliços em volta do tronco, um a cada fatia da volta, e deixa as pontas em (x, y, z)
+  para a copa pôr um tufo em cada uma (o argumento `pontas`). A copa cobre quase todos; sozinhos, são a árvore
+  seca. O galho fica no osso da altura de onde sai (abaixo da cadeia do balanço, no tronco).
+- Os materiais `copa_folhosa`, `copa_folha` e `copa_agulha` têm rampa de 4 tons e a textura de traços curtos,
+  que quebra a fronteira entre os tons (a folha). Os materiais chapados de folha ficam no estilo.
+- As quatro peças de flora desenham as 4 vistas (o `tronco_em_pe` também: o pixel dele na S não mudou).
+- O jeito antigo não existe mais: saíram as peças `pontilhado`, `galhos_em_pena`, `cortinas`, `galhos_grossos` e
+  `galhos_finos` (a recusa `PECA` diz a que ficou no lugar), o módulo da folhagem e, do núcleo, o pontilhado e o
+  polígono plano (a geometria da IR, a projeção, o raster, a sombra e o canvas deles) e o viés de profundidade
+  que a peça do prop punha por vista. O kit tem 35 peças.
+- O oráculo: os 15 casos das cinco peças saíram do `kit.esperado.json`, e a árvore (o repouso e o balanço), do
+  `composicoes.esperado.json`. Os esperados não foram regerados (I11). A fixture da árvore foi para
+  `tests/fixtures/composicoes/`, no modelo novo. As peças novas não têm oráculo.
+- Os testes (`tests/test_flora.py`) medem na câmera do jogo: a copa numa massa só (1 pedaço, 95 % da elipse),
+  com a altura de 0,73 da largura, cobrindo o tronco, com a sombra de 0,48 da largura em altura e 20 partes (os
+  pontos isolados caíram a 0,3 % dos pixels da copa); a sombra da conífera; os galhos em volta; as 4 vistas; o
+  balanço. O controle é a copa do jeito antigo, sintética (discos chapados no plano da frente): 5 pedaços, 54 %,
+  0,49 e 0,11. A IR recusa as duas geometrias.
+- O que mudou de visibilidade: o tronco aparece só embaixo da copa (20 px no exemplo), e os galhos somem sob ela.
+  A skill dá a conta do que sobra do tronco na tela. A sombra da copa entra no canvas (o exemplo foi de 158 × 84
+  para 157 × 130).
+- O que sobra: a borda do tufo e a da saia são lisas (a copa lê como massa, não como folha solta, e a conífera
+  perdeu a silhueta em pontas); a copa pendente é um domo com ramos caindo, não os fios de antes; a sombra no
+  chão do elipsoide segue a aproximação de antes (a elipse com metade da altura dele na tela), e com `pende` ela
+  sai com furos; a linha reta de pasto continua sem peça. A versão do motor não subiu (o id do build leva os
+  pixels), mas a composição que usa as peças que saíram não se lê mais.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

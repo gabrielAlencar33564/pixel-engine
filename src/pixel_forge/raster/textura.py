@@ -18,7 +18,7 @@ HIGHLIGHT = 0.97  # o limiar do tom mais claro (a luz vai de 0 a 1)
 
 
 def h32(*arrays: npt.ArrayLike) -> npt.NDArray[np.int64]:
-    """Hash inteiro de 32 bits, elemento a elemento (o mesmo do pontilhado)."""
+    """Hash inteiro de 32 bits, elemento a elemento."""
     m32 = 0xFFFFFFFF
     primes = (73856093, 19349663, 83492791, 2654435761)
     v: Any = 0

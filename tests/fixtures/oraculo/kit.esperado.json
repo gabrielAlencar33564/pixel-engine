@@ -331,36 +331,6 @@
     "sem_chao_sha256": "8cf112220d5f3b88281dc1827827c2ae91fe9b5e5d1679fbbf0573dce24b7180"
    }
   },
-  "cortinas/cheias": {
-   "S": {
-    "tamanho": [
-     83,
-     53
-    ],
-    "rgba_sha256": "a3197cd37ad669aaa457d67ca6f4609341be13a44d8501b6f0d5d2d0a9113a0a",
-    "sem_chao_sha256": "9f49d8e63860623fedcf5143d149e834f297958d29d131fa35afd38fda125948"
-   }
-  },
-  "cortinas/poucas": {
-   "S": {
-    "tamanho": [
-     74,
-     51
-    ],
-    "rgba_sha256": "6c7d2d838d0469c6266108b9b6d6e36e8c52793dfb4fb889e874e9b8004273fb",
-    "sem_chao_sha256": "6c7d2d838d0469c6266108b9b6d6e36e8c52793dfb4fb889e874e9b8004273fb"
-   }
-  },
-  "cortinas/curtas": {
-   "S": {
-    "tamanho": [
-     69,
-     47
-    ],
-    "rgba_sha256": "a3f235a57ba1a276dcda9560950e43bcedc90a75b4e161d51e0f56244e542275",
-    "sem_chao_sha256": "33b34581dae50334f9fe65dfd6409d20200ea68f5419a8c62a2c74aa2f4785bc"
-   }
-  },
   "elipsoide/domo": {
    "S": {
     "tamanho": [
@@ -449,96 +419,6 @@
     ],
     "rgba_sha256": "8f828a341b965321029113fd80d816d288f6abadad09448bba7551356345fddf",
     "sem_chao_sha256": "8f828a341b965321029113fd80d816d288f6abadad09448bba7551356345fddf"
-   }
-  },
-  "galhos_em_pena/alta": {
-   "S": {
-    "tamanho": [
-     65,
-     107
-    ],
-    "rgba_sha256": "abd6cda8ba3c212783e47c9b75a70cfd133f3da7b8d9ff88a23f6320d4728f87",
-    "sem_chao_sha256": "8ae68e9cd86e87ea4baeac42814ce4cca840a2b4c13552b05e94265dccd40f31"
-   }
-  },
-  "galhos_em_pena/jovem": {
-   "S": {
-    "tamanho": [
-     48,
-     66
-    ],
-    "rgba_sha256": "43b6333d37575c654b267d5fbc23f745ebaa269aa14e79854709e452946d77bb",
-    "sem_chao_sha256": "43b6333d37575c654b267d5fbc23f745ebaa269aa14e79854709e452946d77bb"
-   }
-  },
-  "galhos_em_pena/rala": {
-   "S": {
-    "tamanho": [
-     57,
-     86
-    ],
-    "rgba_sha256": "a9f58ec755530e069204177fa548ab410847e49db84bda9c6e25f87114b30dd2",
-    "sem_chao_sha256": "a9f58ec755530e069204177fa548ab410847e49db84bda9c6e25f87114b30dd2"
-   }
-  },
-  "galhos_finos/três": {
-   "S": {
-    "tamanho": [
-     23,
-     55
-    ],
-    "rgba_sha256": "1fdb1418bb7157eb224d92d4f33e0a17c072ba8151046155d166ad3f86d59643",
-    "sem_chao_sha256": "1fdb1418bb7157eb224d92d4f33e0a17c072ba8151046155d166ad3f86d59643"
-   }
-  },
-  "galhos_finos/dois": {
-   "S": {
-    "tamanho": [
-     17,
-     36
-    ],
-    "rgba_sha256": "03e580f5f6f1f16b0de212cf91a115d08d97dac3cfbebf21430202edb279ec4b",
-    "sem_chao_sha256": "03e580f5f6f1f16b0de212cf91a115d08d97dac3cfbebf21430202edb279ec4b"
-   }
-  },
-  "galhos_finos/abertos": {
-   "S": {
-    "tamanho": [
-     36,
-     45
-    ],
-    "rgba_sha256": "8250f32628e55255828163c0e1b5e9c04107b411d9c9c557aa1380e6b65e3ce2",
-    "sem_chao_sha256": "8250f32628e55255828163c0e1b5e9c04107b411d9c9c557aa1380e6b65e3ce2"
-   }
-  },
-  "galhos_grossos/em leque": {
-   "S": {
-    "tamanho": [
-     61,
-     91
-    ],
-    "rgba_sha256": "05c20bd8de8d647cc0fac6e3b099cadcff998c77c0179aae73ebe0b29b8e870c",
-    "sem_chao_sha256": "05c20bd8de8d647cc0fac6e3b099cadcff998c77c0179aae73ebe0b29b8e870c"
-   }
-  },
-  "galhos_grossos/andares": {
-   "S": {
-    "tamanho": [
-     57,
-     89
-    ],
-    "rgba_sha256": "0707af84776c434fdd3d648081e5b2c9ccce93044b21fc1de6310f9bee942590",
-    "sem_chao_sha256": "0707af84776c434fdd3d648081e5b2c9ccce93044b21fc1de6310f9bee942590"
-   }
-  },
-  "galhos_grossos/aberto": {
-   "S": {
-    "tamanho": [
-     68,
-     89
-    ],
-    "rgba_sha256": "deb24f4eeac99de736f5dbd9c4839d05c621834a6816766e98a6a8e14ba69862",
-    "sem_chao_sha256": "deb24f4eeac99de736f5dbd9c4839d05c621834a6816766e98a6a8e14ba69862"
    }
   },
   "janela/quadrada": {
@@ -719,36 +599,6 @@
     ],
     "rgba_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956",
     "sem_chao_sha256": "238435af19d25e6ae46cad26318761495dbdcd77872912f20c53995a0870e956"
-   }
-  },
-  "pontilhado/copa de folha": {
-   "S": {
-    "tamanho": [
-     86,
-     94
-    ],
-    "rgba_sha256": "ec5c876e056fab18bf71d51f85c83f19388fd5ded13e7a75f5f653a71ae01945",
-    "sem_chao_sha256": "ec5c876e056fab18bf71d51f85c83f19388fd5ded13e7a75f5f653a71ae01945"
-   }
-  },
-  "pontilhado/almofada": {
-   "S": {
-    "tamanho": [
-     79,
-     97
-    ],
-    "rgba_sha256": "24b70d187fbd06f8358b59de46e1ada62bef1dcc2e02269f53fe3180346ab3ce",
-    "sem_chao_sha256": "24b70d187fbd06f8358b59de46e1ada62bef1dcc2e02269f53fe3180346ab3ce"
-   }
-  },
-  "pontilhado/rala": {
-   "S": {
-    "tamanho": [
-     65,
-     91
-    ],
-    "rgba_sha256": "5a4ecf68710a49fc6aea43d85f35e6a26e384c75415727d021bdf29e5c90ec4b",
-    "sem_chao_sha256": "5a4ecf68710a49fc6aea43d85f35e6a26e384c75415727d021bdf29e5c90ec4b"
    }
   },
   "porta/estreita": {

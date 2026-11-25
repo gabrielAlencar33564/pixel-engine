@@ -14,9 +14,9 @@ from .vistas import pontos
 _S, _C = math.sin(math.radians(45)), math.cos(math.radians(45))
 
 
-# o que projeta sombra no chão no render: as faces de vértices em ossos, os traços, as elipses alinhadas à tela, o
-# tronco e o cacho pontilhado (o polígono plano e o detalhe não projetam)
-PROJETAM = ("bound_polygon", "polyline", "tapered_polyline", "ellipse", "revolution", "stipple")
+# o que projeta sombra no chão no render: as faces de vértices em ossos, os traços, as elipses alinhadas à tela e
+# o sólido de revolução (o detalhe não projeta)
+PROJETAM = ("bound_polygon", "polyline", "tapered_polyline", "ellipse", "revolution")
 NAO_PROJETAM = frozenset({"detail", "no_cast", "oriented"})
 
 
@@ -57,21 +57,11 @@ class _Caixa:
         self.vs.extend((vv - dv, vv + dv))
         self.sombra(x + rx, ((cx * sa + cy * ca) / 256 + ry) * _S, cz / 256 + rz)
 
-    def almofada(self, g: dict[str, Any], rot: tuple[int, int]) -> None:
-        """O cacho pontilhado: a sombra dele é a almofada redonda, que no chão desce meia largura para a frente."""
-        ca, sa = rot
-        ps = [(p[0] * ca - p[1] * sa, p[0] * sa + p[1] * ca, p[2]) for p in pontos(g)]
-        meia = (max(p[0] for p in ps) - min(p[0] for p in ps)) / 2
-        for x, y, z in ps:
-            self.sombra(x, (y + meia) * _S, z)
-
     def geometria(self, g: dict[str, Any], rot: tuple[int, int]) -> None:
         t = g["type"]
         if t == "ellipse":
             self.elipse(g, rot)
             return
-        if t == "stipple":
-            self.almofada(g, rot)
         if t == "bound_polygon" or "points_q8" in g:
             raio = g.get("thickness_px", 1) / 2 if "points_q8" in g else 0.0
             for p in pontos(g):

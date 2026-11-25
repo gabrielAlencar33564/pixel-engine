@@ -18,6 +18,9 @@ from .expressao import compilar, valor, variaveis
 from .kit.peca import Peca, ancoras_pedidas, vars_dos_args
 from .kit.registro import PECAS
 
+# as peças que saíram do kit (a flora em cachos pontilhados, penas e cortinas chapadas) e a que faz o papel delas
+SAIRAM = {"pontilhado": "copa", "cortinas": "copa (com 'pende')", "galhos_em_pena": "copa_conica",
+          "galhos_grossos": "galhos", "galhos_finos": "galhos"}
 VARS_REPETICAO = {"linha": {"i", "n", "t"}, "lados": {"i", "n", "lado"}, "anel": {"i", "n", "cos", "sen"}}
 
 
@@ -79,8 +82,9 @@ def _peca(no: No, onde: str, tipo: str) -> Peca:
     peca = PECAS.get(no.peca)
     if peca is None or peca.tipo != tipo:
         nomes = ", ".join(sorted(k for k, p in PECAS.items() if p.tipo == tipo))
+        saiu = f"Ela saiu do kit (a flora é em volumes): use '{SAIRAM[no.peca]}'. " if no.peca in SAIRAM else ""
         raise Recusa("PECA", f"Nó '{no.id}': a peça '{no.peca}' não existe no kit do {tipo}.",
-                     f"Peças: {nomes}. A forma que o kit não faz vira peça nova do kit.", f"{onde}/peca")
+                     f"{saiu}Peças: {nomes}. A forma que o kit não faz vira peça nova do kit.", f"{onde}/peca")
     return peca
 
 

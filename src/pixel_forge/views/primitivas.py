@@ -41,23 +41,6 @@ class TaperedPrim:
 
 
 @dataclass(frozen=True)
-class PolygonPrim:
-    points: tuple[Ponto, ...]
-
-
-@dataclass(frozen=True)
-class StipplePrim:
-    """O polígono pontilhado, com a origem projetada (``ou``, ``ov``) de onde as células contam."""
-
-    points: tuple[Ponto, ...]
-    density: int
-    seed: int
-    cell: int
-    ou: int
-    ov: int
-
-
-@dataclass(frozen=True)
 class FanPrim:
     """Polígono preenchido como a união dos triângulos (p0, pi, pi+1): robusto às dobras da perspectiva."""
 
@@ -78,8 +61,7 @@ class RevolutionPrim:
         return tuple((round(s[0] * 256), round(s[1] * 256)) for s in self.stations)
 
 
-Prim = (EllipsePrim | OrientedEllipsePrim | CapsulePrim | TaperedPrim | PolygonPrim | StipplePrim | FanPrim
-        | RevolutionPrim)
+Prim = EllipsePrim | OrientedEllipsePrim | CapsulePrim | TaperedPrim | FanPrim | RevolutionPrim
 
 
 @dataclass(frozen=True)

@@ -33,7 +33,9 @@ from .oraculo import (
 )
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "kit.esperado.json").read_text(encoding="utf-8"))["casos"]
-NOVAS = {"saia", "lenco"}  # as peças que nasceram na engine nova (a saia e o lenço gerais): sem oráculo, com teste
+# as peças que nasceram na engine nova: sem oráculo, com teste (a saia e o lenço gerais; a flora em volumes, que
+# trocou a de cachos pontilhados, galhos em pena e cortinas do `pixel-engine`: tests/test_flora.py)
+NOVAS = {"saia", "lenco", "copa", "copa_conica", "galhos"}
 VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if pid not in NOVAS for nome, args in p.variacoes]
 
 

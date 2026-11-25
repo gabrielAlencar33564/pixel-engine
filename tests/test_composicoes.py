@@ -1,8 +1,8 @@
-"""As composições sintéticas (a árvore no balanço com os cachos nas pontas dos galhos, o abrigo de pedra e palha, o
-marco nas 4 vistas) dão o mesmo pixel que o `pixel-engine` na mesma entrada. As mudanças intencionais: a sombra de
-contato das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo, ela ficava achatada pela metade); a
-palha do abrigo (nó na camada 10) cobre as pedras da parede (camada 0) onde se tocam (no antigo, a palha ficava na
-camada 0 absoluta, e a câmera de 0,6 mostrava as pedras por cima da beira do telhado)."""
+"""As composições sintéticas (o abrigo de pedra e palha, o marco nas 4 vistas) dão o mesmo pixel que o `pixel-engine`
+na mesma entrada; a árvore saiu da igualdade (a flora em volumes: ``tests/test_flora.py``). As mudanças intencionais:
+a sombra de contato das vistas E, N e W sai reescalada para o oblíquo como a da S (no antigo, ela ficava achatada
+pela metade); a palha do abrigo (nó na camada 10) cobre as pedras da parede (camada 0) onde se tocam (no antigo, a
+palha ficava na camada 0 absoluta, e a câmera de 0,6 mostrava as pedras por cima da beira do telhado)."""
 
 from __future__ import annotations
 
@@ -25,7 +25,6 @@ from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.raster.estilo import estilo_render
 
 from .oraculo import CASOS, no_canvas_antigo
-from .test_humano import _hashes
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "composicoes.esperado.json").read_text(encoding="utf-8"))["casos"]
 PALHA_NA_CAMADA_DO_NO = {("abrigo", "S")}
@@ -73,7 +72,7 @@ def test_composicao_de_fixture_tem_um_arquivo_por_caso() -> None:
 def test_controle_a_ancora_citada_antes_de_ser_deixada_e_recusada(tmp_path: Path) -> None:
     from pixel_forge.core.recusa import Recusa
 
-    dado = json.loads((CASOS / "composicoes" / "arvore.r1.json").read_text(encoding="utf-8"))
+    dado = json.loads((CASOS.parent / "composicoes" / "arvore.r1.json").read_text(encoding="utf-8"))
     dado["nos"] = [dado["nos"][0], dado["nos"][2], dado["nos"][1]]
     arq = tmp_path / "x.json"
     arq.write_text(json.dumps(dado), encoding="utf-8")
@@ -97,15 +96,6 @@ def test_controle_sem_a_sombra_no_canvas_o_abrigo_sai_dele() -> None:
     ir = ir_da_composicao(ler(CASOS / "composicoes" / "abrigo.r1.json", Composicao))
     estreito = ir.model_copy(update={"canvas": ir.canvas.model_copy(update={"width": ir.canvas.width - 40})})
     assert quadro_de_repouso(estreito, estilo_render(estilo_base()), "S").clipping_px > 0
-
-
-@pytest.mark.slow
-def test_o_balanco_da_arvore_igual_ao_oraculo() -> None:
-    """O balanço por deslocamento, quadro a quadro (a cadeia ``sway_*`` em px inteiros)."""
-    quer = ESPERADO["arvore/clipes"]
-    feito = _hashes(ler(CASOS / "composicoes" / "arvore.r1.json", Composicao), quer)
-    assert [k for k in quer if feito[k] != [quer[k]["tamanho"], quer[k]["sem_chao_sha256"]]] == []
-    assert len({quer[k]["sem_chao_sha256"] for k in quer}) > 1  # ele se mexe
 
 
 def _cata_vento(quadros: int) -> Composicao:
@@ -163,9 +153,9 @@ def test_o_no_que_nao_desenha_nada_e_recusado() -> None:
     assert e.value.codigo == "NO_VAZIO" and e.value.onde == "/nos/0/args"
 
 
-def test_o_galho_longo_cabe_no_teto_de_vertices() -> None:
-    """O galho grosso de uma copa de 8 m: o polígono do trecho tem no máximo 32 linhas (64 vértices)."""
-    dado = json.loads((CASOS / "composicoes" / "arvore.r1.json").read_text(encoding="utf-8"))
+def test_a_arvore_de_copa_de_8_m_monta() -> None:
+    """A árvore grande cabe nos tetos da IR (o galho roliço tem sempre os mesmos trechos)."""
+    dado = json.loads((CASOS.parent / "composicoes" / "arvore.r1.json").read_text(encoding="utf-8"))
     dado["medidas"] = {**dado["medidas"], "h": "6m", "a": "4m"}
     dado["categoria"] = "arvore_grande"
     ir = ir_da_composicao(validar(dado, Composicao, "teste"))

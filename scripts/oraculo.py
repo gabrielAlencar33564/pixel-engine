@@ -42,7 +42,8 @@ CAMINHOS = ["src", "presets", "schemas", "pyproject.toml", "README.md", "LICENSE
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "oraculo"
 # os argumentos que a peça antiga pedia para os modos que não vieram (o tronco chapado e o de volume por máscara): o
 # antigo os recebe, com o modo sólido ligado, e os ignora
-NOVAS = {"saia", "lenco"}  # as peças que nasceram na engine nova: o oráculo não as tem
+# as peças que nasceram na engine nova (a saia, o lenço e a flora em volumes): o oráculo não as tem
+NOVAS = {"saia", "lenco", "copa", "copa_conica", "galhos"}
 SO_NO_ANTIGO = {"tronco_em_pe": {"sombra": "plank_deep", "marca": "plank_deep", "pe": "plank_deep", "solido": True}}
 DIRECOES = ("S", "SW", "W", "NW", "N", "NE", "E", "SE")
 # a câmera da engine nova: o antigo a recebe (ele aceitava a profundidade por asset, ADR 0149)

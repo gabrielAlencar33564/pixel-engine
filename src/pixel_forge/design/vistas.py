@@ -23,16 +23,6 @@ N_VISTAS = (1, 2, 4)
 AZIMUTE = {"S": 0, "W": 90_000, "N": 180_000, "E": 270_000}
 
 
-def _plano(g: dict[str, Any]) -> list[Vec]:
-    ox, oy, oz = (c / 256 for c in g["origin_q8"])
-    out = []
-    for a, b in g["vertices_q8"]:
-        a, b = a / 256, b / 256
-        out.append((ox + a, oy, oz + b) if g["plane"] == "xz" else (ox, oy + a, oz + b) if g["plane"] == "yz"
-                   else (ox + a, oy + b, oz))
-    return out
-
-
 def pontos(g: dict[str, Any]) -> list[Vec]:
     """Os pontos de uma geometria (px, no espaço do osso)."""
     t = g["type"]
@@ -40,8 +30,6 @@ def pontos(g: dict[str, Any]) -> list[Vec]:
         return [(v["point_q8"][0] / 256, v["point_q8"][1] / 256, v["point_q8"][2] / 256) for v in g["vertices"]]
     if "points_q8" in g:
         return [(p[0] / 256, p[1] / 256, p[2] / 256) for p in g["points_q8"]]
-    if t in ("polygon", "stipple"):
-        return _plano(g)
     c = g["center_q8"] if t == "ellipse" else g.get("origin_q8")
     return [(c[0] / 256, c[1] / 256, c[2] / 256)] if c is not None else []
 

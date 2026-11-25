@@ -1,0 +1,20 @@
+{
+ "id": "arvore", "revision": 1,
+ "description": "Fixture sintética: tronco, galhos em volta dele e a copa em tufos com um tufo em cada ponta, na cadeia do balanço",
+ "reference": "fixture sintética mínima", "tipo": "prop", "categoria": "arvore_pequena", "semente": 321,
+ "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.42", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
+ "nos": [
+  {"id": "tronco", "peca": "tronco_em_pe", "osso": "tronco", "grupo": "lenho",
+   "args": {"altura": "$copa0 + 20cm", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca"}},
+  {"id": "galhos", "peca": "galhos", "osso": "cadeia", "grupo": "lenho",
+   "args": {"base": "$copa0 * 0.9", "copa": ["$a", "$c", "$cz"], "n": "5", "largura": ["10cm", "13cm"],
+            "ponta": "4cm"}},
+  {"id": "copa", "peca": "copa", "osso": "cadeia", "grupo": "copa",
+   "args": {"copa": ["$a", "$c", "$cz"], "pontas": "galhos.pontas"}}
+ ],
+ "vistas": {"S": {}}, "landmarks": {"sort_front": ["0", "0", "0"]},
+ "movimento": ["static", {"receita": "balanco", "tronco": "$copa0", "base": "$copa0 * 0.9", "topo": "$h", "elos": 4,
+                          "periodo_ms": 2400, "desloca_px": 2}],
+ "tracos": [{"id": "copa_redonda", "description": "A copa redonda sobre o tronco", "parts": ["copa_00"],
+             "verification": "observable"}]
+}

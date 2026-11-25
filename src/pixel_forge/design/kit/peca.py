@@ -43,7 +43,7 @@ class Arg:
 class Ctx:
     """O que a peça recebe além dos argumentos: o construtor, a semente do nó, o id (prefixo das partes), o grupo de
     contorno, a pilha da face e a camada do nó (as faces somam o degrau delas); as vistas da composição (com o
-    azimute), a cadeia do balanço e o osso do nó, as âncoras dos nós de antes e o que a peça muda por vista."""
+    azimute), a cadeia do balanço e o osso do nó e as âncoras dos nós de antes."""
 
     b: AssetBuilder
     st: Stream
@@ -56,7 +56,6 @@ class Ctx:
     cadeia: Sequence[Elo] = ()
     modo_osso: str = "raiz"
     ancoras: dict[str, list[Any]] = field(default_factory=dict)
-    por_vista: dict[str, dict[str, dict[str, Any]]] = field(default_factory=dict)
     no: str = ""
     humano: dict[str, Any] = field(default_factory=dict)  # o corpo em montagem: as medidas e o que a roupa pede
 

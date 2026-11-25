@@ -13,10 +13,8 @@ from ..contracts.ir import (
     EllipseGeom,
     Geometry,
     PartDef,
-    PolygonGeom,
     PolylineGeom,
     RevolutionGeom,
-    StippleGeom,
     TaperedPolylineGeom,
 )
 from ..core.direcoes import AZIMUTE_MDEG
@@ -31,11 +29,9 @@ from .primitivas import (
     EllipsePrim,
     FanPrim,
     OrientedEllipsePrim,
-    PolygonPrim,
     Prim,
     RevolutionPrim,
     Scene2D,
-    StipplePrim,
     SupElipsoide,
     Superficie,
     SupLeque,
@@ -121,28 +117,6 @@ def _polilinha(g: PolylineGeom, pc: _Peca) -> _Projetada:
                       sum(p[2] for p in pts) // len(pts))
 
 
-def _plano(g: PolygonGeom | StippleGeom, v: list[int]) -> Vec3i:
-    o = g.origin_q8
-    if g.plane == "xz":
-        return (o[0] + v[0], o[1], o[2] + v[1])
-    if g.plane == "yz":
-        return (o[0], o[1] + v[0], o[2] + v[1])
-    return (o[0] + v[0], o[1] + v[1], o[2])
-
-
-def _poligono(g: PolygonGeom, pc: _Peca) -> _Projetada:
-    pts = [pc.tela(_plano(g, v)) for v in g.vertices_q8]
-    return _Projetada(PolygonPrim(tuple((p[0], p[1]) for p in pts)), SupLeque(_q8(pts)),
-                      sum(p[2] for p in pts) // len(pts))
-
-
-def _pontilhado(g: StippleGeom, pc: _Peca) -> _Projetada:
-    pts = [pc.tela(_plano(g, v)) for v in g.vertices_q8]
-    ou, ov, _ = pc.tela(_plano(g, [0, 0]))
-    prim = StipplePrim(tuple((p[0], p[1]) for p in pts), g.density_permille, g.seed, g.cell_px, ou, ov)
-    return _Projetada(prim, SupLeque(_q8(pts)), sum(p[2] for p in pts) // len(pts))
-
-
 def _revolucao(g: RevolutionGeom, pc: _Peca) -> _Projetada:
     o = g.origin_q8
     sts = []
@@ -172,10 +146,6 @@ def _projetar(g: Geometry, part: PartDef, pc: _Peca) -> _Projetada:
         return _polilinha(g, pc)
     if isinstance(g, TaperedPolylineGeom):
         return _afunilada(g, pc)
-    if isinstance(g, PolygonGeom):
-        return _poligono(g, pc)
-    if isinstance(g, StippleGeom):
-        return _pontilhado(g, pc)
     return _leque(g, pc, "flat" in part.tags)
 
 

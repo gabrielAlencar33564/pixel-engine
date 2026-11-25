@@ -7,8 +7,9 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 
 - **Núcleo** igual ao `pixel-engine` pixel a pixel (oráculo por `git archive`): q8, IR, FK/IK de 2 e de N segmentos,
   a câmera 3/4 oblíqua (profundidade 0,6, os dois), a projeção, o raster e o pacote `pfe-jogo/1`. Motor 0.2.0.
-- **Kit vigente** (37 peças): construção, telhados, carpintaria, vãos, formas, flora (`pontilhado`, galhos, cortinas,
-  pena), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição num formato só, com o porte.
+- **Kit vigente** (35 peças): construção, telhados, carpintaria, vãos, formas, a flora em volumes (`tronco_em_pe`,
+  `galhos`, `copa`, `copa_conica`), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição
+  num formato só, com o porte.
 - **Movimento:** o parado e a passada do humano, o parado e o passo do quadrúpede, o balanço e o giro do prop.
 - **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `radiografia`, `checar`, `build`,
   `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de pedido e 4 exemplos.
@@ -70,12 +71,16 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 18. A sombra no chão é só a projetada: a mancha de contato saiu (o campo `sombra` da composição é recusado), o
     tronco e a copa pontilhada passam a se lançar no chão, e a limpeza não conta o chão como figura. A 2 e a 4
     (a sombra de contato) ficam sem objeto. Na `18`, banco, abrigo, árvore, humano e canino.
+19. A flora em volumes: a copa da folhosa em tufos (`copa`), a da conífera em andares (`copa_conica`) e os galhos
+    roliços em volta do tronco (`galhos`), nas 4 vistas, com a sombra da copa no chão. Saíram o pontilhado, a
+    pena, as cortinas e os galhos chapados. Na `19`, a árvore de exemplo e o carvalho da prova; na `19b` e na
+    `19c`, as peças.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
 
 - A corrida, o galope, a ação por acessório e a bateria canina (sentar, deitar, latir, uivar): nenhum pedido os usa.
-- O que a rodada 2 apontou sem recusa: a copa do `pontilhado` não faz a linha reta de pasto; a palha não envelhece
+- O que a rodada 2 apontou sem recusa: a copa (hoje em tufos) não faz a linha reta de pasto; a palha não envelhece
   para o cinza; o `olhar` sai sem rótulos (a skill diz a ordem das fileiras). A prévia já avisa a parte escondida.
 - A camponesa: a saia larga em 3/4 lê como saco; o andar (igual ao antigo) gira o tronco nas diagonais.
 - O modelo do humano não tem mais medida fora da faixa na radiografia (mudanças 10 a 12), mas as faixas são
@@ -86,9 +91,13 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   mudanças 7 a 9 ajustaram a pose sobre o modelo antigo e não foram reafinadas no novo.
 - O humano na tela: no andar em diagonal as mãos a até 21 px uma da outra; o perfil parado estreito (12 px, um
   braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
+- A flora em volumes (mudança 19): as bordas do tufo e da saia são lisas, a copa pendente é um domo com ramos
+  caindo, e a sombra do elipsoide no chão é aproximada (em `docs/decisoes.md`). O carvalho do acervo (`r1` e `r2`)
+  usa as peças que saíram: não se lê mais, e tem de ser refeito no modelo novo (a `19` mostra uma versão dele).
 
 ## Espera o dono
 
-A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
+A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`), com a
+flora em volumes entre elas. Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
 (`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 18 ela ainda não foi reconstruída.
