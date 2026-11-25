@@ -34,8 +34,9 @@ class ClipWriter:
         self.keyframes.append({"time_ms": t, "easing": easing, "root_q8": extra[0], "bones": bones,
                                "markers": sorted(extra[1])})
 
-    def clip(self, clip_id: str, duration: int, samples: list[int], contacts: list[dict[str, Any]]) -> dict[str, Any]:
-        return {"id": clip_id, "duration_ms": duration, "loop": True, "keyframes": self.keyframes,
+    def clip(self, clip_id: str, duration: int, samples: list[int], contacts: list[dict[str, Any]],
+             loop: bool = True) -> dict[str, Any]:
+        return {"id": clip_id, "duration_ms": duration, "loop": loop, "keyframes": self.keyframes,
                 "sample_times_ms": samples, "contacts": contacts}
 
 

@@ -247,11 +247,12 @@ def landmarks(c: dict[str, float]) -> list[dict[str, Any]]:
     return out
 
 
-def canvas_de(estatura_px: float) -> dict[str, Any]:
-    """Até ~1,70 m, 96 × 96 com o pivô em (48, 60); acima, 16 px a mais em cima, com o pivô descendo junto."""
-    if estatura_px <= TALL_PX:
-        return {"width": CANVAS, "height": CANVAS, "pivot_px": list(PIVOT)}
-    return {"width": CANVAS, "height": CANVAS + TALL_EXTRA, "pivot_px": [PIVOT[0], PIVOT[1] + TALL_EXTRA]}
+def canvas_de(estatura_px: float, arma: bool = False) -> dict[str, Any]:
+    """Até ~1,70 m, 96 × 96 com o pivô em (48, 60); acima, 16 px a mais em cima, com o pivô descendo junto. Com a
+    arma na mão, mais 16 px em cima e 16 de cada lado: no golpe a lâmina passa por cima da cabeça e sai do lado."""
+    extra = (TALL_EXTRA if estatura_px > TALL_PX else 0) + (TALL_EXTRA if arma else 0)
+    lado = TALL_EXTRA if arma else 0
+    return {"width": CANVAS + 2 * lado, "height": CANVAS + extra, "pivot_px": [PIVOT[0] + lado, PIVOT[1] + extra]}
 
 
 def motion_params(c: dict[str, float]) -> dict[str, int]:

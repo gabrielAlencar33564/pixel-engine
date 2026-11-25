@@ -485,3 +485,12 @@ O dono pediu variações de tronco, para ele não ser simples e só cilíndrico.
   daqui (force push com lease em 4a23b14), e o histórico antigo saiu dela por pedido do dono. O antigo fica no clone
   local `pixel-engine` (com os 81 commits que nunca subiram) e na branch `manequim` do GitHub, que não foi tocada. O
   oráculo segue lendo o clone local; o push daquele clone para a `main` sobrescreveria esta.
+
+## O golpe de espada (pedido do jogo Aldeia da Orla, 2026-11-25)
+
+- O humano ganhou a peça `espada` (na mão direita: a lâmina para a frente e 35° para baixo, a guarda e o cabo) e o
+  clipe `attack` (a receita `golpe`: 480 ms, 8 quadros juntos no corte, sem laço, a marca `hit` aos 200 ms). A
+  receita é do tipo `parado` (os pés plantados por IK); o `parado` passou a ler as curvas por chaves sobre o ciclo e o
+  `laco` da receita. Quem tem a espada ganha 16 px em cima e de cada lado no canvas: a lâmina no alto do golpe saía
+  do quadro. Nada muda no pixel de quem não tem a espada (o oráculo segue igual). A lâmina clara usa `casca_clara`
+  (a rampa ardósia, pedra clara e osso), para não mudar o estilo: o `metal` lia como um risco escuro.

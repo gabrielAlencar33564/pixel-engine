@@ -150,8 +150,9 @@ def _apoio(rec: dict[str, Any], rest: dict[str, Vec3i], k: float) -> dict[str, V
 
 
 def parado(rec: dict[str, Any], r: Papeis, skel: Skeleton, mp: dict[str, int]) -> dict[str, Any]:
-    """Em pé, os pés no apoio por IK, chaves com suavização (o ``idle``); na perna de N segmentos, o IK põe o alvo
-    da cadeia (o jarrete) no repouso e os distais ficam na inclinação de repouso (a pata plana)."""
+    """Em pé, os pés no apoio por IK, chaves com suavização (o ``idle``, e o golpe, que não faz laço: ``laco``
+    false e as curvas por chaves sobre o ciclo); na perna de N segmentos, o IK põe o alvo da cadeia (o jarrete) no
+    repouso e os distais ficam na inclinação de repouso (a pata plana)."""
     duracao, k = rec["duracao_ms"], mp.get("scale_pm", 1000) / 1000
     feet = [r.alvo(r.exige(p, "pe")) for p in rec["pes"]]
     rest = _apoio(rec, rest_ankles(skel, feet), k)
@@ -161,7 +162,7 @@ def parado(rec: dict[str, Any], r: Papeis, skel: Skeleton, mp: dict[str, int]) -
     distais = inclinacoes_de_repouso(skel, r)
     for t in rec["chaves_ms"]:
         ch: Channels = dict(guess)
-        ch.update(canais(rec, r, Instante(t, duracao, mp, k)))
+        ch.update(canais(rec, r, Instante(t, duracao, mp, k, curvas=rec.get("curvas", {}))))
         ch = solve_feet(skel, ch, rest)
         if skirt is not None:
             ch = skirt(ch)
@@ -169,4 +170,4 @@ def parado(rec: dict[str, Any], r: Papeis, skel: Skeleton, mp: dict[str, int]) -
             ch = orienta_distais(skel, ch, r, distais)
         w.key(t, rec["suave"], ch, ([0, 0, 0], list(rec.get("marcas", {}).get(str(t), []))))
     contacts = [{"bone_id": f, "start_ms": 0, "end_ms": duracao, "target_q8": list(rest[f])} for f in feet]
-    return w.clip(rec["clip"], duracao, rec["amostras_ms"], contacts)
+    return w.clip(rec["clip"], duracao, rec["amostras_ms"], contacts, rec.get("laco", True))

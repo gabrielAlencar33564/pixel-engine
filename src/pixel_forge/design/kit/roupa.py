@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..construtor import AssetBuilder, Junta, Parte, ellipse, polyline, q, qv
+from ..escala import PX_POR_M
 from .humano import PE_ALTO, R_OMBRO, SIDES, cranio, frente_da_cabeca, frente_do_peito, peito, taper, trapezio
 
 Regra = dict[str, str]
@@ -39,6 +40,10 @@ LENCO: Casca = (-0.06, 0.06, (0.45, 0.4, -0.1))
 # O chapéu assenta um pouco para trás: centrado, na câmera de cima a aba cobre os olhos em qualquer largura
 CHAPEU, COQUE = ((-0.06, 0.47), (-0.10, 0.31)), 0.57
 SEM_LINHA = ("garment", "no_inner_outline")
+# a espada: quantos graus a lâmina desce abaixo da linha da mão, a lâmina, o cabo e a guarda em metros, e os raios
+# (px) da lâmina no pé e na ponta e o do cabo e da guarda. Com o contorno, a lâmina tem 2 a 3 px na tela
+ESPADA_DESCE, ESPADA_M, ESPADA_R = 35.0, (0.70, 0.12, 0.17), (0.75, 0.35, 0.5)
+ESPADA_TAGS = ("garment", "no_inner_outline", "no_cast")
 MARCAS_DO_OLHO = (*SEM_LINHA, "no_outline", "eye")  # nem o contorno de fora: o olho é o pixel dele, e a limpeza o poupa
 
 
@@ -289,7 +294,33 @@ def lenco(v: Veste) -> Vista:
     return Vista(cobre=["hair_cap", "topknot", "hair_side_l", "hair_side_r"], back_rules=[regra("scarf_knot", "neck")])
 
 
+def espada(v: Veste) -> Vista:
+    """A espada na mão direita: o cabo no punho fechado (no segundo material), a guarda atravessada e a lâmina, que
+    sai para a frente e desce :data:`ESPADA_DESCE` graus abaixo da linha da mão (no repouso a ponta fica à frente,
+    perto do chão; no golpe ela segue o braço e a mão). ``comprimento_pct`` é a lâmina sobre :data:`ESPADA_M`."""
+    a = math.radians(ESPADA_DESCE)
+    d = (0.0, math.cos(a), -math.sin(a))
+    lamina, cabo, guarda = (m * PX_POR_M for m in ESPADA_M)
+    lamina *= v.pct("comprimento_pct", 100)
+    g = (0.0, 0.0, -0.42 * v.c["mao"])  # o meio do punho fechado
+
+    def ao_longo(s: float) -> tuple[float, float, float]:
+        return (g[0], g[1] + d[1] * s, g[2] + d[2] * s)
+
+    def fuso(de: tuple[float, float, float], ate: tuple[float, float, float], r0: float, r1: float) -> dict[str, Any]:
+        return {"type": "tapered_polyline", "points_q8": [qv(*de), qv(*ate)], "radii_q8": [q(r0), q(r1)]}
+
+    base = ao_longo(cabo / 2)
+    metal = Parte(bone="hand_r", group="sword", tags=ESPADA_TAGS)
+    v.b.part("sword_blade", v.mat, fuso(base, ao_longo(cabo / 2 + lamina), ESPADA_R[0], ESPADA_R[1]), metal)
+    v.b.part("sword_guard", v.mat, fuso((-guarda / 2, base[1], base[2]), (guarda / 2, base[1], base[2]),
+                                        ESPADA_R[2], ESPADA_R[2]), metal)
+    v.b.part("sword_grip", v.mat2 or v.mat, fuso(ao_longo(-cabo / 2), base, ESPADA_R[2], ESPADA_R[2]), metal)
+    return Vista(rules=[regra("hand_r", "sword_grip"), regra("sword_guard", "sword_blade")])
+
+
 PECAS: dict[str, Callable[[Veste], Vista]] = {
     "jaqueta": jaqueta, "faixa": faixa, "calca": calca, "olhos": olhos, "cabelo_preso": cabelo_preso,
     "chapeu": chapeu, "bolsa": bolsa, "sandalia": sandalia, "tabi": tabi, "saia": saia, "lenco": lenco,
+    "espada": espada,
 }

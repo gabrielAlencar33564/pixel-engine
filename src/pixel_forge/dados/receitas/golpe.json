@@ -1,0 +1,36 @@
+{
+  "id": "golpe",
+  "clip": "attack",
+  "tipo": "parado",
+  "laco": false,
+  "descricao": "O golpe de espada de cima para baixo, com a mão direita, em 480 ms sem laço: a preparação (o braço sobe por cima do ombro, o cotovelo dobra, o punho joga a lâmina para trás e o tronco gira e recua), o corte (o braço desce para a frente e estica, o punho estala, o tronco gira e se inclina, o quadril baixa) e a volta ao repouso. Os pés ficam plantados, o esquerdo à frente. As amostras se juntam no corte: um quadro pega a lâmina no meio da descida (o acerto, a marca 'hit').",
+  "duracao_ms": 480,
+  "chaves_ms": [0, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480],
+  "suave": "smoothstep",
+  "amostras_ms": [0, 70, 130, 175, 215, 270, 350, 420],
+  "marcas": {"200": ["hit"]},
+  "pes": ["perna_l", "perna_r"],
+  "avanco_m": [0.10, -0.08],
+  "curvas": {
+    "ombro": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, 150], [0.30, 150], [0.45, 25], [0.62, 15], [1.0, 0]]},
+    "abre": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, 20], [0.45, 8], [1.0, 0]]},
+    "cotovelo": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, 95], [0.30, 95], [0.45, 0], [0.62, 5], [1.0, 0]]},
+    "punho": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, -45], [0.30, -45], [0.45, 40], [0.62, 30], [1.0, 0]]},
+    "giro": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, 20], [0.30, 20], [0.45, -18], [0.62, -14], [1.0, 0]]},
+    "inclina": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, 6], [0.30, 6], [0.45, -14], [0.62, -10], [1.0, 0]]},
+    "cabeca": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, -4], [0.45, 9], [0.62, 7], [1.0, 0]]},
+    "outro_braco": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.22, 15], [0.45, -25], [0.62, -20], [1.0, 0]]},
+    "agacha": {"sobre": "ciclo", "chaves": [[0.0, 0], [0.30, 0], [0.45, 1], [0.62, 1], [1.0, 0]]}
+  },
+  "canais": {
+    "pelve.base": {"tr": [0, 0, {"termos": [{"amp": -400, "curva": "agacha"}], "fator": "escala"}], "rot": 0},
+    "coluna.giro": {"rot": {"termos": [{"amp": 1000, "curva": "giro"}]}},
+    "coluna.frente": {"rot": {"termos": [{"amp": 1000, "curva": "inclina"}]}},
+    "cabeca.frente": {"rot": {"termos": [{"amp": 1000, "curva": "cabeca"}]}},
+    "braco_r.frente": {"rot": {"termos": [{"amp": 1000, "curva": "ombro"}]}},
+    "braco_r.abre": {"rot": {"termos": [{"amp": 1000, "curva": "abre"}]}},
+    "braco_r.cotovelo": {"rot": {"termos": [{"amp": 1000, "curva": "cotovelo"}]}},
+    "braco_r.mao": {"rot": {"termos": [{"amp": 1000, "curva": "punho"}]}},
+    "braco_l.frente": {"rot": {"termos": [{"amp": 1000, "curva": "outro_braco"}]}}
+  }
+}

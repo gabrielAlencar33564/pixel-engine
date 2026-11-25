@@ -21,7 +21,7 @@ from .kit.registro import PECAS
 from .kit.roupa import Vista
 
 CORPO = "corpo_humano"
-CLIPES = {"idle": "parado", "walk": "andar_poses"}  # o clipe e a receita que o gera
+CLIPES = {"idle": "parado", "walk": "andar_poses", "attack": "golpe"}  # o clipe e a receita que o gera
 
 
 def clipes(comp: Composicao) -> dict[str, str]:
@@ -94,8 +94,9 @@ def ir_do_humano(comp: Composicao) -> dict[str, Any]:
                   humano=humano)
         PECAS[no.peca].desenha(ctx, args)
     c = humano["medidas"]
+    arma = any(no.peca == "espada" for no in comp.nos)
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": landmarks(c),
-            "canvas": canvas_de(c["estatura"]), "views": _vistas(b, humano["vista"]), "modelo": "humano"}
+            "canvas": canvas_de(c["estatura"], arma), "views": _vistas(b, humano["vista"]), "modelo": "humano"}
 
 
 def movimento_do_humano(comp: Composicao) -> dict[str, int]:

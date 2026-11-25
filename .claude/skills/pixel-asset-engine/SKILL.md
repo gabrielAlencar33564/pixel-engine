@@ -50,7 +50,7 @@ Um JSON `<id>.r<n>.json` (o `<id>` em minúsculas, `_` e dígitos). Campos:
 | `medidas` | nomes → expressões, usados nos argumentos como `$nome` |
 | `nos` | as peças, em ordem (veja abaixo) |
 | `vistas` | o prop parado: `{"S": {}}` (2 ou 4 cardinais só se o pedido disser); quem anda: as 8 direções `S SW W NW N NE E SE` |
-| `movimento` | o prop: `["static"]` (balanço `{"receita": "balanco", ...}` ou giro `{"receita": "giro", ...}` se o pedido disser); o humano e o quadrúpede: `["idle", "walk"]` |
+| `movimento` | o prop: `["static"]` (balanço `{"receita": "balanco", ...}` ou giro `{"receita": "giro", ...}` se o pedido disser); o humano e o quadrúpede: `["idle", "walk"]`; o humano armado, também `"attack"` (o golpe de espada, sem laço) |
 | `landmarks` | pontos do jogo no prop (`"sort_front": ["0", "0", "0"]`) |
 | `tracos` | o que tem de ler no sprite: `id`, `description`, `parts` (ids de partes), `verification` (`observable`: recusado se nenhuma vista mostra um pixel dele) e, se quiser, `reads_in_silhouette` (tem de tocar a borda da figura) |
 
@@ -73,7 +73,7 @@ camada dela e a seguinte; para nada se cobrir, use pilhas diferentes), `osso`
 tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à direita. O contrato está em
 `docs/coordenadas.md`.
 
-**O humano:** o primeiro nó é `corpo_humano`; a roupa vem depois, cada peça um nó. **O quadrúpede:** um nó
+**O humano:** o primeiro nó é `corpo_humano`; a roupa vem depois, cada peça um nó. A `espada` vai na mão direita e dá ao canvas 16 px a mais em cima e de cada lado; com ela, o clipe `attack` (480 ms, 8 quadros, sem laço) sobe a lâmina por cima do ombro e corta para a frente. **O quadrúpede:** um nó
 `corpo_canino`, com as marcas e as orelhas como argumentos.
 
 **A árvore e a moita** são volumes: `tronco_em_pe` e a copa, que é `copa` (a folhosa, em tufos redondos; no chão e

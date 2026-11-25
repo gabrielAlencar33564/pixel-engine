@@ -7,10 +7,11 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 
 - **Núcleo** igual ao `pixel-engine` pixel a pixel (oráculo por `git archive`): q8, IR, FK/IK de 2 e de N segmentos,
   a câmera 3/4 oblíqua (profundidade 0,6, os dois), a projeção, o raster e o pacote `pfe-jogo/1`. Motor 0.2.0.
-- **Kit vigente** (35 peças): construção, telhados, carpintaria, vãos, formas, a flora em volumes (`tronco_em_pe`,
-  `galhos`, `copa`, `copa_conica`), o humano com as roupas (e as novas saia e lenço), o corpo canino. Composição
-  num formato só, com o porte.
-- **Movimento:** o parado e a passada do humano, o parado e o passo do quadrúpede, o balanço e o giro do prop.
+- **Kit vigente** (36 peças): construção, telhados, carpintaria, vãos, formas, a flora em volumes (`tronco_em_pe`,
+  `galhos`, `copa`, `copa_conica`), o humano com as roupas (e as novas saia e lenço) e a espada, o corpo canino.
+  Composição num formato só, com o porte.
+- **Movimento:** o parado, a passada e o golpe de espada (sem laço) do humano, o parado e o passo do quadrúpede, o
+  balanço e o giro do prop.
 - **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `radiografia`, `checar`, `build`,
   `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de pedido e 4 exemplos.
 

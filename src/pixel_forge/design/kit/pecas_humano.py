@@ -112,6 +112,12 @@ PECAS_HUMANO = [
     _roupa("sandalia", "Sola sob o pé e a tira sobre o peito do pé", (DETALHE,), {},
            (("palha", {"material": "fibra"}), ("tira de couro", {"material": "fibra", "detalhe": "couro"}),
             ("couro", {"material": "couro"}))),
-    _roupa("tabi", "Calçado fechado sobre o pé e o tornozelo (meia, tamanco, bota baixa)", (), {},
+    _roupa("espada", "Espada na mão direita: a lâmina para a frente e para baixo, a guarda e o cabo no punho fechado "
+           "(no golpe ela segue o braço)", (DETALHE, X("comprimento", "escalar", "a lâmina sobre 70 cm", "100%")),
+           {"comprimento": "comprimento_pct"},
+           (("de aço polido", {"material": "casca_clara", "detalhe": "couro"}),
+            ("curta", {"material": "metal", "detalhe": "couro", "comprimento": "70%"}),
+            ("cabo vermelho", {"material": "metal", "detalhe": "pano_vermelho"}))),
+    _roupa("tabi","Calçado fechado sobre o pé e o tornozelo (meia, tamanco, bota baixa)", (), {},
            (("linho", {"material": "linho"}), ("escuro", {"material": "pano_azul"}), ("couro", {"material": "couro"}))),
 ]
