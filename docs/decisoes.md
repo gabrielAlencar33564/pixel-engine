@@ -682,8 +682,15 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
     metade da altura da maior: `flora.MESMO_PORTE`). Nos acervos de prova a razão de altura vai de 0,11 a 0,36
     da árvore à flora baixa (com assinaturas de até 0,75: a moita redonda e a copa redonda) e de 0,52 a 0,88
     entre touceiras e entre árvores; o limite cai no vão. As irmãs saem com a categoria.
+  - **As ervas** (`pecas_ervas.py`): o `salpico` escolhe os pontos da âncora pela normal na massa contra a
+    câmera da vista que melhor os vê, e o ponto da face de um volume entra na folhagem (0,6 do raio mais os 2 px
+    que o detalhe vence): de frente aparece, e na beira a folhagem o cobre. Nas variações do kit (6 sementes) os
+    pontos no contorno foram de 90 para 16 na vista S e de 414 para 110 nas quatro vistas. O tom das lâminas é o
+    do lado da luz na tela em cada vista: a IR ganhou o material da parte por vista (`ViewSpec.materials`; a
+    vista S e as composições de vista única não mudam). A folha larga lisa é chapada (as faixas da peça lisa a
+    faziam ler como tubo), com a nervura escura como a da pena. O capim de 20 a 40 cm (5 a 9 px de alto na tela)
+    é limite da resolução: lê com poucas lâminas e `cai` 0, e nada mudou.
 - O que sobra: a casca clara e a anelada seguem na rampa lilás, e falta o cinza-esverdeado (a sálvia, a
-  oliveira); a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
-  fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a semelhança compara só a silhueta (duas
+  oliveira); a semelhança compara só a silhueta (duas
   plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se
   leem mais, e as de `copa` dão outro desenho.

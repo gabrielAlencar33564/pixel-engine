@@ -138,8 +138,8 @@ and drop `planta`. Vary a set by habit, proportions, age, wind and seed.
 | tiers | `tronco_em_pe` + `copa_conica` | the conifer with jagged skirts; `pontas`, `recorte` and `cai` give a full or a thin skirt |
 | rosette on top | `tronco_em_pe` + `touceira` with `pe` at the trunk top, `largura` and `pena` | the palm (feathered), the sword leaf (smooth) |
 | dead | `tronco_em_pe` + `galhos` | the leafless tree |
-| bush | `copa` on the ground, no trunk | the shrub; with `salpico` on its `superficie`, flowers and fruit; a bush of two or three masses is several `copa` nodes with `desvio`, in the same `grupo` |
-| clump | `touceira` | blades: thin, grass and reeds; with `largura` and `pena`, the fern; with `salpico` on the `pontas`, wild flowers and seed heads (a flower needs an almost straight blade, `cai` up to 0.1; an upright seed head, `alonga` 3) |
+| bush | `copa` on the ground, no trunk | the shrub; with `salpico` on its `superficie`, flowers and fruit (on the points a view sees face-on, tucked into the foliage); a bush of two or three masses is several `copa` nodes with `desvio`, in the same `grupo` |
+| clump | `touceira` | blades: thin, grass and reeds (grass of 20-40 cm is 5-9 px tall on screen: few blades, `n` at most the width in px / 2, and `cai` 0); with `largura` and `pena`, the fern; with `largura` and no `pena`, flat sword leaves with a dark midrib; with `salpico` on the `pontas`, wild flowers and seed heads (a flower needs an almost straight blade, `cai` up to 0.1; an upright seed head, `alonga` 3) |
 
 Foliage is one mass of light (bright on top and on the left) per `grupo`: foliage nodes in the same group brighten and
 darken together, each lobe is a relief on the mass, and each lobe's edge is cut into leaves. `desvio` moves the crown
