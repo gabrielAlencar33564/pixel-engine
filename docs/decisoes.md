@@ -236,6 +236,39 @@ O dono viu o busto como uma bola: o personagem masculino parecia ter seios.
   diagonais e a ombreira de lá some de perfil; sem manga, o braço de lá fica atrás do peito na vista SW. Olho,
   chapéu e cabelo não mudaram.
 
+## O humano: a cabeça e os olhos (pedido do dono, 2026-11-24)
+
+O dono viu os olhos estranhos, o perfil com cabelo como o de um alienígena e, na primeira tentativa (rejeitada), os
+olhos atravessando o chapéu.
+
+- O olho não é detalhe. A tentativa rejeitada o marcava como `detail`, que vence a peça até 2 px à frente dele: por
+  isso atravessava a aba. Agora ele só perde o contorno em volta (`no_inner_outline`: num rosto de 6 px o contorno
+  de cada olho virava uma máscara escura) e a limpeza de cor isolada o poupa (`eye`). O chapéu, o cabelo e o lenço
+  o cobrem pela profundidade, sem regra.
+- O olho tem 1 px de largura e fica a 58 % da altura da cabeça (`OLHO_Z`), não a 50 % como no corpo real: a câmera
+  a 45° mostra o alto da cabeça e comprime a face, e a 50 % o olho caía a 74 % da cabeça na tela, colado ao
+  queixo. A 58 % cai a ~62 %. Estava a 82 % (na testa, onde a aba e o cabelo assentam). É estilização, como a
+  cabeça de 1/6.
+- A cabeça (`CRANIO`, `FACE`, `QUEIXO`, `NARIZ`, em `kit/humano.py`): o crânio com o alto no alto da cabeça; a
+  face com 0,62 da cabeça de largura (eram 0,52: lia como lâmpada) e rente à testa (a mandíbula avançava como um
+  focinho); o nariz, parte nova (`nose`), é a ponta do perfil a 40 % da altura. As quatro são uma massa só
+  (`shade_group`), como o tronco.
+- O cabelo preso e o lenço são cascas sobre o crânio (`CABELO`, `LENCO`): o centro recua e sobe, os raios crescem
+  um pouco, e a face sai pela frente de baixo, pela profundidade. Antes o cabelo recuava 20 % da cabeça (o perfil
+  alongado) e, de frente, uma regra punha o crânio inteiro por cima dele e do lenço: sobrava um aro, e o nó do
+  lenço ia parar na testa. As regras saíram. Sem linha de contorno na testa; no cabelo, também sem a sombra
+  projetada (lia como aba de chapéu).
+- O chapéu não mudou; segue o crânio novo. Com a aba de 150 % da cabeça (o viajante) os olhos aparecem sob ela; a
+  partir de ~160 % a aba os cobre, pela geometria. O catálogo diz isso no argumento da aba.
+- O olho recuado para dentro do crânio (para sair da borda no perfil) foi medido e não veio: de frente ele subia
+  para a linha do cabelo.
+- As quatro medidas da cabeça entram na faixa (rosto 0,63 → 0,85; olhos 0,82 → 0,55; ponta do perfil 0,25 → 0,38;
+  cabelo 1,25 → 1,11), e o corpo do kit não tem mais medida fora da faixa. As faixas seguem aproximações minhas.
+- O oráculo compara na cabeça do antigo: o teste repõe as três massas (sem o nariz, cada uma sombreada sozinha),
+  os olhos e o cabelo dele. Os controles: a cabeça do antigo sai da faixa nas quatro medidas e tem o contorno em
+  volta dos olhos. O lenço não tem oráculo (peça nova): o teste confere o rosto à mostra e o nó só de costas. Os
+  esperados não foram regerados (I11).
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

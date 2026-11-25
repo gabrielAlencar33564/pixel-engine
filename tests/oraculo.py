@@ -37,6 +37,11 @@ LINHA_DO_OMBRO = ("trap_", "jacket_yoke_")  # as partes que o `pixel-engine` nã
 # o grupo de contorno de cada massa do tronco (na engine o peito e a cintura são uma massa só)
 BOLA_DO_PEITO, BOLA_DA_JAQUETA = (0.70, 0.32), (0.68, 0.36)
 GRUPO_DO_ANTIGO = {"chest": "chest", "waist": "waist", "jacket_chest": "jacket", "jacket_waist": "jacket"}
+# a cabeça do `pixel-engine`: o crânio menor e mais alto, a mandíbula estreita e à frente (o focinho), sem nariz, e
+# cada massa sombreada sozinha
+CABECA_DO_ANTIGO = ((humano, "CRANIO", (-0.06, 0.43, 0.41, 0.33)), (humano, "FACE", (0.08, 0.02, 0.26, 0.30, 0.25)),
+                    (humano, "QUEIXO", (0.27, -0.15, 0.13, 0.10, 0.10)))
+MASSAS_DA_CABECA = {"skull": "head", "jaw": "head", "chin": "head"}
 
 
 def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -63,6 +68,56 @@ def _frente_do_antigo(c: dict[str, float], z: float, folga: float = 0.0) -> floa
     return 0.1 + ry * math.sqrt(max(0.0, 1 - u * u))
 
 
+def _partes_do_antigo(monkeypatch: pytest.MonkeyPatch, grupos: dict[str, str], fora: tuple[str, ...]) -> None:
+    """As partes de ``grupos`` no grupo de contorno do antigo, cada uma sombreada sozinha, e sem as de ``fora`` (os
+    ids que começam assim: as partes que o `pixel-engine` não tem)."""
+    parte = AssetBuilder.part
+
+    def do_antigo(b: AssetBuilder, id: str, material: str, geometry: dict[str, Any], como: Parte = PARTE) -> None:
+        if id in grupos:
+            como = replace(como, group=grupos[id], tags=tuple(t for t in como.tags if t != "shade_group"))
+        if not id.startswith(fora):
+            parte(b, id, material, geometry, como)
+
+    monkeypatch.setattr(AssetBuilder, "part", do_antigo)
+
+
+def _olhos_do_antigo(v: roupa.Veste) -> roupa.Vista:
+    """Os olhos do `pixel-engine`: na testa (a meio caminho entre o centro e o alto do crânio), com o contorno em
+    volta, e por cima do cabelo e do lenço por regra."""
+    cy, cz, rx, ry, rz = humano.cranio(v.c)
+    z = cz + 0.5 * rz
+    for side, sx in humano.SIDES:
+        x = sx * 0.42 * rx
+        y = cy + ry * math.sqrt(max(0.0, 1 - (x / rx) ** 2 - ((z - cz) / rz) ** 2))
+        v.part(f"eye_{side}", ellipse(qv(x, y, z), qv(0.6, 0.5, 0.9)), ("head", "eyes"))
+    return roupa.Vista(hide_back=["eye_l", "eye_r"], hide_w=["eye_r"], hide_e=["eye_l"],
+                       front_rules=[roupa.regra(f"eye_{s}", o) for s in ("l", "r")
+                                    for o in ("skull", "hair_cap", "scarf")])
+
+
+def _cabelo_do_antigo(v: roupa.Veste) -> roupa.Vista:
+    """O cabelo preso do `pixel-engine`: a massa recuada 20 % da cabeça, com o crânio por cima dela de frente."""
+    cab = v.c["cabeca"]
+    cy, cz, rx, ry, rz = humano.cranio(v.c)
+    v.part("hair_cap", ellipse(qv(0, cy - 0.20 * cab, cz + 0.13 * cab), qv(rx + 0.25, ry + 0.05, rz)), ("head", "hair"))
+    v.part("topknot", ellipse(qv(0, cy - 0.16 * cab, cz + 0.42 * cab), qv(0.14 * cab, 0.16 * cab, 0.13 * cab)),
+           ("head", "hair"))
+    return roupa.Vista(rules=[roupa.regra("topknot", "hair_cap")], front_rules=[roupa.regra("skull", "hair_cap")],
+                       back_rules=[roupa.regra("hair_cap", "skull")])
+
+
+def cabeca_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A cabeça, os olhos e o cabelo preso do humano como no `pixel-engine`: a engine corrigiu a anatomia da cabeça
+    (mudança intencional), e o oráculo compara o resto do humano na cabeça dele. O chapéu segue o crânio, e volta
+    junto."""
+    for modulo, nome, valor in CABECA_DO_ANTIGO:
+        monkeypatch.setattr(modulo, nome, valor)
+    monkeypatch.setitem(roupa.PECAS, "olhos", _olhos_do_antigo)
+    monkeypatch.setitem(roupa.PECAS, "cabelo_preso", _cabelo_do_antigo)
+    _partes_do_antigo(monkeypatch, MASSAS_DA_CABECA, ("nose",))
+
+
 def tronco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     """O tronco, os ombros, o pescoço e o braço do humano nas medidas do `pixel-engine`, com o peito em bola (e
     cada massa do tronco sombreada e contornada sozinha) e sem a linha do ombro: a engine corrigiu a anatomia
@@ -73,15 +128,7 @@ def tronco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
     for modulo in (humano, roupa):
         monkeypatch.setattr(modulo, "peito", _peito_do_antigo)
     monkeypatch.setattr(roupa, "frente_do_peito", _frente_do_antigo)
-    parte = AssetBuilder.part
-
-    def do_antigo(b: AssetBuilder, id: str, material: str, geometry: dict[str, Any], como: Parte = PARTE) -> None:
-        if id in GRUPO_DO_ANTIGO:
-            como = replace(como, group=GRUPO_DO_ANTIGO[id], tags=tuple(t for t in como.tags if t != "shade_group"))
-        if not id.startswith(LINHA_DO_OMBRO):
-            parte(b, id, material, geometry, como)
-
-    monkeypatch.setattr(AssetBuilder, "part", do_antigo)
+    _partes_do_antigo(monkeypatch, GRUPO_DO_ANTIGO, LINHA_DO_OMBRO)
 
 
 def apoio_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:

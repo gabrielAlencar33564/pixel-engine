@@ -1,7 +1,7 @@
 """O humano: o corpo vestido dá o mesmo pixel que o `pixel-engine` no parado e no andar, nas 8 direções, quadro a
-quadro (no tronco, na abertura de braço, no balanço e no apoio dele: os da engine mudaram de propósito); cada peça de
-roupa veste o corpo; o peito e a cintura são uma massa só, sem linha entre os dois; a saia segue a coxa ao andar; e
-quem anda tem as 8 direções."""
+quadro (no tronco, na cabeça, na abertura de braço, no balanço e no apoio dele: os da engine mudaram de propósito);
+cada peça de roupa veste o corpo; o peito e a cintura são uma massa só, sem linha entre os dois; a saia segue a coxa
+ao andar; e quem anda tem as 8 direções."""
 
 from __future__ import annotations
 
@@ -25,8 +25,8 @@ from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
 from pixel_forge.raster.contorno import QUATRO, contorno_interno
 from pixel_forge.raster.estilo import estilo_render
-from pixel_forge.raster.grade import shift
-from pixel_forge.raster.montagem import compor, tabelas
+from pixel_forge.raster.grade import Mascara, shift
+from pixel_forge.raster.montagem import Camadas, compor, tabelas
 from pixel_forge.rig.fk import Skeleton
 from pixel_forge.rig.pose import rest_pose
 from pixel_forge.views.projetor import project_view
@@ -36,6 +36,7 @@ from .oraculo import (
     apoio_do_antigo,
     balanco_do_antigo,
     braco_do_antigo,
+    cabeca_do_antigo,
     no_canvas_antigo,
     tronco_do_antigo,
 )
@@ -76,6 +77,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 @pytest.mark.slow
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
     tronco_do_antigo(monkeypatch)
+    cabeca_do_antigo(monkeypatch)
     braco_do_antigo(monkeypatch)
     balanco_do_antigo(monkeypatch)
     apoio_do_antigo(monkeypatch)
@@ -107,13 +109,18 @@ def test_controle_o_braco_do_antigo_deixa_as_maos_longe(monkeypatch: pytest.Monk
     assert _maos_sobre_os_ombros() > MAOS_SOBRE_OS_OMBROS
 
 
-def _tronco_numa_massa(comp: Composicao, peito: str, cintura: str) -> tuple[bool, int]:
-    """De frente: (o peito e a cintura sombreiam como um volume só, os pixels de linha de contorno entre os dois: os
-    da cintura com a linha, vizinhos do peito e de nenhuma outra peça)."""
+def _camadas(comp: Composicao) -> tuple[Camadas, Mascara]:
+    """De frente: as camadas do quadro e os pixels da linha de contorno entre peças, pelo passe da engine."""
     ir, est = ir_da_composicao(comp), estilo_render(estilo_base())
     cam = compor(project_view(ir, rest_pose(Skeleton(ir.bones)), "S"), est.materials, ir.canvas.width,
                  ir.canvas.height)
-    linha = contorno_interno(cam, tabelas(cam, est.materials), np.zeros(cam.part.shape, dtype=np.uint16))
+    return cam, contorno_interno(cam, tabelas(cam, est.materials), np.zeros(cam.part.shape, dtype=np.uint16))
+
+
+def _tronco_numa_massa(comp: Composicao, peito: str, cintura: str) -> tuple[bool, int]:
+    """De frente: (o peito e a cintura sombreiam como um volume só, os pixels de linha de contorno entre os dois: os
+    da cintura com a linha, vizinhos do peito e de nenhuma outra peça)."""
+    cam, linha = _camadas(comp)
     do_peito, outra = cam.part == cam.num[peito], ~np.isin(cam.part, [0, cam.num[peito], cam.num[cintura]])
     junto, perto = (np.logical_or.reduce([shift(m, dx, dy) for dx, dy in QUATRO]) for m in (do_peito, outra))
     uma = {peito, cintura} <= cam.massa.keys() and bool(np.array_equal(cam.massa[peito], cam.massa[cintura]))
@@ -130,6 +137,41 @@ def test_controle_o_tronco_do_antigo_tem_a_linha_do_busto(monkeypatch: pytest.Mo
     uma, linha = _tronco_numa_massa(de_uma_peca("corpo_humano", {}), "chest", "waist")
     assert not uma and linha >= 4  # a linha sob a bola do peito, de um braço ao outro
     assert not _tronco_numa_massa(_comp("vestido"), "jacket_chest", "jacket_waist")[0]
+
+
+def _na_cabeca(com: str = "") -> Composicao:
+    """O corpo vestido sem o chapéu (o cabelo preso e os olhos à mostra) e, com ``com``, com essa peça na cabeça."""
+    dado = json.loads((CASOS / "humanos" / "vestido.r1.json").read_text(encoding="utf-8"))
+    dado["nos"] = [n for n in dado["nos"] if n["peca"] != "chapeu"]
+    if com:
+        dado["nos"].append({"id": com, "peca": com, "args": {"material": "pano_ferrugem"}})
+    dado["tracos"] = []
+    return validar(dado, Composicao, "teste")
+
+
+def _os_olhos_de_frente(comp: Composicao) -> tuple[int, int]:
+    """De frente: (os pixels dos dois olhos, os pixels de linha de contorno vizinhos deles)."""
+    cam, linha = _camadas(comp)
+    olho = np.isin(cam.part, [cam.num["eye_l"], cam.num["eye_r"]])
+    junto = np.logical_or.reduce([shift(olho, dx, dy) for dx, dy in QUATRO])
+    return int(olho.sum()), int((linha & junto & ~olho).sum())
+
+
+def test_os_olhos_sao_dois_pixels_sem_contorno_em_volta() -> None:
+    pixels, linha = _os_olhos_de_frente(_na_cabeca())
+    assert 2 <= pixels <= 4 and linha == 0
+
+
+def test_controle_os_olhos_do_antigo_tem_a_mascara_em_volta(monkeypatch: pytest.MonkeyPatch) -> None:
+    cabeca_do_antigo(monkeypatch)
+    assert _os_olhos_de_frente(_na_cabeca())[1] >= 6  # o contorno em volta de cada olho, num rosto de 5 px
+
+
+def test_o_lenco_deixa_o_rosto_e_o_no_fica_na_nuca() -> None:
+    ir, est = ir_da_composicao(_na_cabeca("lenco")), estilo_render(estilo_base())
+    frente, costas = (quadro_de_repouso(ir, est, d).visiveis for d in ("S", "N"))
+    assert {"eye_l", "eye_r", "scarf", "jaw"} <= frente.keys() and "scarf_knot" not in frente
+    assert "scarf_knot" in costas and "eye_l" not in costas
 
 
 def _maos_no_andar_de_perfil() -> float:

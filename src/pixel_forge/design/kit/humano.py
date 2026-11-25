@@ -27,6 +27,11 @@ OMBRO_CAI, R_OMBRO = 0.035, 1.25
 # baixo dela, cada um com a altura no tronco e o raio (a meia profundidade) sobre o fundo do peito, e a meia largura
 # de baixo sobre a da cintura. O baixo fica a 0,43 do tronco: mais baixo, a cunha da jaqueta cobre a faixa
 CINTURA, PEITO_ALTO, PEITO_BAIXO, PEITO_NA_CINTURA = (0.28, 0.30), (0.78, 0.95), (0.43, 0.80), 1.05
+# a cabeça, em frações dela, no osso da cabeça (0,25 acima do queixo). O crânio: o centro (y, z) e os raios (y, z);
+# a meia largura dele é ``cabeca_larg``. A face, o queixo e o nariz: o centro (y, z) e os raios (x, y, z). A face
+# tem 0,62 da cabeça de largura e fica rente à testa; o nariz é a ponta do perfil, a 40 % da altura
+CRANIO = (-0.08, 0.40, 0.42, 0.35)
+FACE, QUEIXO, NARIZ = (0.04, 0.08, 0.31, 0.30, 0.33), (0.20, -0.17, 0.13, 0.10, 0.08), (0.34, 0.15, 0.07, 0.12, 0.10)
 SIDES = (("l", 1), ("r", -1))
 FRONT_VIEWS = ("S", "SW", "W", "E", "SE")
 CANVAS, PIVOT, TALL_EXTRA = 96, (48, 60), 16
@@ -115,6 +120,21 @@ def frente_do_peito(c: dict[str, float], z: float, folga: float = 0.0) -> float:
     return rb + (ra - rb) * max(0.0, z - zb) / (za - zb)
 
 
+def cranio(c: dict[str, float]) -> tuple[float, float, float, float, float]:
+    """(o centro y, o centro z, o raio x, o raio y, o raio z) do crânio em px, no osso da cabeça."""
+    cab = c["cabeca"]
+    return CRANIO[0] * cab, CRANIO[1] * cab, c["cabeca_larg"] / 2, CRANIO[2] * cab, CRANIO[3] * cab
+
+
+def frente_da_cabeca(c: dict[str, float], x: float, z: float) -> float:
+    """A frente (+y) da cabeça em (x, z) do osso dela: a maior entre a do crânio e a da face (onde o olho assenta)."""
+    cab = c["cabeca"]
+    cy, cz, rx, ry, rz = cranio(c)
+    massas = ((cy, cz, rx, ry, rz), (FACE[0] * cab, FACE[1] * cab, FACE[2] * cab, FACE[3] * cab, FACE[4] * cab))
+    dentro = [(my, mry, 1 - (x / mrx) ** 2 - ((z - mz) / mrz) ** 2) for my, mz, mrx, mry, mrz in massas]
+    return max((my + mry * math.sqrt(s) for my, mry, s in dentro if s > 0), default=cy)
+
+
 def neck_len(c: dict[str, float]) -> float:
     return c["pescoco"] + 0.25 * c["cabeca"]  # a base do crânio fica um quarto da cabeça acima do queixo
 
@@ -128,7 +148,7 @@ def esqueleto(b: AssetBuilder, c: dict[str, float]) -> None:
 
 
 def _tronco(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
-    cab, t = c["cabeca"], c["tronco"]
+    t = c["tronco"]
     b.part("pelvis_block", pele, ellipse(qv(0, -0.2, 0.9), qv(c["quadril_larg_x"], c["peito_y"] * 0.85,
                                                              0.11 * c["estatura"] * 0.5)),
            Parte(bone="pelvis_tilt", group="pelvis"))
@@ -142,12 +162,16 @@ def _tronco(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
     nl = neck_len(c)
     b.part("neck", pele, taper((-0.1, 1.0), -nl, (c["r_pescoco"], c["r_pescoco"] * 0.9)),
            Parte(bone="neck", group="neck"))
-    b.part("skull", pele, ellipse(qv(0, -0.06 * cab, 0.43 * cab), qv(c["cabeca_larg"] / 2, 0.41 * cab, 0.33 * cab)),
-           Parte(bone="head", group="head"))
-    b.part("jaw", pele, ellipse(qv(0, 0.08 * cab, 0.02 * cab), qv(0.26 * cab, 0.30 * cab, 0.25 * cab)),
-           Parte(bone="head", group="head"))
-    b.part("chin", pele, ellipse(qv(0, 0.27 * cab, -0.15 * cab), qv(0.13 * cab, 0.10 * cab, 0.10 * cab)),
-           Parte(bone="head", group="head"))
+
+
+def _cabeca(b: AssetBuilder, c: dict[str, float], pele: str) -> None:
+    """O crânio, a face (``jaw``), o queixo e o nariz, numa massa só: a luz e a sombra caem na cabeça inteira."""
+    cab = c["cabeca"]
+    cy, cz, rx, ry, rz = cranio(c)
+    massa = Parte(bone="head", group="head", tags=("shade_group",))
+    b.part("skull", pele, ellipse(qv(0, cy, cz), qv(rx, ry, rz)), massa)
+    for pid, (my, mz, mrx, mry, mrz) in (("jaw", FACE), ("chin", QUEIXO), ("nose", NARIZ)):
+        b.part(pid, pele, ellipse(qv(0, my * cab, mz * cab), qv(mrx * cab, mry * cab, mrz * cab)), massa)
 
 
 def _membros(b: AssetBuilder, c: dict[str, float], pele: str, side: str) -> None:
@@ -181,10 +205,11 @@ def _juntas(b: AssetBuilder, c: dict[str, float], junta: str, side: str) -> None
 
 def corpo(b: AssetBuilder, c: dict[str, float], pele: str, junta: str) -> None:
     """A sombra de contato, as massas do corpo em ``pele`` (o tronco numa massa só, sem linha nem sombra entre o
-    peito e a cintura, e a linha do ombro de cada lado) e uma esfera em cada junta em ``junta``."""
+    peito e a cintura, a linha do ombro de cada lado e a cabeça) e uma esfera em cada junta em ``junta``."""
     b.part("ground_shadow", "sombra", ellipse(qv(0, 0.3, 0), qv(c["quadril_larg_x"] * 1.1, 3.6, 0.3)),
            Parte(tags=("ground_shadow",), priority=-100))
     _tronco(b, c, pele)
+    _cabeca(b, c, pele)
     for side, _ in SIDES:
         _membros(b, c, pele, side)
         _juntas(b, c, junta, side)
@@ -204,8 +229,9 @@ def regras(d: str) -> list[dict[str, str]]:
 def landmarks(c: dict[str, float]) -> list[dict[str, Any]]:
     """O alto da cabeça, o queixo, as mãos e os pés (os pontos do jogo e das medidas de pose)."""
     cab = c["cabeca"]
-    out = [{"id": "head_top", "bone_id": "head", "point_q8": qv(0, -0.06 * cab, 0.75 * cab)},
-           {"id": "chin", "bone_id": "head", "point_q8": qv(0, 0.30 * cab, -0.20 * cab)}]
+    out = [{"id": "head_top", "bone_id": "head", "point_q8": qv(0, CRANIO[0] * cab, 0.75 * cab)},
+           {"id": "chin", "bone_id": "head",
+            "point_q8": qv(0, (QUEIXO[0] + 0.03) * cab, (QUEIXO[1] - 0.05) * cab)}]
     for side, _ in SIDES:
         out += [{"id": f"hand_{side}", "bone_id": f"hand_{side}", "point_q8": qv(0, 0, -0.45 * c["mao"])},
                 {"id": f"foot_{side}", "bone_id": f"foot_{side}", "point_q8": qv(0, 0, 0)}]

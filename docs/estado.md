@@ -19,7 +19,7 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 |---|---|---|
 | Linhas em `src/` | 32 701 | 8 273 |
 | Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~30 s, 263 testes |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~35 s, 268 testes |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
@@ -54,6 +54,9 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
     ombreira. Na `10r`, a radiografia do corpo, antes em cima.
 11. O peito do humano em cunha, numa massa só com a cintura (era uma bola com a sua linha e a sua sombra, e lia
     como busto), no corpo e na jaqueta. Na `11r`, a radiografia, antes em cima.
+12. A cabeça e os olhos do humano: a face larga e rente à testa, o nariz, os olhos de 1 px a 58 % da cabeça e sem
+    contorno, o cabelo e o lenço como cascas sobre o crânio. Na `12b`, as cabeças de perto (8×); na `12r`, a
+    radiografia.
 Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o id do build leva os pixels.
 
 ## O que não veio ou não passou
@@ -62,11 +65,10 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 - O que a rodada 2 apontou sem recusa: a copa do `pontilhado` não faz a linha reta de pasto; a palha não envelhece
   para o cinza; o `olhar` sai sem rótulos (a skill diz a ordem das fileiras). A prévia já avisa a parte escondida.
 - A camponesa: a saia larga em 3/4 lê como saco; o andar (igual ao antigo) gira o tronco nas diagonais.
-- **A cabeça do modelo do humano está errada na anatomia** (`pfe radiografia`, 2026-11-24): os olhos a 82 % da
-  altura da cabeça (o real é ~50 %: ficam na testa, na faixa da aba do chapéu); o rosto com 0,63 da largura do
-  crânio (lê como uma lâmpada); a mandíbula como o ponto mais à frente do perfil (não há nariz); o cabelo preso
-  alongando a cabeça em 25 % para trás. A roupa veste por cima e herda tudo. O tronco e os ombros foram corrigidos
-  (mudanças 10 e 11); as mudanças 7 a 9 ajustaram a pose sobre o modelo antigo e não foram reafinadas no novo.
+- O modelo do humano não tem mais medida fora da faixa na radiografia (mudanças 10 a 12), mas as faixas são
+  aproximações e a arte espera o dono. O que sobra: o cabelo preso de frente é um bloco com o coque (pode ler como
+  um gorro); o chapéu de aba acima de ~150 % cobre os olhos; o quadril do corpo nu é mais largo que o peito; as
+  mudanças 7 a 9 ajustaram a pose sobre o modelo antigo e não foram reafinadas no novo.
 - O humano na tela: no andar em diagonal as mãos a até 21 px uma da outra; o perfil parado estreito (12 px, um
   braço cobrindo o outro); o andar em S e N com o balanço comprimido pela câmera.
 
@@ -74,4 +76,4 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`). Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 11 ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 12 ela ainda não foi reconstruída.

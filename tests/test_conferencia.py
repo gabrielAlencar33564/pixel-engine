@@ -1,6 +1,7 @@
 """A conferência do que se vê: a prévia diz, por vista, as partes que nenhum pixel mostra e os pixels de cada traço;
 o traço observável sem pixel em nenhuma vista é recusado, na prévia e no build pelo mesmo caminho (I8), e o traço de
-silhueta que nunca toca a borda da figura também."""
+silhueta que nunca toca a borda da figura também. O chapéu cobre os olhos pela profundidade: sob a aba do viajante
+eles aparecem, e a aba mais larga os esconde."""
 
 from __future__ import annotations
 
@@ -20,10 +21,17 @@ VIAJANTE = Path(__file__).parent / "fixtures" / "exemplos" / "viajante.r1.json"
 OLHOS = {"id": "olhos", "description": "Os dois olhos no rosto", "parts": ["eye_l", "eye_r"]}
 
 
-def _viajante(tracos: list[dict[str, Any]], sem: str = "") -> Composicao:
-    """O viajante parado com os traços dados e, com ``sem``, sem a peça desse nome (o chapéu que cobre os olhos)."""
+ABA_LARGA = "180%"  # a aba do viajante tem 150 % da cabeça e deixa os olhos à mostra; a de 180 % os cobre
+
+
+def _viajante(tracos: list[dict[str, Any]], sem: str = "", aba: str = ABA_LARGA) -> Composicao:
+    """O viajante parado com os traços dados, o chapéu com a aba ``aba`` (a larga, que cobre os olhos; vazia: a
+    dele) e, com ``sem``, sem a peça desse nome."""
     dado = json.loads(VIAJANTE.read_text(encoding="utf-8"))
     dado["nos"] = [n for n in dado["nos"] if n["peca"] != sem]
+    for no in dado["nos"]:
+        if no["peca"] == "chapeu" and aba:
+            no["args"]["largura"] = aba
     dado["tracos"] = tracos
     dado["movimento"] = ["idle"]  # o parado basta para a oclusão, e o build fica curto
     return validar(dado, Composicao, "teste")
@@ -31,9 +39,14 @@ def _viajante(tracos: list[dict[str, Any]], sem: str = "") -> Composicao:
 
 def test_a_previa_diz_as_partes_que_ninguem_ve(tmp_path: Path) -> None:
     r = previa(_viajante([]), tmp_path)
-    assert {"eye_l", "eye_r"} <= set(r["escondidas"]["S"])  # a aba do chapéu cobre os olhos
+    assert {"eye_l", "eye_r"} <= set(r["escondidas"]["S"])  # a aba larga do chapéu cobre os olhos
     assert "pants_thigh_r" in r["escondidas"]["W"]  # de perfil, a perna de cá cobre a de lá
     assert "hat_brim" not in r["escondidas"]["S"]
+
+
+def test_sob_a_aba_do_viajante_os_olhos_aparecem(tmp_path: Path) -> None:
+    r = previa(_viajante([{**OLHOS, "verification": "observable"}], aba=""), tmp_path)
+    assert not {"eye_l", "eye_r"} & set(r["escondidas"].get("S", [])) and r["tracos"]["olhos"]["S"] > 0
 
 
 def test_controle_sem_o_chapeu_os_olhos_nao_estao_escondidos(tmp_path: Path) -> None:

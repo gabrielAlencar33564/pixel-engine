@@ -1,8 +1,8 @@
 """A radiografia do modelo: a ampliação é da geometria (a figura cresce inteira, k vezes); a elevação mostra a altura
 sem a câmera do jogo; as medidas do corpo acertam num corpo sintético de proporções reais e acusam cada defeito posto
-nele; e o corpo do kit tem, hoje, uma lista conhecida de medidas fora da faixa (a lista encolhe quando o modelo é
-corrigido, e nenhuma medida nova pode sair da faixa sem aparecer aqui). O tronco e os ombros já foram corrigidos: as
-medidas deles estão na faixa, e o tronco do `pixel-engine` (com o peito em bola) volta a sair dela."""
+nele; e o corpo do kit não tem nenhuma medida fora da faixa (nenhuma pode sair dela sem este teste acusar). O tronco,
+os ombros e a cabeça foram corrigidos: o tronco e a cabeça do `pixel-engine` voltam a sair da faixa, cada um nas
+medidas dele."""
 
 from __future__ import annotations
 
@@ -26,12 +26,12 @@ from pixel_forge.quality.anatomia import medidas_do_humano
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.grade import Mascara
 
-from .oraculo import tronco_do_antigo
+from .oraculo import cabeca_do_antigo, tronco_do_antigo
 
 EXEMPLOS = Path(__file__).parent / "fixtures" / "exemplos"
-# as medidas do corpo do kit que hoje saem da faixa do corpo real: os defeitos do modelo (os da cabeça), medidos em
-# 2026-11-24; e as do tronco e dos ombros, que saíam dela até a correção do mesmo dia
-DEFEITOS_DO_MODELO = {"rosto_sobre_o_cranio", "olhos_na_cabeca", "ponta_do_perfil", "cabelo_sobre_o_cranio"}
+# as medidas que saíam da faixa do corpo real no modelo do `pixel-engine`, medidas em 2026-11-24: as da cabeça e as
+# do tronco e dos ombros (corrigidas no mesmo dia)
+DEFEITOS_DA_CABECA_ANTIGA = {"rosto_sobre_o_cranio", "olhos_na_cabeca", "ponta_do_perfil", "cabelo_sobre_o_cranio"}
 DEFEITOS_DO_TRONCO_ANTIGO = {"cintura_sobre_o_peito", "peito_na_caixa", "vao_no_ombro", "ombro_sobre_o_queixo",
                              "pescoco"}
 
@@ -141,13 +141,18 @@ def _defeitos_do_kit() -> set[str]:
     return {m["medida"] for m in medidas if not m["ok"]}
 
 
-def test_o_corpo_do_kit_tem_estes_defeitos_medidos_e_nenhum_outro() -> None:
-    assert _defeitos_do_kit() == DEFEITOS_DO_MODELO
+def test_o_corpo_do_kit_nao_tem_medida_fora_da_faixa() -> None:
+    assert _defeitos_do_kit() == set()
 
 
 def test_controle_o_tronco_do_antigo_sai_da_faixa(monkeypatch: pytest.MonkeyPatch) -> None:
     tronco_do_antigo(monkeypatch)
-    assert _defeitos_do_kit() == DEFEITOS_DO_MODELO | DEFEITOS_DO_TRONCO_ANTIGO
+    assert _defeitos_do_kit() == DEFEITOS_DO_TRONCO_ANTIGO
+
+
+def test_controle_a_cabeca_do_antigo_sai_da_faixa(monkeypatch: pytest.MonkeyPatch) -> None:
+    cabeca_do_antigo(monkeypatch)
+    assert _defeitos_do_kit() == DEFEITOS_DA_CABECA_ANTIGA
 
 
 @pytest.mark.slow

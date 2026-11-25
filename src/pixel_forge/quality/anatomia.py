@@ -2,8 +2,8 @@
 de perfil, na elevação da radiografia. Cada medida vem com a faixa de um corpo real (o cânone de desenho e a
 antropometria, com folga): fora dela, a forma lê errada antes de qualquer pixel, e não há roupa nem pose que a conserte.
 
-As partes são as do ``corpo_humano`` do kit (o crânio, a mandíbula, o queixo, o pescoço, o peito, a cintura, o quadril,
-a linha e as esferas dos ombros) e, quando a composição as tem, as dos olhos e do cabelo preso.
+As partes são as do ``corpo_humano`` do kit (o crânio, a face, o queixo, o nariz, o pescoço, o peito, a cintura, o
+quadril, a linha e as esferas dos ombros) e, quando a composição as tem, as dos olhos e do cabelo preso.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import numpy as np
 from ..raster.grade import Mascara
 
 Mascaras = Mapping[str, Mascara]
-CABECA = ("skull", "jaw", "chin")
+CABECA = ("skull", "jaw", "chin", "nose")  # com o nariz, quando o corpo o tem
 TRONCO = ("chest", "waist", "neck", "trap_l", "trap_r")  # com a linha do ombro, quando o corpo a tem
 
 
@@ -35,7 +35,8 @@ class Medida:
 
 
 def _uniao(ms: Mascaras, *nomes: str) -> Mascara:
-    out: Mascara = np.logical_or.reduce([ms[n] for n in nomes])
+    """A união das partes de ``nomes`` que o corpo tem."""
+    out: Mascara = np.logical_or.reduce([ms[n] for n in nomes if n in ms])
     return out
 
 
@@ -104,7 +105,7 @@ def _ombros(c: _Corpo) -> list[Medida]:
     esfera = _uniao(c.ms, "j_shoulder_l", "j_shoulder_r")
     alto, baixo = _fileiras(esfera)
     meio = (alto + baixo) // 2
-    a, b = _colunas(_uniao(c.ms, *(p for p in TRONCO if p in c.ms)), meio)
+    a, b = _colunas(_uniao(c.ms, *TRONCO), meio)
     centro, meia = (a + b) / 2, (b - a + 1) / 2
     fora = [abs(x - centro) for x in np.nonzero(esfera[meio])[0] if abs(x - centro) > meia]
     return [Medida("vao_no_ombro", (min(fora, default=meia) - meia) / c.estatura, (0.0, 0.01),
@@ -130,7 +131,7 @@ def _perfil(ms: Mascaras) -> list[Medida]:
                   "mandíbula que avança, como um focinho")]
     if "hair_cap" in ms:
         fundo = max(_colunas(cab, y)[1] for y in frente) - ponta + 1
-        com = _uniao(ms, *CABECA, *(p for p in ("hair_cap", "topknot") if p in ms))
+        com = _uniao(ms, *CABECA, "hair_cap", "topknot")
         t, q = _fileiras(com)
         colunas = [_colunas(com, y) for y in range(t, q + 1)]
         fundo_com = max(b for _, b in colunas) - min(a for a, _ in colunas) + 1

@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..construtor import AssetBuilder, Junta, Parte, ellipse, polyline, q, qv
-from .humano import R_OMBRO, SIDES, frente_do_peito, peito, taper, trapezio
+from .humano import R_OMBRO, SIDES, cranio, frente_da_cabeca, frente_do_peito, peito, taper, trapezio
 
 Regra = dict[str, str]
 # a jaqueta sobre o tronco: a folga do peito dela na profundidade e na largura (vezes, mais), o centro e a meia
@@ -22,6 +22,15 @@ Regra = dict[str, str]
 # o alto, sem a manga fazer um gomo acima dela)
 JAQUETA_FOLGA, JAQUETA_LARGA, JAQUETA_CINTURA, MANGA_DE = 0.45, (1.1, 0.4), (0.26, 0.30), 0.0
 ALCA = 0.7  # sem manga, a ombreira cobre esta fração da linha do ombro
+# o olho: a altura no osso da cabeça (0,33 da cabeça: 58 % da altura dela; a 50 % a câmera a 45° o cola no queixo),
+# a distância do meio sobre a meia largura do crânio e os raios em px (1 px de largura na tela)
+OLHO_Z, OLHO_X, OLHO_R = 0.33, 0.44, (0.5, 0.5, 0.9)
+# o cabelo e o lenço são cascas sobre o crânio: o centro recua e sobe (frações da cabeça) e os raios crescem (px), e
+# a face sai pela frente de baixo. Sem linha de contorno na testa (e, no cabelo, sem a sombra: lia como aba)
+Casca = tuple[float, float, tuple[float, float, float]]
+CABELO: Casca = (-0.08, 0.10, (0.05, 0.25, 0.1))
+LENCO: Casca = (-0.07, 0.06, (0.45, 0.4, 0.4))
+SEM_LINHA = ("garment", "no_inner_outline")
 
 
 def regra(front: str, back: str) -> Regra:
@@ -135,40 +144,45 @@ def calca(v: Veste) -> Vista:
     return Vista(cobre=cobre, rules=[regra("jacket_waist", "pants_seat")])
 
 
-def _skull(c: dict[str, float]) -> tuple[float, float, float, float, float]:
-    cab = c["cabeca"]
-    return -0.06 * cab, 0.43 * cab, c["cabeca_larg"] / 2, 0.41 * cab, 0.33 * cab
+def _casca(v: Veste, pid: str, forma: Casca, marcas: tuple[str, ...]) -> float:
+    """A casca ``pid`` sobre o crânio, no grupo dela; devolve o fundo (−y) dela, onde fica a nuca."""
+    cab = v.c["cabeca"]
+    cy, cz, rx, ry, rz = cranio(v.c)
+    y, (ax, ay, az) = cy + forma[0] * cab, forma[2]
+    v.b.part(pid, v.mat, ellipse(qv(0, y, cz + forma[1] * cab), qv(rx + ax, ry + ay, rz + az)),
+             Parte(bone="head", group={"hair_cap": "hair"}.get(pid, pid), tags=marcas))
+    return y - ry - ay
 
 
 def olhos(v: Veste) -> Vista:
-    """Dois olhos na frente do crânio, a meio caminho entre o centro e o alto (a 45° o olho sobe); somem de costas, e
-    de perfil o do lado de lá some."""
-    cy, cz, rx, ry, rz = _skull(v.c)
-    z = cz + 0.5 * rz
+    """Dois olhos de um pixel na frente da cabeça, a 58 % da altura dela, sem contorno em volta (num rosto de 6 px o
+    contorno de cada olho virava uma máscara). Não são detalhe: o chapéu, o cabelo e o lenço os cobrem pela
+    profundidade. Somem de costas, e de perfil o do lado de lá some."""
+    z, rx = OLHO_Z * v.c["cabeca"], cranio(v.c)[2]
     for side, sx in SIDES:
-        x = sx * 0.42 * rx
-        y = cy + ry * math.sqrt(max(0.0, 1 - (x / rx) ** 2 - ((z - cz) / rz) ** 2))
-        v.part(f"eye_{side}", ellipse(qv(x, y, z), qv(0.6, 0.5, 0.9)), ("head", "eyes"))
+        x = sx * OLHO_X * rx
+        v.b.part(f"eye_{side}", v.mat, ellipse(qv(x, frente_da_cabeca(v.c, x, z), z), qv(*OLHO_R)),
+                 Parte(bone="head", group="eyes", tags=(*SEM_LINHA, "eye")))
     return Vista(hide_back=["eye_l", "eye_r"], hide_w=["eye_r"], hide_e=["eye_l"],
-                 front_rules=[regra(f"eye_{s}", o) for s in ("l", "r") for o in ("skull", "hair_cap", "scarf")])
+                 front_rules=[regra(f"eye_{s}", o) for s in ("l", "r") for o in ("skull", "jaw")])
 
 
 def cabelo_preso(v: Veste) -> Vista:
-    """O cabelo puxado para trás, cobrindo o alto e a nuca e deixando a testa, com o coque no alto."""
+    """O cabelo puxado para trás: a casca rente ao crânio, que cobre o alto, os lados e a nuca e deixa a testa e o
+    rosto, com o coque no alto."""
     cab = v.c["cabeca"]
-    cy, cz, rx, ry, rz = _skull(v.c)
-    v.part("hair_cap", ellipse(qv(0, cy - 0.20 * cab, cz + 0.13 * cab), qv(rx + 0.25, ry + 0.05, rz)), ("head", "hair"))
+    cy, cz, _, _, _ = cranio(v.c)
+    _casca(v, "hair_cap", CABELO, (*SEM_LINHA, "no_cast"))
     v.part("topknot", ellipse(qv(0, cy - 0.16 * cab, cz + 0.42 * cab), qv(0.14 * cab, 0.16 * cab, 0.13 * cab)),
            ("head", "hair"))
-    return Vista(rules=[regra("topknot", "hair_cap")], front_rules=[regra("skull", "hair_cap")],
-                 back_rules=[regra("hair_cap", "skull")])
+    return Vista(rules=[regra("topknot", "hair_cap")])
 
 
 def chapeu(v: Veste) -> Vista:
     """O chapéu mole de aba larga: a copa baixa sobre o crânio e a aba em disco, um pouco caída para a frente;
     ``largura_pct`` é a aba sobre a largura da cabeça."""
     cab, aba = v.c["cabeca"], v.pct("largura_pct", 180)
-    cy, cz, rx, ry, _ = _skull(v.c)
+    cy, cz, rx, ry, _ = cranio(v.c)
     v.part("hat_crown", ellipse(qv(0, cy - 0.02 * cab, cz + 0.30 * cab), qv(rx + 0.35, ry + 0.3, 0.24 * cab)),
            ("head", "hat"))
     v.part("hat_brim", ellipse(qv(0, cy + 0.06 * cab, cz + 0.16 * cab), qv(rx * aba, ry * aba, 0.05 * cab + 0.3)),
@@ -247,22 +261,17 @@ def saia(v: Veste) -> Vista:
 
 
 def lenco(v: Veste) -> Vista:
-    """O lenço na cabeça: cobre o alto, os lados e a nuca e deixa o rosto, com o nó atrás, na nuca, e as duas pontas
-    pendendo no segundo material."""
-    cab = v.c["cabeca"]
-    cy, cz, rx, ry, rz = _skull(v.c)
-    v.part("scarf", ellipse(qv(0, cy - 0.12 * cab, cz + 0.08 * cab), qv(rx + 0.45, ry + 0.25, rz + 0.35)),
-           ("head", "scarf"))
-    nuca = cy - ry - 0.2
+    """O lenço na cabeça: a casca sobre o crânio, que cobre o alto, os lados e a nuca e deixa o rosto, com o nó
+    atrás, na nuca, e as duas pontas pendendo no segundo material."""
+    cab, cz = v.c["cabeca"], cranio(v.c)[1]
+    nuca = _casca(v, "scarf", LENCO, SEM_LINHA) + 0.3
     v.part("scarf_knot", ellipse(qv(0, nuca, cz - 0.30 * cab), qv(0.16 * cab, 0.12 * cab, 0.12 * cab)),
            ("head", "scarf"))
     for side, sx in SIDES:
         v.part(f"scarf_tail_{side}", polyline([qv(sx * 0.4, nuca, cz - 0.36 * cab),
                                                qv(sx * 1.4, nuca - 0.8, cz - 0.75 * cab)], 1), ("head", "scarf"),
                v.mat2)
-    return Vista(cobre=["hair_cap", "topknot"], rules=[regra("scarf_knot", "scarf")],
-                 front_rules=[regra("skull", "scarf"), regra("jaw", "scarf"), regra("chin", "scarf")],
-                 back_rules=[regra("scarf", "skull"), regra("scarf_knot", "neck")])
+    return Vista(cobre=["hair_cap", "topknot"], back_rules=[regra("scarf_knot", "neck")])
 
 
 PECAS: dict[str, Callable[[Veste], Vista]] = {

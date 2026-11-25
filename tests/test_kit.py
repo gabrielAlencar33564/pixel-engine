@@ -22,7 +22,7 @@ from pixel_forge.design.kit.pilha import Pilha
 from pixel_forge.design.kit.registro import PECAS, conferida
 from pixel_forge.raster.estilo import estilo_render
 
-from .oraculo import CASOS, braco_do_antigo, no_canvas_antigo, tronco_do_antigo
+from .oraculo import CASOS, braco_do_antigo, cabeca_do_antigo, no_canvas_antigo, tronco_do_antigo
 
 ESPERADO: dict[str, Any] = json.loads((CASOS / "kit.esperado.json").read_text(encoding="utf-8"))["casos"]
 NOVAS = {"saia", "lenco"}  # as peças que nasceram na engine nova (a saia e o lenço gerais): sem oráculo, com teste
@@ -41,6 +41,7 @@ def test_cada_variacao_monta(peca: str, nome: str, args: dict[str, Any], monkeyp
     if PECAS[peca].tipo == "humanoide":
         braco_do_antigo(monkeypatch)  # o braço do repouso fechou: o resto do humano se compara na abertura do antigo
         tronco_do_antigo(monkeypatch)  # e o tronco e os ombros mudaram de forma: compara-se no tronco do antigo
+        cabeca_do_antigo(monkeypatch)  # a cabeça, os olhos e o cabelo também
     quer = ESPERADO[f"{peca}/{nome}"]["S"]
     feito = rgba_da_variacao(peca, args, quer["tamanho"])
     chave = "sem_chao_sha256" if PECAS[peca].tipo == "quadrupede" else "rgba_sha256"  # a pegada do quadrúpede mudou
