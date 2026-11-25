@@ -1,5 +1,6 @@
 """O humano: o corpo vestido dá o mesmo pixel que o `pixel-engine` no parado e no andar, nas 8 direções, quadro a
-quadro (no tronco, na cabeça, na abertura de braço, no balanço e no apoio dele: os da engine mudaram de propósito);
+quadro (no tronco, na cabeça, na abertura das pernas e do braço, no balanço e no apoio dele: os da engine mudaram de
+propósito);
 cada peça de roupa veste o corpo; o peito e a cintura são uma massa só, sem linha entre os dois; a saia segue a coxa
 ao andar; e quem anda tem as 8 direções."""
 
@@ -35,6 +36,7 @@ from pixel_forge.views.projetor import project_view
 
 from .oraculo import (
     CASOS,
+    abertura_do_antigo,
     apoio_do_antigo,
     balanco_do_antigo,
     braco_do_antigo,
@@ -50,6 +52,9 @@ MAOS_SOBRE_OS_OMBROS = 1.5  # no repouso, de frente, as mãos ficam a até 1,5×
 # estica para a frente (a câmera achata a altura, e o balanço do antigo lia como um braço apontando)
 MAOS_NO_ANDAR = (0.30, 0.45)
 PES_NO_PERFIL = 3  # no parado de perfil os pés ficam a 3 px ou mais um do outro: as duas pernas leem
+# no repouso, de frente, os pés ficam a até 1,1× a distância entre as juntas do quadril; de perfil, o pé de lá sobe
+# até 4 px na tela (a câmera a 45° sobe o que está longe)
+PES_SOB_O_QUADRIL = (1.1, 4.0)
 VARIACOES = [(pid, nome, args) for pid, p in sorted(PECAS.items()) if p.tipo == "humanoide"
              for nome, args in p.variacoes]
 
@@ -81,6 +86,7 @@ def _hashes(comp: Composicao, quer: dict[str, Any]) -> dict[str, Any]:
 def test_o_humano_vestido_parado_e_andando_igual_ao_oraculo(monkeypatch: pytest.MonkeyPatch) -> None:
     tronco_do_antigo(monkeypatch)
     cabeca_do_antigo(monkeypatch)
+    abertura_do_antigo(monkeypatch)
     braco_do_antigo(monkeypatch)
     balanco_do_antigo(monkeypatch)
     apoio_do_antigo(monkeypatch)
@@ -95,6 +101,26 @@ def test_cada_peca_veste_o_corpo(peca: str, nome: str, args: dict[str, Any]) -> 
     ir = ir_da_composicao(de_uma_peca(peca, args))
     q = quadro_de_repouso(ir, estilo_render(estilo_base()), "S")
     assert q.clipping_px == 0 and len(ir.views) == 8, (peca, nome)
+
+
+def _os_pes_na_tela() -> tuple[float, float]:
+    """No repouso do corpo: (a distância entre os pés de frente sobre a das juntas do quadril, os px que o pé de lá
+    fica acima do de cá de perfil)."""
+    ir, est = ir_da_composicao(de_uma_peca("corpo_humano", {})), estilo_render(estilo_base())
+    frente, perfil = (quadro_de_repouso(ir, est, d).landmarks for d in ("S", "W"))
+    return (abs(frente["foot_l"][0] - frente["foot_r"][0]) / 256 / (2 * medidas(Corpo())["quadril_x"]),
+            abs(perfil["foot_l"][1] - perfil["foot_r"][1]) / 256)
+
+
+def test_no_repouso_os_pes_ficam_sob_o_quadril() -> None:
+    frente, perfil = _os_pes_na_tela()
+    assert frente <= PES_SOB_O_QUADRIL[0] and perfil <= PES_SOB_O_QUADRIL[1]
+
+
+def test_controle_a_abertura_do_antigo_poe_os_pes_fora_do_quadril(monkeypatch: pytest.MonkeyPatch) -> None:
+    abertura_do_antigo(monkeypatch)
+    frente, perfil = _os_pes_na_tela()
+    assert frente > 1.5 and perfil > 5  # as canelas fora do tronco; o pé de lá no meio da canela de cá
 
 
 def _maos_sobre_os_ombros() -> float:

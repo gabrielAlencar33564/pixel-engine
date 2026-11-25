@@ -15,7 +15,9 @@ from ..escala import PX_POR_M
 from .esqueleto import monta
 
 PESCOCO, BRACO, ANTEBRACO, MAO, TORNOZELO_Z, PE = 0.028, 0.167, 0.131, 0.108, 0.039, 0.152
-OMBRO_X, QUADRIL_X, TORNOZELO_X = 0.105, 0.050, 0.080
+# o tornozelo fica sob a junta do quadril (a perna desce reta): mais aberto, de frente as canelas passam da largura
+# do tronco, e de perfil a câmera a 45° sobe o pé de lá na tela (a 0,080 ele flutuava no meio da canela)
+OMBRO_X, QUADRIL_X, TORNOZELO_X = 0.105, 0.050, 0.050
 PEITO_X, CINTURA_X, QUADRIL_LARG_X, PEITO_Y = 0.090, 0.075, 0.095, 0.060
 COXA_DA_PERNA = 0.499
 R_COXA, R_JOELHO, R_CANELA_BAIXO, R_BRACO, R_COTOVELO, R_PUNHO, R_PESCOCO = (0.047, 0.034, 0.021, 0.027, 0.023, 0.018,
@@ -142,7 +144,7 @@ def neck_len(c: dict[str, float]) -> float:
 
 
 def esqueleto(b: AssetBuilder, c: dict[str, float]) -> None:
-    """Os ossos do modelo ``humano`` nas medidas do corpo: os pés na largura do quadril, os braços afastados
+    """Os ossos do modelo ``humano`` nas medidas do corpo: os pés sob as juntas do quadril, os braços afastados
     :data:`ABRE_BRACO_MDEG` e os cotovelos dobrados ~12° no repouso."""
     abre = round(math.degrees(math.atan2(c["tornozelo_x"] - c["quadril_x"], c["quadril_z"] - c["tornozelo_z"])) * 1000)
     monta(b, "humano", {**c, "abre_perna_mdeg": float(abre), "abre_braco_mdeg": ABRE_BRACO_MDEG,

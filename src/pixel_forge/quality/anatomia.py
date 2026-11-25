@@ -3,7 +3,8 @@ de perfil, na elevação da radiografia. Cada medida vem com a faixa de um corpo
 antropometria, com folga): fora dela, a forma lê errada antes de qualquer pixel, e não há roupa nem pose que a conserte.
 
 As partes são as do ``corpo_humano`` do kit (o crânio, a face, o queixo, o nariz, o pescoço, o peito, a cintura, o
-quadril, a linha e as esferas dos ombros) e, quando a composição as tem, as dos olhos e do cabelo preso.
+quadril, a linha e as esferas dos ombros, as esferas do quadril e dos tornozelos) e, quando a composição as tem, as
+dos olhos e do cabelo preso.
 """
 
 from __future__ import annotations
@@ -101,6 +102,19 @@ def _tronco(c: _Corpo) -> list[Medida]:
                    "enche 0,79 da caixa) e lê como busto")]
 
 
+def _centro(m: Mascara) -> float:
+    xs = np.nonzero(m.any(axis=0))[0]
+    return (int(xs.min()) + int(xs.max())) / 2
+
+
+def _pernas(c: _Corpo) -> list[Medida]:
+    pes, quadril = (abs(_centro(c.ms[f"{j}_l"]) - _centro(c.ms[f"{j}_r"])) for j in ("j_ankle", "j_hip"))
+    return [Medida("pes_sobre_o_quadril", pes / quadril, (0.6, 1.15),
+                   "a distância entre os tornozelos sobre a distância entre as juntas do quadril; acima da faixa, as "
+                   "pernas abrem para fora: de frente passam da largura do tronco, e de perfil o pé de lá sobe na "
+                   "tela e parece flutuar")]
+
+
 def _ombros(c: _Corpo) -> list[Medida]:
     esfera = _uniao(c.ms, "j_shoulder_l", "j_shoulder_r")
     alto, baixo = _fileiras(esfera)
@@ -146,4 +160,4 @@ def medidas_do_humano(frente: Mascaras, perfil: Mascaras) -> list[dict[str, Any]
     topo, queixo = _fileiras(_uniao(frente, *CABECA))
     chao = _fileiras(_uniao(frente, "foot_l", "foot_r"))[1]
     corpo = _Corpo(frente, topo, queixo, chao - topo + 1)
-    return [m.dado() for m in (*_rosto(corpo), *_perfil(perfil), *_tronco(corpo), *_ombros(corpo))]
+    return [m.dado() for m in (*_rosto(corpo), *_perfil(perfil), *_tronco(corpo), *_ombros(corpo), *_pernas(corpo))]

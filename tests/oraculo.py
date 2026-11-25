@@ -25,6 +25,7 @@ from pixel_forge.raster.estilo import estilo_render
 
 CASOS = Path(__file__).parent / "fixtures" / "oraculo"
 ABRE_BRACO_DO_ANTIGO = 15_000.0  # o `pixel-engine` abre o braço a 15° no repouso
+ABERTURA_DO_ANTIGO = 0.080  # e põe cada tornozelo a 0,080 da estatura do meio do corpo
 BALANCO_DO_ANTIGO = (23_000, 26_000)  # e, no andar, balança o ombro 23° e dobra o cotovelo 26° (mdeg)
 # o tronco do `pixel-engine`: a junta do ombro na base do pescoço, o pescoço fino, o braço do tamanho real, o peito
 # e a cintura como duas bolas (cada uma com a sua sombra e, no corpo, o seu contorno), a jaqueta sobre elas e a manga
@@ -42,6 +43,13 @@ GRUPO_DO_ANTIGO = {"chest": "chest", "waist": "waist", "jacket_chest": "jacket",
 CABECA_DO_ANTIGO = ((humano, "CRANIO", (-0.06, 0.43, 0.41, 0.33)), (humano, "FACE", (0.08, 0.02, 0.26, 0.30, 0.25)),
                     (humano, "QUEIXO", (0.27, -0.15, 0.13, 0.10, 0.10)))
 MASSAS_DA_CABECA = {"skull": "head", "jaw": "head", "chin": "head"}
+
+
+def abertura_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:
+    """As pernas abertas do `pixel-engine`: os tornozelos a 0,080 da estatura do meio (26 cm um do outro), mais
+    afastados que as juntas do quadril. A engine os põe sob elas (mudança intencional), e o oráculo compara o resto
+    do humano na abertura dele."""
+    monkeypatch.setattr(humano, "TORNOZELO_X", ABERTURA_DO_ANTIGO)
 
 
 def braco_do_antigo(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -292,6 +292,26 @@ Depois da mudança 12 o dono ainda viu o cabelo como um gorro e a cabeça sem fo
   arredondamento; no corpo de 1,68 m e 105 % de largura o pescoço mede 0,059 (a faixa começa em 0,060), e já
   media antes desta mudança.
 
+## O humano: a abertura das pernas (pedido do dono, 2026-11-25)
+
+O dono pediu a análise do quadril, das pernas e dos pés, e escolheu começar pela abertura.
+
+- O tornozelo fica sob a junta do quadril (`TORNOZELO_X` 0,050 da estatura; eram 0,080). A perna desce reta. Antes
+  os tornozelos ficavam a 26 cm um do outro, com as juntas do quadril a 17 cm: de frente as canelas passavam da
+  largura do tronco (os pés a 8,9 px um do outro), e de perfil a câmera a 45° punha o pé de lá 5,3 px acima do de
+  cá, no meio da canela. Agora são 5,4 px e 3,2 px. O andar usa a mesma abertura e muda junto.
+- A medida nova `pes_sobre_o_quadril` (a distância entre os tornozelos sobre a das juntas do quadril, de 0,6 a
+  1,15) entra na radiografia: dava 1,56 e dá 1,0. O teste na câmera do jogo confere os pés de frente e de perfil;
+  o controle é a abertura do antigo, que o oráculo repõe (`abertura_do_antigo`). Os esperados não foram regerados
+  (I11).
+- O que mudou de visibilidade (corpo nu, calça presa, calça solta e saia curta): de costas as pontas dos pés ficam
+  atrás dos calcanhares e somem. Nada mais.
+- O resto da análise ficou para depois, na ordem em que pesa: a esfera saliente no joelho e no tornozelo (0,075
+  contra 0,057 da canela; 0,048 contra 0,039); a canela em cone, sem panturrilha (0,053 a 30 %, contra ~0,07); o
+  pé alto (0,066, contra ~0,045) e apontando reto; a cintura fina para o quadril (0,145 e 0,197); a barra da calça
+  solta e o fundo da saia, que fecham arredondados. As referências do corpo real são de memória, não conferidas
+  em fonte.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico
