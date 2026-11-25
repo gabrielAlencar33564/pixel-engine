@@ -29,9 +29,11 @@ OMBRO_CAI, R_OMBRO = 0.035, 1.25
 CINTURA, PEITO_ALTO, PEITO_BAIXO, PEITO_NA_CINTURA = (0.28, 0.30), (0.78, 0.95), (0.43, 0.80), 1.05
 # a cabeça, em frações dela, no osso da cabeça (0,25 acima do queixo). O crânio: o centro (y, z) e os raios (y, z);
 # a meia largura dele é ``cabeca_larg``. A face, o queixo e o nariz: o centro (y, z) e os raios (x, y, z). A face
-# tem 0,62 da cabeça de largura e fica rente à testa; o nariz é a ponta do perfil, a 40 % da altura
+# tem a largura do crânio na tela (0,68 da cabeça: com menos, a 45° o crânio é uma bola e o rosto um apêndice sob
+# ela) e fica rente à testa, como o queixo; o nariz é a ponta do perfil, a 33 % da altura (uma fileira sob o olho),
+# com o centro à frente da face: mais para dentro, de perfil ele some por arredondamento em algumas estaturas
 CRANIO = (-0.08, 0.40, 0.42, 0.35)
-FACE, QUEIXO, NARIZ = (0.04, 0.08, 0.31, 0.30, 0.33), (0.20, -0.17, 0.13, 0.10, 0.08), (0.34, 0.15, 0.07, 0.12, 0.10)
+FACE, QUEIXO, NARIZ = (0.04, 0.08, 0.34, 0.30, 0.33), (0.24, -0.17, 0.13, 0.10, 0.08), (0.40, 0.08, 0.07, 0.08, 0.09)
 SIDES = (("l", 1), ("r", -1))
 FRONT_VIEWS = ("S", "SW", "W", "E", "SE")
 CANVAS, PIVOT, TALL_EXTRA = 96, (48, 60), 16

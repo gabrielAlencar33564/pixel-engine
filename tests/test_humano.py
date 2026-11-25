@@ -20,6 +20,7 @@ from pixel_forge.contracts.carregar import ler, validar
 from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.core.recusa import Recusa
 from pixel_forge.design.asset import ir_da_composicao, movimento
+from pixel_forge.design.kit import humano
 from pixel_forge.design.kit.humano import Corpo, medidas
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.motion.gerar import gerar_clipe
@@ -27,6 +28,7 @@ from pixel_forge.raster.contorno import QUATRO, contorno_interno
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.grade import Mascara, shift
 from pixel_forge.raster.montagem import Camadas, compor, tabelas
+from pixel_forge.raster.renderer import mascaras
 from pixel_forge.rig.fk import Skeleton
 from pixel_forge.rig.pose import rest_pose
 from pixel_forge.views.projetor import project_view
@@ -38,6 +40,7 @@ from .oraculo import (
     braco_do_antigo,
     cabeca_do_antigo,
     no_canvas_antigo,
+    sem_as_partes,
     tronco_do_antigo,
 )
 
@@ -172,6 +175,69 @@ def test_o_lenco_deixa_o_rosto_e_o_no_fica_na_nuca() -> None:
     frente, costas = (quadro_de_repouso(ir, est, d).visiveis for d in ("S", "N"))
     assert {"eye_l", "eye_r", "scarf", "jaw"} <= frente.keys() and "scarf_knot" not in frente
     assert "scarf_knot" in costas and "eye_l" not in costas
+
+
+def _a_cabeca_na_tela() -> tuple[int, int, int]:
+    """Na câmera do jogo: (a fileira mais larga do crânio de frente, a da face, quantas fileiras o nariz desce
+    abaixo do olho de perfil)."""
+    ir, est = ir_da_composicao(_na_cabeca()), estilo_render(estilo_base())
+    frente, perfil = (mascaras(project_view(ir, rest_pose(Skeleton(ir.bones)), d), est, ir.canvas.width,
+                               ir.canvas.height) for d in ("S", "W"))
+    olho, nariz = (int(np.nonzero(perfil[p].any(axis=1))[0].max()) for p in ("eye_l", "nose"))
+    return int(frente["skull"].sum(axis=1).max()), int(frente["jaw"].sum(axis=1).max()), nariz - olho
+
+
+def test_na_tela_a_face_tem_a_largura_do_cranio_e_o_nariz_fica_sob_o_olho() -> None:
+    cranio, face, nariz = _a_cabeca_na_tela()
+    assert face == cranio and nariz >= 1
+
+
+@pytest.mark.parametrize(("parte", "de_antes"), [("FACE", (0.04, 0.08, 0.31, 0.30, 0.33)),
+                                                 ("NARIZ", (0.40, 0.17, 0.07, 0.08, 0.09))])
+def test_controle_a_face_estreita_e_o_nariz_alto_sao_acusados(parte: str, de_antes: tuple[float, ...],
+                                                              monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(humano, parte, de_antes)  # a bola com o rosto de apêndice; o nariz na fileira do olho
+    cranio, face, nariz = _a_cabeca_na_tela()
+    assert face < cranio if parte == "FACE" else nariz < 1
+
+
+def _estaturas_sem_nariz_de_perfil() -> list[int]:
+    """As estaturas (em cm, de 1,20 a 1,96 m) em que o nariz não tem nenhum pixel de perfil."""
+    est, sem = estilo_render(estilo_base()), []
+    for cm in range(120, 200, 4):
+        ir = ir_da_composicao(de_uma_peca("corpo_humano", {"estatura": f"{cm / 100:.2f}m"}))
+        sem += [] if quadro_de_repouso(ir, est, "W").visiveis.get("nose") else [cm]
+    return sem
+
+
+def test_o_nariz_aparece_de_perfil_em_toda_estatura() -> None:
+    assert _estaturas_sem_nariz_de_perfil() == []
+
+
+def test_controle_o_nariz_rente_a_face_some_em_algumas_estaturas(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(humano, "NARIZ", (0.34, 0.08, 0.07, 0.12, 0.07))  # o centro dentro da face
+    assert _estaturas_sem_nariz_de_perfil() != []
+
+
+def _fileiras_da_testa_entre_o_cabelo() -> int:
+    """De frente, as fileiras em que o crânio aparece com o cabelo dos dois lados (o rosto emoldurado)."""
+    cam = _camadas(_na_cabeca())[0]
+    cabelo = np.isin(cam.part, [cam.num[p] for p in cam.num if p.startswith("hair_")])
+    testa = cam.part == cam.num["skull"]
+    n = 0
+    for y in np.nonzero(testa.any(axis=1))[0]:
+        xs = np.nonzero(testa[y])[0]
+        n += bool(cabelo[y, xs[0] - 1] and cabelo[y, xs[-1] + 1])
+    return n
+
+
+def test_o_cabelo_emoldura_o_rosto() -> None:
+    assert _fileiras_da_testa_entre_o_cabelo() >= 1
+
+
+def test_controle_sem_as_mechas_o_cabelo_acaba_numa_linha_reta(monkeypatch: pytest.MonkeyPatch) -> None:
+    sem_as_partes(monkeypatch, "hair_side_")
+    assert _fileiras_da_testa_entre_o_cabelo() == 0  # o gorro: o bloco em cima e a testa inteira embaixo
 
 
 def _maos_no_andar_de_perfil() -> float:

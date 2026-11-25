@@ -269,6 +269,28 @@ olhos atravessando o chapéu.
   volta dos olhos. O lenço não tem oráculo (peça nova): o teste confere o rosto à mostra e o nó só de costas. Os
   esperados não foram regerados (I11).
 
+## O humano: o formato da cabeça e o cabelo (pedido do dono, 2026-11-24)
+
+Depois da mudança 12 o dono ainda viu o cabelo como um gorro e a cabeça sem formato de cabeça.
+
+- A radiografia (a elevação) não via o defeito: as medidas estavam na faixa. Ele está na câmera do jogo. A 45° o
+  crânio é uma bola de 7 px e a face, com 0,62 da cabeça, saía com 5 px sob ela, como um apêndice. A face passa a
+  0,68 da cabeça (`FACE`): na tela tem a largura do crânio, e a cabeça é um bloco arredondado só.
+- O queixo fica rente à testa (`QUEIXO`; recuava 1 px no perfil). O nariz desce a 33 % da altura (`NARIZ`): a
+  40 % caía na fileira do olho, como um bico. O centro dele fica à frente da face: rente a ela, de perfil ele
+  sumia por arredondamento em algumas estaturas (1,64 e 1,68 m).
+- O cabelo preso ganha uma mecha em cada têmpora (`hair_side_l`, `hair_side_r`, `MECHA`). A casca sozinha acaba
+  numa linha reta acima da testa (o gorro) e, por ser um elipsoide, não desce pelos lados sem cobrir a testa. Com
+  as mechas a testa fica entre o cabelo. O lenço as cobre.
+- Os testes novos medem na câmera do jogo, não na elevação: a fileira mais larga da face igual à do crânio, o
+  nariz descendo abaixo do olho no perfil, o nariz com pixel de perfil de 1,20 a 1,96 m e a testa com cabelo dos
+  dois lados. Os controles: a face de 0,62, o nariz a 42 %, o nariz rente à face e o cabelo sem as mechas.
+- O que mudou de visibilidade: de perfil a mecha de lá fica escondida, e o queixo passa a aparecer. Olho e chapéu
+  não mudaram.
+- O que sobra: a ponta do perfil fica a 0,32 da cabeça, perto do piso da faixa (0,30); em duas estaturas de cada
+  dez o nariz ainda cai na fileira do olho, por arredondamento; no corpo de 1,68 m e 105 % de largura o pescoço
+  mede 0,059 (a faixa começa em 0,060), e já media antes desta mudança.
+
 ## O remoto (pedido do dono, 2026-11-23)
 
 - O GitHub `gabrielAlencar33564/pixel-engine` passa a ser esta engine: a `main` de lá foi substituída pelo histórico

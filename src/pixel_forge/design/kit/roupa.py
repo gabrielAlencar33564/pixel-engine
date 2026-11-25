@@ -29,6 +29,9 @@ OLHO_Z, OLHO_X, OLHO_R = 0.33, 0.44, (0.5, 0.5, 0.9)
 # a face sai pela frente de baixo. Sem linha de contorno na testa (e, no cabelo, sem a sombra: lia como aba)
 Casca = tuple[float, float, tuple[float, float, float]]
 CABELO: Casca = (-0.08, 0.10, (0.05, 0.25, 0.1))
+# a mecha do cabelo em cada têmpora: o lado (sobre o raio do crânio), o centro (y, z) a partir do centro do crânio e
+# os raios, em frações da cabeça. Sem ela a casca acaba numa linha reta acima da testa, e o cabelo lê como gorro
+MECHA = (0.92, 0.12, -0.02, (0.10, 0.15, 0.20))
 LENCO: Casca = (-0.07, 0.06, (0.45, 0.4, 0.4))
 SEM_LINHA = ("garment", "no_inner_outline")
 
@@ -169,10 +172,15 @@ def olhos(v: Veste) -> Vista:
 
 def cabelo_preso(v: Veste) -> Vista:
     """O cabelo puxado para trás: a casca rente ao crânio, que cobre o alto, os lados e a nuca e deixa a testa e o
-    rosto, com o coque no alto."""
+    rosto, uma mecha em cada têmpora (emolduram o rosto) e o coque no alto."""
     cab = v.c["cabeca"]
-    cy, cz, _, _, _ = cranio(v.c)
-    _casca(v, "hair_cap", CABELO, (*SEM_LINHA, "no_cast"))
+    cy, cz, rx, _, _ = cranio(v.c)
+    cabelo = Parte(bone="head", group="hair", tags=(*SEM_LINHA, "no_cast"))
+    _casca(v, "hair_cap", CABELO, cabelo.tags)
+    lado, my, mz, (rmx, rmy, rmz) = MECHA
+    for side, sx in SIDES:
+        v.b.part(f"hair_side_{side}", v.mat, ellipse(qv(sx * lado * rx, cy + my * cab, cz + mz * cab),
+                                                     qv(rmx * cab, rmy * cab, rmz * cab)), cabelo)
     v.part("topknot", ellipse(qv(0, cy - 0.16 * cab, cz + 0.42 * cab), qv(0.14 * cab, 0.16 * cab, 0.13 * cab)),
            ("head", "hair"))
     return Vista(rules=[regra("topknot", "hair_cap")])
@@ -271,7 +279,7 @@ def lenco(v: Veste) -> Vista:
         v.part(f"scarf_tail_{side}", polyline([qv(sx * 0.4, nuca, cz - 0.36 * cab),
                                                qv(sx * 1.4, nuca - 0.8, cz - 0.75 * cab)], 1), ("head", "scarf"),
                v.mat2)
-    return Vista(cobre=["hair_cap", "topknot"], back_rules=[regra("scarf_knot", "neck")])
+    return Vista(cobre=["hair_cap", "topknot", "hair_side_l", "hair_side_r"], back_rules=[regra("scarf_knot", "neck")])
 
 
 PECAS: dict[str, Callable[[Veste], Vista]] = {

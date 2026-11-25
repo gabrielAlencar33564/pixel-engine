@@ -82,6 +82,11 @@ def _partes_do_antigo(monkeypatch: pytest.MonkeyPatch, grupos: dict[str, str], f
     monkeypatch.setattr(AssetBuilder, "part", do_antigo)
 
 
+def sem_as_partes(monkeypatch: pytest.MonkeyPatch, *prefixos: str) -> None:
+    """O corpo sem as partes cujo id começa por um dos ``prefixos`` (o controle de uma parte nova)."""
+    _partes_do_antigo(monkeypatch, {}, prefixos)
+
+
 def _olhos_do_antigo(v: roupa.Veste) -> roupa.Vista:
     """Os olhos do `pixel-engine`: na testa (a meio caminho entre o centro e o alto do crânio), com o contorno em
     volta, e por cima do cabelo e do lenço por regra."""
