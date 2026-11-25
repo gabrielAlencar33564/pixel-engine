@@ -76,6 +76,8 @@ tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à
 **O humano:** o primeiro nó é `corpo_humano`; a roupa vem depois, cada peça um nó. A `espada` vai na mão direita e dá ao canvas 16 px a mais em cima e de cada lado; com ela, o clipe `attack` (480 ms, 8 quadros, sem laço) sobe a lâmina por cima do ombro e corta para a frente. **O quadrúpede:** um nó
 `corpo_canino`, com as marcas e as orelhas como argumentos.
 
+**A pedra solta** é o `penedo`, não o `elipsoide` (que lê como ovo): um poliedro sorteado pela semente, com faces, quinas e o tom pela normal; `agudo` fecha a ponta, `inclina` deita o topo, `irregular` lasca, `musgo` cobre as faces de cima, `fendas` racha as maiores, e `material` é a família (`alvenaria`, o granito; `palha`, o arenito, com `tom` -1). Outra semente dá outra pedra do mesmo tipo: para variar o cenário, varie a semente e a forma, não só o tamanho.
+
 **A árvore e a moita** são volumes: `tronco_em_pe` e a copa, que é `copa` (a folhosa, em tufos redondos; no chão e
 sem tronco é a moita; com `pende`, os ramos caem) ou `copa_conica` (a conífera, em andares). A copa mostra o alto e
 cobre o tronco pela frente: do tronco sobra na tela a altura do centro da copa × 0,71 menos

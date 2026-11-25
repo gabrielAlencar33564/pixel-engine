@@ -494,3 +494,14 @@ O dono pediu variações de tronco, para ele não ser simples e só cilíndrico.
   `laco` da receita. Quem tem a espada ganha 16 px em cima e de cada lado no canvas: a lâmina no alto do golpe saía
   do quadro. Nada muda no pixel de quem não tem a espada (o oráculo segue igual). A lâmina clara usa `casca_clara`
   (a rampa ardósia, pedra clara e osso), para não mudar o estilo: o `metal` lia como um risco escuro.
+
+## O penedo (pedido do dono, 2026-11-25)
+
+- A pedra solta ganhou a peça `penedo`: as pedras do jogo eram elipsoides e liam como ovos. É o fecho convexo de
+  anéis de pontos sorteados pela semente (base, cintura, ombro e um topo chato que fecha em ponta com `agudo`), com
+  as faces quase no mesmo plano (13°) fundidas numa só. Só as faces de frente para a câmera S se desenham (as do
+  convexo não se cobrem) e só as que têm 3 px² ou mais na tela; o tom vem da luz pela normal na família do material
+  (`alvenaria` ou `palha`), um degrau abaixo nas de costas para a luz. O musgo vai nas faces mais deitadas, com o
+  tom calculado na peça (o verde não tem família de degraus). O teste mede o ovo: a pedra cobre até 90 % do ovo
+  inscrito na caixa dela, e o elipsoide, 93 % ou mais (o controle).
+
