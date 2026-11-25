@@ -6,6 +6,7 @@ da escrita peça por peça. Os controles: o traço fora da faixa, a planta num h
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ from pixel_forge.design import habito
 from pixel_forge.design.asset import ir_da_composicao
 from pixel_forge.design.escala import PPM
 from pixel_forge.design.habito import expandida
+from pixel_forge.design.porte import altura_m
 from pixel_forge.quality import flora
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -154,7 +156,126 @@ def test_as_laminas_do_capim_nascem_cada_uma_no_seu_pe() -> None:
 
 def test_controle_com_o_pe_num_ponto_as_laminas_se_fundem(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(habito, "PE_DA_TOUCEIRA", 0.15)  # o pé antigo: as lâminas nasciam quase de um ponto só
+    monkeypatch.setattr(habito, "LAMINA_EM_PE", (0.9, 0.12))  # e a abertura dava toda a largura
     assert _pes_do_capim() < 0.3 * 0.6 * PPM
+
+
+def _pontas_da_frente(altura: str, largura: str, semente: int) -> float:
+    """A altura média na tela das pontas da metade da frente (as que a câmera vê e onde a flor cai) de um capim
+    derivado, em alturas da lâmina mais alta: da câmera de cima a 45°, o z sobe e o y (para a câmera) desce."""
+    pontas = []
+    for s in (semente, semente + 1, semente + 2):
+        dado = _comp("objeto", habito="touceira", altura=altura, largura=largura).model_dump(mode="json")
+        ir = ir_da_composicao(validar({**dado, "semente": s}, Composicao, "teste"))
+        fins = [p.geometry.points_q8[-1] for p in ir.parts if p.geometry.type == "polyline"]
+        alto = max(z for _, _, z in fins)
+        pontas += [(z - y) / alto for _, y, z in fins if y >= 0]
+    return sum(pontas) / len(pontas)
+
+
+CAPINS_BAIXOS = (("40cm", "70cm", 7), ("50cm", "80cm", 21), ("30cm", "60cm", 9))
+
+
+def test_a_touceira_fina_baixa_tem_as_pontas_no_alto_para_a_flor() -> None:
+    """A flor nas pontas (o ``salpico`` em ``folhas.pontas``) pede a lâmina quase em pé e reta: na touceira baixa e
+    larga, a largura vem do pé, e as pontas da frente ficam no alto da figura (a de antes abria até 0,9 e caía 0,12:
+    as pontas da frente desciam até o pé, e a flor ficava no chão). As lâminas seguem cada uma no seu pé."""
+    for altura, largura, semente in (*CAPINS_BAIXOS, ("45cm", "60cm", 1013)):
+        assert float(_args(_comp("objeto", habito="touceira", altura=altura, largura=largura), "folhas")["cai"]) <= 0.1
+        assert _pontas_da_frente(altura, largura, semente) >= 0.35
+    assert _pes_do_capim() >= 0.3 * 0.6 * PPM
+
+
+def test_controle_com_a_lamina_aberta_e_caida_as_pontas_descem(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(habito, "LAMINA_EM_PE", (0.9, 0.12))  # o jeito antigo: a abertura até 0,9 e a ponta caída
+    for altura, largura, semente in CAPINS_BAIXOS:
+        assert _pontas_da_frente(altura, largura, semente) < 0.3
+
+
+def _cortina(**planta: Any) -> tuple[int, float]:
+    """Os ramos que caem de um chorão derivado de 5 m e onde para o mais curto, em fustes."""
+    ir = ir_da_composicao(_comp(habito="pendente", altura="5m", largura="5.2m", folha="miuda", **planta))
+    fins = [p.geometry.points_q8[-1][2] / 256 for p in ir.parts
+            if p.geometry.type == "tapered_polyline" and "_ramo_" in p.id]
+    return len(fins), max(fins, default=0.0) / (0.45 * 5 * PPM)
+
+
+def test_a_cortina_do_chorao_e_densa_e_desce_perto_do_chao() -> None:
+    """O pendente tem os lóbulos miúdos (cada lóbulo de baixo dá os ramos dele) e o ``pende`` sai do fuste: o ramo
+    mais curto desce pela parte do fuste que a ``cortina`` pede, e os outros param perto do chão. O traço encurta a
+    cortina (0: nenhum ramo); fora da copa em massa é recusado."""
+    ramos, curto = _cortina()
+    assert ramos >= 60 and curto <= 0.45
+    assert _cortina(cortina="0.3")[1] > 0.6 and _cortina(cortina="0")[0] == 0
+    assert float(_args(_comp(habito="decurrente", cortina="0.5"), "copa")["pende"]) > 1
+    with pytest.raises(Recusa) as e:
+        ir_da_composicao(_comp(habito="aberto", cortina="0.5"))
+    assert e.value.codigo == "PLANTA"
+
+
+def test_controle_a_cortina_de_antes_e_rala_e_curta(monkeypatch: pytest.MonkeyPatch) -> None:
+    # o jeito antigo: os 12 lóbulos da largura, o perfil −0,5 e o ``pende`` fixo em 2,2 (a cortina de 0,41)
+    antigo = replace(habito.HABITOS["pendente"], perfil=-0.5, cortina=0.41, mais=0)
+    monkeypatch.setitem(habito.HABITOS, "pendente", antigo)
+    assert float(_args(_comp(habito="pendente", altura="5m", largura="5.2m"), "copa")["pende"]) == pytest.approx(2.2,
+                                                                                                                 abs=0.05)
+    ramos, curto = _cortina()
+    assert ramos <= 45 and curto > 0.5
+
+
+ALTURAS = (("4.5m", "3.6m"), ("6.5m", "2.4m"), ("3m", "3.5m"))
+
+
+def _px_da_medida(texto: str) -> float:
+    return float(texto.removesuffix("cm")) / 100 * PPM if texto.endswith("cm") else float(texto.removesuffix("m")) * PPM
+
+
+def _erro_da_altura(habito_: str, altura: str, largura: str, semente: int, **planta: Any) -> float:
+    """A altura medida (o ponto mais alto da geometria) menos a pedida, em px."""
+    categoria = "arbusto" if habito_ in ("moita", "touceira") else "arvore_grande"
+    dado = _comp(categoria, habito=habito_, altura=altura, largura=largura, **planta).model_dump(mode="json")
+    ir = ir_da_composicao(validar({**dado, "semente": semente}, Composicao, "teste"))
+    return altura_m(ir) * PPM - _px_da_medida(altura)
+
+
+@pytest.mark.parametrize("habito_", sorted(PECAS_DO_HABITO))
+def test_a_altura_medida_e_a_pedida(habito_: str) -> None:
+    """A altura do sprite é a pedida, até 2 % ou 1 px, em qualquer hábito, tamanho, idade, vento e semente: onde o
+    alto vem de uma ponta sorteada na peça (a nuvem do aberto, o galho seco, a lâmina), a engine mede e acerta."""
+    baixa = habito_ in ("moita", "touceira")
+    medidas = (("70cm", "2.2m"), ("1.2m", "50cm"), ("45cm", "60cm")) if baixa else ALTURAS
+    for (altura, largura), idade, vento, semente in zip(medidas * 2, ("jovem", "velha") * 3, ("0", "0.7") * 3,
+                                                       (5, 41, 77, 11, 3, 23), strict=False):
+        erro = _erro_da_altura(habito_, altura, largura, semente, idade=idade, **({} if baixa else {"vento": vento}))
+        assert abs(erro) <= max(1.0, 0.02 * _px_da_medida(altura)), (altura, largura, idade, vento, semente, erro)
+
+
+def test_controle_sem_medir_o_alto_o_aberto_fica_baixo(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(habito, "_assentada", lambda _comp, _m, nos: nos)  # o jeito antigo: o alto que a peça sortear
+    assert min(_erro_da_altura("aberto", a, w, s) / _px_da_medida(a) for a, w in ALTURAS for s in (5, 41)) < -0.05
+
+
+def _bandeira(vento: str, semente: int) -> float:
+    """Quanto o meio da folhagem do aberto sai do alto do tronco, para o lado do vento, em larguras."""
+    comp = validar({**_comp(habito="aberto", vento=vento).model_dump(mode="json"), "semente": semente}, Composicao,
+                   "teste")
+    folhas = [p.geometry.center_q8[0] / 256 for p in ir_da_composicao(comp).parts
+              if p.id.startswith("copa") and p.geometry.type == "ellipse"]
+    alto = _px(_args(comp, "tronco").get("inclinacao", 0))
+    return (sum(folhas) / len(folhas) - alto) / (3.6 * PPM) * (-1 if vento.startswith("-") else 1)
+
+
+def test_o_vento_leva_a_copa_aberta_em_bandeira() -> None:
+    """Com o vento, o lado dele fica curto e um galho a mais leva nuvens para o lado de lá: a folhagem sai do alto do
+    tronco para onde o vento vai (antes ela só ia com o tronco e ficava centrada nele). Sem vento, nada muda."""
+    for semente in (5, 41, 77):
+        assert _bandeira("1", semente) >= 0.06 and _bandeira("-0.6", semente) >= 0.05
+    assert [n.id for n in expandida(_comp(habito="aberto")).nos] == ["tronco", "galhos", "copa"]
+
+
+def test_controle_sem_a_bandeira_a_copa_fica_centrada_no_tronco(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(habito, "_bandeira", lambda _m, _alto, _copa: (1.0, []))  # o jeito antigo: só o tronco inclina
+    assert max(_bandeira("1", s) for s in (5, 41, 77)) < 0.04
 
 
 def test_a_conifera_derivada_passa_na_critica_em_qualquer_tamanho() -> None:
@@ -203,7 +324,8 @@ def test_a_previa_devolve_os_nos_derivados(tmp_path: Path, capsys: pytest.Captur
 
 
 def test_controle_o_traco_fora_da_faixa_e_recusado() -> None:
-    tracos: list[dict[str, Any]] = [{"fuste": "0.95"}, {"esbeltez": "2"}, {"vento": "3"}, {"altura": "0"}]
+    tracos: list[dict[str, Any]] = [{"fuste": "0.95"}, {"esbeltez": "2"}, {"vento": "3"}, {"altura": "0"},
+                                    {"cortina": "1.5"}]
     for traco in tracos:
         with pytest.raises(Recusa) as e:
             ir_da_composicao(_comp(habito="decurrente", **traco))

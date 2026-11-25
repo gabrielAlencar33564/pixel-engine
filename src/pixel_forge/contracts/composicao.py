@@ -96,8 +96,9 @@ class Traco(Strict):
 class Planta(Strict):
     """A planta pelos traços dela, em vez de peça por peça: a engine deriva os nós (``design/habito.py``). O hábito
     é a arquitetura; a altura e a largura, as medidas reais; a folha escolhe a folhagem; a idade muda o tronco e a
-    copa. O fuste (a parte da altura sem copa), a esbeltez (a altura sobre o diâmetro do pé) e o vento (de −1 a 1)
-    só se dizem quando a espécie foge do hábito."""
+    copa. O fuste (a parte da altura sem copa), a esbeltez (a altura sobre o diâmetro do pé), o vento (de −1 a 1)
+    e a cortina (a parte do fuste que os ramos que caem da copa em massa cobrem, de 0 a 1) só se dizem quando a
+    espécie foge do hábito."""
 
     habito: Literal["decurrente", "excurrente", "aberto", "pendente", "guarda_sol", "seco", "moita", "touceira"]
     altura: Expr
@@ -107,6 +108,7 @@ class Planta(Strict):
     fuste: Expr | None = None
     esbeltez: Expr | None = None
     vento: Expr | None = None
+    cortina: Expr | None = None
     casca: Id = "casca_sulcada"
 
 

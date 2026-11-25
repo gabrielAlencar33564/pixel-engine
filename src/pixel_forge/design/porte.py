@@ -19,7 +19,7 @@ FAIXAS = {
 }
 
 
-def _topo(g: dict[str, Any]) -> float:
+def topo(g: dict[str, Any]) -> float:
     """O z mais alto da geometria (px)."""
     if g["type"] == "ellipse":
         return float(g["center_q8"][2] + g["radii_q8"][2]) / 256
@@ -34,7 +34,7 @@ def _topo(g: dict[str, Any]) -> float:
 def altura_m(ir: AssetIR) -> float:
     """A altura do asset em metros: o ponto mais alto da geometria no repouso."""
     d = ir.model_dump(mode="json")
-    return max((_topo(p["geometry"]) for p in no_mundo(d["parts"], d["bones"])), default=0.0) / PPM
+    return max((topo(p["geometry"]) for p in no_mundo(d["parts"], d["bones"])), default=0.0) / PPM
 
 
 def conferir_porte(categoria: str, ir: AssetIR) -> None:
