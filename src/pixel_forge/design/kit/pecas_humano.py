@@ -100,7 +100,7 @@ PECAS_HUMANO = [
     _roupa("cabelo_preso", "Cabelo puxado para trás com o coque no alto", (), {},
            (("escuro", {"material": "couro"}), ("pano", {"material": "pano_azul"}), ("palha", {"material": "fibra"}))),
     _roupa("chapeu", "Chapéu mole de aba larga, a copa baixa, assentado um pouco para trás", (
-           DETALHE, X("largura", "escalar", "a aba sobre a largura da cabeça (de ~190 % em diante cobre os olhos)",
+           DETALHE, X("largura", "escalar", "a aba sobre a largura da cabeça (de ~210 % em diante cobre os olhos)",
                       "180%")),
            {"largura": "largura_pct"},
            (("de feltro", {"material": "couro"}), ("aba curta", {"material": "pano_azul", "largura": "140%"}),

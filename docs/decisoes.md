@@ -322,14 +322,14 @@ A regra entrou em `docs/regras.md`.
 - A cabeça é uma parte só (`skull`), um elipsoide (`CRANIO`): 0,70 da cabeça de largura, 0,76 de fundo e 1,0 de
   altura (mais alto que fundo, para de perfil não ler deitado). A face, o queixo e o nariz das mudanças 12 e 13
   saíram, com os testes deles (a largura da face, o nariz sob o olho e por estatura).
-- O olho fica a 0,38 da cabeça no osso dela (`OLHO_Z`; 63 % da altura): na tela cai entre 43 % e 57 % do ovo, de
-  1,20 a 1,96 m. Perde também o contorno de fora (`no_outline`): de perfil, por ser uma peça fina, o contorno dele
+- O olho fica a 0,38 da cabeça no osso dela (`OLHO_Z`; 63 % da altura): na tela cai entre 56 % e 69 % do ovo, de
+  cima para baixo (um pouco abaixo do meio), de 1,20 a 1,96 m. Perde também o contorno de fora (`no_outline`): de perfil, por ser uma peça fina, o contorno dele
   saía da borda da cabeça, como um ressalto. Encostar o olho por dentro da superfície foi medido e não veio: não
   mudava o perfil e escondia o olho sob a aba.
 - O cabelo, as mechas, o coque e o lenço foram reafinados sobre o ovo (`CABELO`, `MECHA`, `COQUE`, `LENCO`).
 - O chapéu assenta um pouco para trás (`CHAPEU`): centrado no ovo, na câmera de cima a aba cobre os olhos em
   qualquer largura acima de ~110 %. Assim os olhos aparecem de frente até ~150 % de aba (1,72 m) e em alguma vista
-  até ~180 %; de ~190 % em diante a aba os cobre em todas. O catálogo diz isso.
+  até ~200 %; de ~210 % em diante a aba os cobre em todas (medido em 1,60, 1,72 e 1,85 m). O catálogo diz isso.
 - A régua: `olhos_na_cabeca` aceita até 0,70 (a figura para a câmera de cima põe o olho acima do real). As outras
   medidas da cabeça seguem na faixa. A cabeça do antigo continua saindo dela nas quatro.
 - Os testes: a cabeça é uma parte só e oval na tela, de frente e de perfil (o controle é a cabeça de três massas
