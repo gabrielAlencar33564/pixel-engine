@@ -1,45 +1,47 @@
-# Regras da engine
+# Engine rules
 
-A fonte única das regras que não viraram checagem. O `CLAUDE.md`, o `AGENTS.md` e a skill citam este arquivo e não
-repetem nada dele. O que dá para checar é teste, não linha aqui.
+The single source of the rules that did not become checks. `CLAUDE.md`, `AGENTS.md` and the skill cite this file and
+repeat nothing from it. What can be checked is a test, not a line here.
 
-## O que a engine é
+## What the engine is
 
-- A engine é a mão de uma IA para pixel art: a IA descreve o asset em dados, e a engine desenha, confere e exporta.
-- O agente do jogo pede (criar, completar, corrigir) e monta as cenas; a engine faz a autoria e entrega, sem montar
-  cena nem jogo.
+- The engine is an AI's hand for pixel art: the AI describes the asset as data, and the engine draws, checks and
+  exports.
+- The game agent asks (create, complete, fix) and assembles the scenes; the engine authors and delivers, without
+  assembling a scene or a game.
 
-## Desenho
+## Drawing
 
-- Forma antes de cor: a entrega fraca se corrige na construção (peças, medidas, primitivas), não trocando tons.
-- Referência concreta antes de desenhar: a ficha cita a fonte, as medidas reais e o que dá vida à coisa; ela informa
-  os dados e nunca vira recorte 2D.
-- Anatomia contra a referência: se o rig não faz a pose, diga antes de desenhar.
-- Criação, não reuso: um asset novo nasce da ficha dele, não de um exemplo esticado.
-- O tamanho vem dos metros reais na escala do mundo, nunca do canvas.
-- A solução se mede no pixel final do sprite e no custo, não num render 3D sofisticado.
-- O personagem é uma figura para a câmera de cima, com poucos pixels: formas simples, que a IA prevê no pixel (a
-  cabeça é um ovo), e não a anatomia real. O corpo real dá as proporções gerais; o detalhe que não se vê no sprite
-  (o nariz, o queixo, o crânio) não se modela: só distorce.
+- Shape before colour: a weak delivery is fixed in the construction (pieces, measurements, primitives), not by
+  swapping tones.
+- A concrete reference before drawing: the sheet cites the source, the real measurements and what gives the thing
+  life; it informs the data and never becomes a 2D cut-out.
+- Anatomy against the reference: if the rig cannot do the pose, say so before drawing.
+- Creation, not reuse: a new asset is born from its own sheet, not from a stretched example.
+- Size comes from real metres at the world scale, never from the canvas.
+- A solution is measured in the sprite's final pixel and in its cost, not in a sophisticated 3D render.
+- A character is a figure for the top-down camera, with few pixels: simple shapes the AI can predict in the pixel
+  (the head is an egg), not real anatomy. The real body gives the overall proportions; detail that does not show in
+  the sprite (the nose, the chin, the skull) is not modelled: it only distorts.
 
-## Limites e correções
+## Limits and fixes
 
-- Pare em vez de piorar: se um limite obriga a perder qualidade visível, corrija a causa no motor (a peça, o
-  limite), nunca o desenho, e mostre o antes e o depois.
-- Treino corrige o motor: a falha que um asset expõe vira capacidade geral, provada por fixture sintética com
-  controle negativo; nunca remendo no asset, e o asset de treino não fica no repositório.
-- Um fator por vez, com o antes e o depois lado a lado antes de declarar melhoria.
-- A correção só conta quando a engine recusa o jeito antigo ou quando ele não existe mais.
+- Stop rather than make it worse: if a limit forces a visible loss of quality, fix the cause in the engine (the
+  piece, the limit), never the drawing, and show the before and after.
+- Training fixes the engine: a failure that an asset exposes becomes a general capability, proven by a synthetic
+  fixture with a negative control; never a patch on the asset, and the training asset does not stay in the repository.
+- One factor at a time, with before and after side by side before declaring an improvement.
+- A fix only counts when the engine refuses the old way or when the old way no longer exists.
 
-## Arte e aprovação
+## Art and approval
 
-- Só o dono aprova arte: o `art_review` muda só por revisão humana registrada.
-- Ninguém aprova o próprio trabalho: o pronto vem de uma prova feita por quem não escreveu o código.
+- Only the owner approves art: `art_review` changes only through a recorded human review.
+- Nobody approves their own work: done comes from a proof made by someone who did not write the code.
 
-## Trabalho
+## Work
 
-- Só uma sessão escreve neste repositório por vez.
-- Imagem: leia primeiro os números; a prancha é o recorte no tamanho real, ampliado no máximo 4×.
-- A decisão que o plano não fixa vai em uma linha em `docs/decisoes.md`; o porquê vai no commit.
-- Cada etapa verificada vira um commit pequeno na `main`, sem pedir; o push só quando o dono pedir.
-- O acervo de trabalho e os builds ficam fora do git.
+- Only one session writes to this repository at a time.
+- Images: read the numbers first; the sheet is the real-size crop, enlarged at most 4×.
+- A decision the plan does not fix goes in one line in `docs/decisoes.md`; the why goes in the commit.
+- Each verified step becomes a small commit on `main`, without asking; push only when the owner asks.
+- The working asset store and the builds stay out of git.

@@ -79,4 +79,4 @@ def test_o_porte_fora_da_categoria_e_recusado_com_o_porte_esperado(
     assert main(["build", str(comp), "--acervo", str(tmp_path), "--json"]) == codigo
     if codigo:
         erro = json.loads(capsys.readouterr().out)["errors"][0]
-        assert erro["code"] == "PORTE" and "~2,5×" in erro["hint"] and "metros" in erro["hint"]
+        assert erro["code"] == "PORTE" and "~2.5×" in erro["hint"] and "metros" in erro["hint"]

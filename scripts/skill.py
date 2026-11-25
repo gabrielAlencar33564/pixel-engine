@@ -31,8 +31,8 @@ def _bloco(texto: str, nome: str) -> str:
 
 
 def portes() -> str:
-    linhas = ["| Categoria | Faixa | Típico |", "|---|---|---|"]
-    linhas += [f"| `{c}` | de {lo}× a {hi}× | {tip} |" for c, (lo, hi, tip) in FAIXAS.items()]
+    linhas = ["| Category | Range | Typical |", "|---|---|---|"]
+    linhas += [f"| `{c}` | {lo}× to {hi}× | {tip} |" for c, (lo, hi, tip) in FAIXAS.items()]
     return "\n".join(linhas) + "\n"
 
 
@@ -40,8 +40,8 @@ def gerados() -> dict[Path, str]:
     """O conteúdo que cada arquivo gerado deve ter."""
     fonte = SKILL.read_text(encoding="utf-8")
     skill = fonte.replace(_bloco(fonte, "portes"), portes())
-    pedido = ("# O pedido de um asset\n\nO formulário que o agente do jogo preenche para pedir um asset à engine. "
-              "Gerado da skill\n(`.claude/skills/pixel-asset-engine/SKILL.md`) por `scripts/skill.py`; não edite aqui."
+    pedido = ("# Requesting an asset\n\nThe form the game agent fills in to ask the engine for an asset. Generated "
+              "from the skill\n(`.claude/skills/pixel-asset-engine/SKILL.md`) by `scripts/skill.py`; do not edit here."
               "\n\n" + _bloco(skill, "pedido"))
     return {SKILL: skill, ESPELHO: skill, PEDIDO: pedido}
 

@@ -12,10 +12,10 @@ from .vistas import no_mundo, pontos
 
 # (mínimo, máximo, típico) em humanos de 1,65 m
 FAIXAS = {
-    "arvore_grande": (1.8, 4.0, "~2,5× (~4 m no jogo)"), "arvore_pequena": (1.0, 2.0, "~1,5×"),
-    "arbusto": (0.25, 1.0, "~0,6×"), "casa": (1.3, 3.0, "~2×"), "estrutura": (0.3, 2.5, "de 0,3× a 2,5×"),
-    "objeto": (0.1, 1.5, "de 0,1× a 1,5×"), "prop_de_mao": (0.03, 0.6, "~0,3×"), "humano": (0.6, 1.25, "~1×"),
-    "quadrupede": (0.15, 1.2, "~0,5×"),
+    "arvore_grande": (1.8, 4.0, "~2.5× (~4 m in game)"), "arvore_pequena": (1.0, 2.0, "~1.5×"),
+    "arbusto": (0.25, 1.0, "~0.6×"), "casa": (1.3, 3.0, "~2×"), "estrutura": (0.3, 2.5, "0.3× to 2.5×"),
+    "objeto": (0.1, 1.5, "0.1× to 1.5×"), "prop_de_mao": (0.03, 0.6, "~0.3×"), "humano": (0.6, 1.25, "~1×"),
+    "quadrupede": (0.15, 1.2, "~0.5×"),
 }
 
 

@@ -1,11 +1,11 @@
-# O pedido de um asset
+# Requesting an asset
 
-O formulário que o agente do jogo preenche para pedir um asset à engine. Gerado da skill
-(`.claude/skills/pixel-asset-engine/SKILL.md`) por `scripts/skill.py`; não edite aqui.
+The form the game agent fills in to ask the engine for an asset. Generated from the skill
+(`.claude/skills/pixel-asset-engine/SKILL.md`) by `scripts/skill.py`; do not edit here.
 
-- **Verbo:** criar (um asset novo), completar (o que falta num asset: um clipe, uma vista pedida) ou corrigir (o
-  desenho errado de um asset).
-- **O quê:** o tipo (objeto, construção, árvore, arbusto, humano, quadrúpede), a função no jogo, se anda ou é
-  estático, e o porte (a categoria da tabela de porte ou a altura em metros).
-- **Onde fica:** o lugar no jogo (a orla de um campo, um pátio, uma casa), que diz o clima e o desgaste.
-- **Referência:** a espécie, o modelo ou a imagem, se houver.
+- **Verb:** create (a new asset), complete (what an asset lacks: a clip, a requested view) or fix (an asset drawn
+  wrong).
+- **What:** the type (object, building, tree, shrub, human, quadruped), its role in the game, whether it walks or is
+  static, and the size (the category from the size table, or the height in metres).
+- **Where:** the place in the game (the edge of a field, a yard, a house), which tells the climate and the wear.
+- **Reference:** the species, the model or the image, if any.

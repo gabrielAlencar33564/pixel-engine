@@ -70,7 +70,7 @@ def test_so_sai_publicado_com_a_revisao_do_dono(tmp_path: Path, capsys: pytest.C
 def test_a_previa_recusa_o_que_o_build_recusa(tmp_path: Path, capsys: pytest.CaptureFixture[str], comando: str) -> None:
     comp = _copia(tmp_path, MOURAO, categoria="arvore_grande")
     codigo, r = pfe(capsys, comando, str(comp), *(["--acervo", str(tmp_path)] if comando != "checar" else []))
-    assert codigo == 2 and r["errors"][0]["code"] == "PORTE" and "~2,5×" in r["errors"][0]["hint"]
+    assert codigo == 2 and r["errors"][0]["code"] == "PORTE" and "~2.5×" in r["errors"][0]["hint"]
 
 
 def test_a_identidade_e_imutavel_e_a_mudanca_e_a_revisao_seguinte(tmp_path: Path,
