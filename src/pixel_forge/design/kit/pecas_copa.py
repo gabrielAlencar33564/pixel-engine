@@ -23,7 +23,9 @@ AFINA = 0.6  # com o perfil em 1, a copa afina tanto no alto (a gota)
 RAMINHO = 0.14  # o raminho na borda do lóbulo, em fração da copa
 VARIA = 2.5  # o tamanho do lóbulo varia ``irregular`` vezes isto
 RECUA = 1.2  # e o lóbulo recua da borda da copa até ``irregular`` vezes isto
-RAMOS_QUE_CAEM = 3  # por lóbulo
+MAX_RECUO = 0.28  # mas nunca mais que isto: o lóbulo que recua demais abre a copa e mostra o miolo chapado
+RAMOS_QUE_CAEM = 5  # por lóbulo
+ONDULA = 2.0  # a ponta do ramo sai do prumo até tantos raios dele, para um lado
 ACIMA_DO_CHAO = 0.18  # a ponta do ramo para a esta fração da altura de onde ele sai (de 0,4 a 1,4 vezes isto)
 RAMO_FINO = 0.045  # o raio do ramo que cai, em fração da meia largura da copa (1 px no mínimo)
 PONTA_DO_RAMO = 0.45  # o raio na ponta, em fração do raio no alto
@@ -57,7 +59,7 @@ def _lobulos(st: Stream, a: dict[str, Any], folga: float) -> list[Tufo]:
         s = 1 - t * (1 - baixo)
         w = 1 - AFINA * max(0.0, perfil) * (1 - t)
         f = min(0.7, max(0.18, a["tamanho"] * (1 + VARIA * irr * _sorte(st)))) * math.sqrt(w)
-        k = max(0.0, 1 - folga - f) * (1 - RECUA * irr * abs(_sorte(st)))
+        k = max(0.0, 1 - folga - f) * (1 - min(MAX_RECUO, RECUA * irr * abs(_sorte(st))))
         ce = math.sqrt(1 - s * s)
         out.append(((ce * math.sin(az) * k * w, ce * math.cos(az) * k * w, s * k), f))
     return out
@@ -90,19 +92,19 @@ def tufos(st: Stream, a: dict[str, Any]) -> list[tuple[Vec, Vec]]:
 
 
 def ramos(st: Stream, a: dict[str, Any], lobulos: list[tuple[Vec, Vec]]) -> list[tuple[Vec, Vec, float]]:
-    """Os ramos que caem (``pende``): três de cada lóbulo da metade de baixo da copa, cada um de dentro do lóbulo
-    até ``pende`` meias alturas abaixo do meio da copa. O quanto desce é sorteado, e a barra da cortina é
-    desigual: nenhum ramo chega ao chão. Devolve o alto, a ponta e o raio de cada um."""
+    """Os ramos que caem (``pende``): cinco de cada lóbulo dos dois terços de baixo da copa, cada um de dentro do
+    lóbulo até ``pende`` meias alturas abaixo do meio da copa. O quanto desce é sorteado, e a barra da cortina é
+    desigual: nenhum ramo chega ao chão. Devolve o alto, a ponta (um pouco fora do prumo) e o raio de cada um."""
     meia_l, meia_a, cz = a["copa"]
-    baixos = sorted(lobulos, key=lambda v: v[0][2])[:(len(lobulos) + 1) // 2] if a["pende"] > 0 else []
+    baixos = sorted(lobulos, key=lambda v: v[0][2])[:(2 * len(lobulos) + 2) // 3] if a["pende"] > 0 else []
     out = []
     for (x, y, z), (rx, ry, _) in baixos:
         for _ in range(RAMOS_QUE_CAEM):
-            px, py = x + 0.6 * rx * _sorte(st), y + 0.6 * ry * _sorte(st)
+            px, py = x + 0.8 * rx * _sorte(st), y + 0.8 * ry * _sorte(st)
             desce = cz - meia_a * a["pende"] * (0.45 + 0.55 * abs(_sorte(st)))
             ponta = max(z * ACIMA_DO_CHAO * (0.4 + abs(_sorte(st))), desce)
             raio = max(1.0, meia_l * RAMO_FINO * (0.7 + 0.6 * abs(_sorte(st))))
-            out.append(((px, py, z), (px * 1.03, py * 1.03, ponta), raio))
+            out.append(((px, py, z), (px * 1.03 + ONDULA * raio * _sorte(st), py * 1.03, ponta), raio))
     return out
 
 
@@ -148,8 +150,10 @@ def _copa(c: Ctx, a: dict[str, Any]) -> None:
     volumes = tufos(c.st, a)
     _volumes(c, a["material"], [(fora_do_eixo(o), r) for o, r in volumes] + nas_pontas, (dx, dy, cz))
     for i, (alto, ponta, raio) in enumerate(ramos(c.st, a, volumes[:a["tufos"]])):
-        geo = {"type": "tapered_polyline", "points_q8": [qv(*fora_do_eixo(alto)), qv(*fora_do_eixo(ponta))],
-               "radii_q8": [max(RAIO_MINIMO, q(raio)), max(RAIO_MINIMO, q(raio * PONTA_DO_RAMO))]}
+        meio = ((alto[0] * 2 + ponta[0]) / 3, (alto[1] + ponta[1]) / 2, (alto[2] + ponta[2]) / 2)
+        geo = {"type": "tapered_polyline",
+               "points_q8": [qv(*fora_do_eixo(alto)), qv(*fora_do_eixo(meio)), qv(*fora_do_eixo(ponta))],
+               "radii_q8": [max(RAIO_MINIMO, q(raio * k)) for k in (1.0, 0.8, PONTA_DO_RAMO)]}
         c.b.part(f"{c.pid}_ramo_{i:02d}", a["material"], geo,
                  Parte(group=c.grupo, tags=("volume_sphere", f"massa_{c.grupo}", "no_outline")))
 

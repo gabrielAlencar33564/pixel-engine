@@ -142,3 +142,22 @@ def test_o_ponto_alongado_e_a_espiga_em_pe() -> None:
 def test_controle_por_padrao_o_ponto_e_redondo() -> None:
     largo, alto = _raios_do_ponto()
     assert alto == largo
+
+
+def _claras_de_cada_lado() -> tuple[int, int]:
+    """As lâminas claras de uma touceira grande que abrem para a esquerda da tela (a luz) e para a direita."""
+    ir = ir_da_composicao(de_uma_peca("touceira", {**CAPIM, "n": "40", "raio": "0"}))
+    lados = [p.geometry.points_q8[-1][0] for p in ir.parts
+             if p.material == "capim_claro" and p.geometry.type == "polyline"]
+    return sum(1 for x in lados if x < 0), sum(1 for x in lados if x > 0)
+
+
+def test_o_claro_das_laminas_fica_do_lado_da_luz() -> None:
+    esquerda, direita = _claras_de_cada_lado()
+    assert esquerda >= 6 and direita == 0
+
+
+def test_controle_so_com_o_sorteio_o_claro_cai_dos_dois_lados(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "LADO_DA_LUZ", 0.0)
+    esquerda, direita = _claras_de_cada_lado()
+    assert esquerda >= 3 and direita >= 3

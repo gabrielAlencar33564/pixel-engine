@@ -30,7 +30,7 @@ from pixel_forge.core.rng import Stream
 from pixel_forge.design import canvas
 from pixel_forge.design.asset import ir_da_composicao, movimento
 from pixel_forge.design.escala import PPM
-from pixel_forge.design.kit import pecas_copa
+from pixel_forge.design.kit import pecas_copa, pecas_tronco
 from pixel_forge.design.kit.pecas_copa import ramos, tufos
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.porte import altura_m
@@ -149,8 +149,8 @@ def test_os_ramos_que_caem_fazem_a_cortina() -> None:
     a = {**COPA_DE_TESTE, "pende": 2.5}
     lobulos = tufos(Stream(1), a)[:7]
     cortina = ramos(Stream(1), a, lobulos)
-    centros = {c[2] for c, _ in sorted(lobulos, key=lambda v: v[0][2])[:4]}
-    assert len(cortina) == 3 * 4 and all(alto[2] in centros for alto, _, _ in cortina)  # saem de dentro dos lóbulos
+    centros = {c[2] for c, _ in sorted(lobulos, key=lambda v: v[0][2])[:5]}
+    assert len(cortina) == 5 * 5 and all(alto[2] in centros for alto, _, _ in cortina)  # saem de dentro dos lóbulos
     pontas = [ponta[2] for _, ponta, _ in cortina]
     assert min(pontas) > 0 and max(pontas) - min(pontas) >= 3  # nenhum chega ao chão, e a barra é desigual
     assert min(pontas) < min(c[2] - r[2] for c, r in lobulos) - 5
@@ -582,3 +582,26 @@ def test_o_tronco_velho_desenha_as_quatro_vistas() -> None:
                      "teste")
     ir, est = ir_da_composicao(quatro), estilo_render(estilo_base())
     assert all(quadro_de_repouso(ir, est, d).clipping_px == 0 for d in ir.views)
+
+
+def _viradas_das_raizes() -> list[float]:
+    """Quanto cada raiz do tronco velho vira do pé à ponta, vista de cima (graus)."""
+    ir = ir_da_composicao(de_uma_peca("tronco_em_pe", PECAS["tronco_em_pe"].variacoes[2][1]))
+    out = []
+    for p in ir.parts:
+        if "_raiz_" in p.id and p.geometry.type == "tapered_polyline":
+            pts = p.geometry.points_q8
+            pe, ponta = math.atan2(pts[1][0], pts[1][1]), math.atan2(pts[-1][0], pts[-1][1])
+            out.append(abs(math.degrees(math.atan2(math.sin(ponta - pe), math.cos(ponta - pe)))))
+    return out
+
+
+def test_a_raiz_deita_em_curva() -> None:
+    """A raiz vira para um lado até a ponta: não é uma lâmina reta saindo do pé."""
+    viradas = _viradas_das_raizes()
+    assert len(viradas) == 5 and min(viradas) >= 15
+
+
+def test_controle_a_raiz_sem_torcer_e_uma_lamina_reta(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_tronco, "RAIZ_TORCE", (0, 0))
+    assert max(_viradas_das_raizes()) < 1

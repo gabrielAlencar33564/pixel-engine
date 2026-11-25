@@ -572,8 +572,15 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
     barras iguais até o chão, e duas despontavam por cima da copa);
   - a lâmina fina deixou de ser detalhe e lança a sombra dela (as ervas flutuavam); a pena tem um dente a cada
     2,5 px (a de 1,5 px virava mancha chapada); o `salpico` ganhou o `alonga` (a espiga em pé).
-- O que sobra: a raiz à mostra do tronco é um espinho reto (mudança 20); a folha larga lisa é roliça, não chata; a
-  folha em pena não tem contorno; o tom das lâminas é sorteado (sem lado da luz); o capim de 20 a 40 cm tem 6 a
-  13 px; a agulha da conífera aberta não se distingue da folha; a semelhança compara só a silhueta (duas plantas de
-  silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se leem mais,
-  e as de `copa` dão outro desenho.
+- A segunda rodada da revisão (outro agente, com a régua do jogador que a skill passou a dizer): passou 4 das 10 e
+  mandou corrigir 6. O defeito que mais se repetiu: o que é linear e orgânico saía como barra reta. Corrigido na
+  causa: a raiz à mostra deita em curva, grossa junto do tronco (era uma lâmina reta: a mudança 20 lia como pião
+  com aletas); a cortina tem cinco ramos por lóbulo dos dois terços de baixo, cada um um pouco fora do prumo; a
+  folha em pena tem o corpo roliço e as penas passando dele (o zigue-zague sozinho lia como rabisco); o claro das
+  lâminas fica do lado da luz da vista S (era sorteado, e caía contra a luz); o lóbulo recua no máximo 0,28 (o
+  que recuava mais abria a copa e mostrava o miolo chapado).
+- O que sobra: a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
+  fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
+  folha; não há casca cinzenta com veio (a clara é lisa e lê como metal); a semelhança compara só a silhueta (duas
+  plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se
+  leem mais, e as de `copa` dão outro desenho.

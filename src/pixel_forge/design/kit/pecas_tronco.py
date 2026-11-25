@@ -20,7 +20,8 @@ ESTACOES = 20  # as estações do fuste (mais as do pé)
 NO_PE = (0.12, 0.25, 0.4, 0.6, 0.9, 1.3)  # as estações a mais onde o pé abre, em larguras do tronco
 PE_SOBE = 0.45  # o pé cai a 1/e a esta altura, em larguras do tronco
 ONDAS = ((0.6, 1.5), (0.4, 3.7))  # o perfil irregular: o peso e as voltas de cada onda ao longo da altura
-RAIZ = (0.45, 0.2, 0.75, 0.45)  # a raiz, em larguras do tronco: de onde sai, o raio, o alcance; e o raio da ponta
+RAIZ = (0.45, 0.2, 0.6, 0.3)  # a raiz, em larguras do tronco: de onde sai, o raio, o alcance; e o raio da ponta
+RAIZ_TORCE = (25, 55)  # quanto a raiz vira para um lado do pé à ponta (graus, sorteado na faixa)
 NO = (0.3, 0.85, 0.5, 0.75)  # os nós: de onde a onde ficam na altura, o raio e o centro (frações do raio do fuste)
 NO_ABRE = 75  # até onde o nó sai da frente, para cada lado (graus)
 NO_MINIMO = 1.2  # o menor nó que se lê (px)
@@ -69,19 +70,23 @@ def _no_perfil(perfil: list[tuple[float, float, float]], z: float) -> tuple[floa
 
 
 def _raizes(c: Ctx, a: dict[str, Any], perfil: list[tuple[float, float, float]], como: Parte) -> None:
-    """As raízes à mostra: saem do pé, uma a cada fatia da volta (a primeira para a frente), e deitam no chão."""
+    """As raízes à mostra: saem do pé, uma a cada fatia da volta (a primeira para a frente), grossas junto do
+    tronco, e deitam no chão numa curva para um lado (o lado e o quanto são sorteados): não são lâminas retas."""
     n, b0 = a["raizes"], a["base"]
     for j in range(n):
         az = 2 * math.pi * (j + c.st.randint(-DESVIO_NA_FATIA, DESVIO_NA_FATIA) / 100) / n
-        dx, dy = math.sin(az), math.cos(az)
         alto = RAIZ[0] * b0
         r0, desvio = _no_perfil(perfil, alto)
         grossa = RAIZ[1] * b0 * c.st.randint(80, 110) / 100
         longe = r0 + RAIZ[2] * b0 * c.st.randint(75, 115) / 100
-        pts = [(desvio + dx * r0 * 0.6, dy * r0 * 0.6, alto), (dx * (r0 + longe) / 2, dy * (r0 + longe) / 2, grossa),
-               (dx * longe, dy * longe, RAIZ[3] * grossa)]
+        torce = math.radians(c.st.randint(RAIZ_TORCE[0], RAIZ_TORCE[1]) * (1 if c.st.randint(0, 1) else -1))
+        pts = []
+        for k, (dist, z) in enumerate(((r0 * 0.6, alto), (r0 + (longe - r0) * 0.35, grossa * 1.2),
+                                       (r0 + (longe - r0) * 0.7, grossa * 0.7), (longe, RAIZ[3] * grossa))):
+            giro = az + torce * (k / 3) ** 2
+            pts.append(((desvio if k == 0 else 0.0) + math.sin(giro) * dist, math.cos(giro) * dist, z))
         geo = {"type": "tapered_polyline", "points_q8": [qv(*p) for p in pts],
-               "radii_q8": [max(RAIO_MINIMO, q(grossa * k)) for k in (1.0, 0.7, RAIZ[3])]}
+               "radii_q8": [max(RAIO_MINIMO, q(grossa * k)) for k in (1.3, 1.0, 0.65, RAIZ[3])]}
         c.b.part(f"{c.pid}_raiz_{j}", a["casca"], geo, como)
 
 
