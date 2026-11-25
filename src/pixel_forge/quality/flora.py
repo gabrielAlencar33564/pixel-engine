@@ -31,6 +31,11 @@ ESPELHADA = 0.95  # a folhagem e o espelho dela coincidem tanto
 SEM_DIRECAO = 0.02
 TRONCO_SUMIDO = 0.015  # o lenho à mostra é menos disto da figura
 PARECIDA = 0.88  # a assinatura coincide tanto com a de uma irmã
+# a planta de outra categoria é irmã no mesmo porte: a figura menor tem pelo menos isto da altura da maior. Nos
+# acervos de prova, entre categorias, a árvore e a flora baixa dão de 0,11 a 0,36 (a moita redonda e a copa redonda
+# chegam a 0,75 de assinatura, e no cenário nada se parecem); a árvore pequena e a grande, de 0,64 a 0,72; a touceira
+# de objeto e a de arbusto, de 0,52 a 0,88
+MESMO_PORTE = 0.5
 IRMAS_NA_PRANCHA = 3
 
 
@@ -38,11 +43,12 @@ IRMAS_NA_PRANCHA = 3
 class Leitura:
     """As medidas de um quadro: os pixels da folhagem, do lenho e da figura; a solidez (a folhagem sobre o fecho
     convexo dela), a simetria (a folhagem sobre o espelho dela), a luz (quanto o claro fica do lado da luz), as
-    ilhas da figura e a assinatura (a silhueta na grade de 32, do pé para cima)."""
+    ilhas da figura, a altura dela na tela (o porte) e a assinatura (a silhueta na grade de 32, do pé para cima)."""
 
     folhagem_px: int
     lenho_px: int
     figura_px: int
+    altura_px: int
     solidez: float
     simetria: float
     luz: float
@@ -51,8 +57,8 @@ class Leitura:
 
     def numeros(self) -> dict[str, Any]:
         return {"folhagem_px": self.folhagem_px, "lenho_px": self.lenho_px, "figura_px": self.figura_px,
-                "solidez": round(self.solidez, 3), "simetria": round(self.simetria, 3), "luz": round(self.luz, 3),
-                "ilhas": self.ilhas}
+                "altura_px": self.altura_px, "solidez": round(self.solidez, 3), "simetria": round(self.simetria, 3),
+                "luz": round(self.luz, 3), "ilhas": self.ilhas}
 
 
 def _caixa(m: Mascara) -> Mascara:
@@ -167,18 +173,27 @@ def semelhanca(a: Mascara, b: Mascara) -> float:
     return float((a & b).sum()) / uniao if uniao else 0.0
 
 
+def porte(a: Leitura, b: Leitura) -> float:
+    """A altura da figura menor sobre a da maior, na tela: 1 = o mesmo porte. A assinatura não vê o tamanho (a
+    moita redonda e a copa redonda coincidem nela); o porte vê."""
+    return min(a.altura_px, b.altura_px) / max(a.altura_px, b.altura_px, 1)
+
+
 def ler(folhagem: Mascara, lenho: Mascara, figura: Mascara, luminancia: Floats) -> Leitura:
-    return Leitura(int(folhagem.sum()), int(lenho.sum()), int(figura.sum()), solidez(folhagem), simetria(folhagem),
-                   luz(luminancia, folhagem), ilhas(figura), assinatura(figura))
+    linhas = np.flatnonzero(figura.any(axis=1))
+    altura = int(linhas[-1] - linhas[0] + 1) if linhas.size else 0
+    return Leitura(int(folhagem.sum()), int(lenho.sum()), int(figura.sum()), altura, solidez(folhagem),
+                   simetria(folhagem), luz(luminancia, folhagem), ilhas(figura), assinatura(figura))
 
 
 def _achado(codigo: str, gravidade: str, medida: str, dica: str) -> dict[str, str]:
     return {"codigo": codigo, "gravidade": gravidade, "medida": medida, "dica": dica}
 
 
-def achados(m: Leitura, arvore: bool, irmas: dict[str, float]) -> list[dict[str, str]]:
+def achados(m: Leitura, arvore: bool, irmas: dict[str, tuple[str, float]]) -> list[dict[str, str]]:
     """O que as medidas acusam. ``defeito`` impede a crítica de passar; ``aviso`` pede o olho de quem revisa.
-    ``arvore``: o porte pede o tronco à mostra; ``irmas``: a semelhança com cada outra planta do acervo."""
+    ``arvore``: o porte pede o tronco à mostra; ``irmas``: a categoria de cada irmã do acervo e a semelhança com
+    ela."""
     out = []
     massa = m.folhagem_px >= MASSA_MINIMA
     if massa and m.solidez >= LISA:
@@ -200,10 +215,10 @@ def achados(m: Leitura, arvore: bool, irmas: dict[str, float]) -> list[dict[str,
         out.append(_achado("TRONCO_SUMIDO", "aviso", f"o lenho à mostra é {m.lenho_px} px de {m.figura_px} da figura",
                            "A árvore lê como moita no chão. Suba a copa ou diminua o fundo dela; se a espécie tem a "
                            "saia até o chão, diga na ficha."))
-    for irma, s in sorted(irmas.items(), key=lambda kv: -kv[1]):
+    for irma, (categoria, s) in sorted(irmas.items(), key=lambda kv: -kv[1][1]):
         if s >= PARECIDA:
-            out.append(_achado("PARECIDA_COM_A_IRMA", "defeito", f"a silhueta coincide {s:.0%} com a de '{irma}' (o "
-                               f"limite é {PARECIDA:.0%})", "É a mesma planta em outro tamanho ou cor. Mude a "
-                               "construção (outra peça de copa, outro perfil, os galhos à mostra, o tronco curvo "
-                               "ou bifurcado, o porte), não só a semente ou as medidas."))
+            out.append(_achado("PARECIDA_COM_A_IRMA", "defeito", f"a silhueta coincide {s:.0%} com a de '{irma}', "
+                               f"{categoria} (o limite é {PARECIDA:.0%})", "É a mesma planta em outro tamanho ou "
+                               "cor. Mude a construção (outra peça de copa, outro perfil, os galhos à mostra, o "
+                               "tronco curvo ou bifurcado, o porte), não só a semente ou as medidas."))
     return out

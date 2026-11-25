@@ -1,7 +1,7 @@
 """A crítica da flora: a revisão que outro agente faz antes da entrega. A engine mede o quadro (``quality/flora.py``),
-compara a planta com as irmãs do acervo (a mesma categoria), grava a prancha de quem revisa (o sprite e a silhueta
-dele; embaixo, as irmãs mais parecidas) e as perguntas que só o olho responde. Quem revisa não é quem compôs: ele
-responde cada pergunta com uma nota, e o registro fica em ``criticas/<asset>.r<n>.json`` do acervo.
+compara a planta com as irmãs do acervo (a mesma categoria ou o mesmo porte), grava a prancha de quem revisa (o
+sprite e a silhueta dele; embaixo, as irmãs mais parecidas) e as perguntas que só o olho responde. Quem revisa não é
+quem compôs: ele responde cada pergunta com uma nota, e o registro fica em ``criticas/<asset>.r<n>.json`` do acervo.
 
 A crítica passa sem defeito medido e com todas as respostas boas; sem ela o pacote da flora não sai. Ela não aprova
 a arte (isso é do dono, em ``revisao.py``): tira o defeito antes de o dono olhar."""
@@ -47,9 +47,11 @@ PERGUNTAS = {
                "dele?",
     "outra_coisa": "Nada no sprite lê como outra coisa (ovo, pedra, brócolis, funil, dente, guarda-chuva)?",
     "ficha": "O que a ficha diz que dá vida à espécie (a forma da copa, o tronco, a cor) está no sprite?",
-    "irmas": "Ao lado das irmãs (a fileira de baixo), é outra planta, com outra construção e outra silhueta, e não a "
-             "mesma em outro tamanho ou cor?",
+    "irmas": "Ao lado das irmãs (a fileira de baixo: as plantas do acervo da mesma categoria ou do mesmo porte), é "
+             "outra planta, com outra construção e outra silhueta, e não a mesma em outro tamanho ou cor?",
 }
+SEM_IRMA = ("O acervo ainda não tem outra planta da mesma categoria nem do mesmo porte (a fileira de baixo falta): "
+            "não há com que comparar. Responda ok e diga isso na nota.")
 
 
 def _papeis(comp: Composicao, partes: dict[str, str]) -> dict[str, str]:
@@ -102,21 +104,25 @@ def medir(comp: Composicao) -> tuple[flora.Leitura, Quadro, Rgba]:
             q.to_rgba({p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in style.palette}))
 
 
-def _irmas(comp: Composicao, acervo: Path) -> dict[str, tuple[flora.Leitura, Quadro, Rgba]]:
-    """As outras plantas do acervo da mesma categoria, cada uma na última revisão que ainda se lê e se monta."""
+def irmas(comp: Composicao, m: flora.Leitura, acervo: Path) -> dict[str, tuple[str, flora.Leitura, Quadro, Rgba]]:
+    """As outras plantas do acervo que dividem o cenário com esta, cada uma na última revisão que ainda se lê e se
+    monta, com a categoria dela: as da mesma categoria e as de outra no mesmo porte (a touceira de objeto ao lado da
+    de arbusto, a árvore pequena ao lado da grande). A de outra categoria e outro porte não é irmã: a moita redonda
+    e a copa redonda coincidem na assinatura e não no cenário."""
     ultimas: dict[str, tuple[int, Path]] = {}
     for p in sorted((acervo / "composicoes").glob("*.r*.json")):
-        m = re.fullmatch(r"(.+)\.r(\d+)\.json", p.name)
-        if m and m.group(1) != comp.id and int(m.group(2)) >= ultimas.get(m.group(1), (0, p))[0]:
-            ultimas[m.group(1)] = (int(m.group(2)), p)
-    out = {}
+        r = re.fullmatch(r"(.+)\.r(\d+)\.json", p.name)
+        if r and r.group(1) != comp.id and int(r.group(2)) >= ultimas.get(r.group(1), (0, p))[0]:
+            ultimas[r.group(1)] = (int(r.group(2)), p)
+    out: dict[str, tuple[str, flora.Leitura, Quadro, Rgba]] = {}
     for ident, (_, p) in ultimas.items():
         try:
             irma = ler(p, Composicao)
-            if irma.categoria == comp.categoria and e_flora(irma):
-                out[ident] = medir(irma)
+            medida = medir(irma) if e_flora(irma) else None
         except Recusa:  # a composição de um formato ou de uma peça que saiu não é mais irmã de ninguém
             continue
+        if medida is not None and (irma.categoria == comp.categoria or flora.porte(m, medida[0]) >= flora.MESMO_PORTE):
+            out[ident] = (irma.categoria, *medida)
     return out
 
 
@@ -162,21 +168,22 @@ def criticar(build: Path) -> dict[str, Any]:
                      "com `pfe build`.")
     acervo = build.parent.parent
     m, q, rgba = medir(comp)
-    irmas = _irmas(comp, acervo)
-    perto = {i: flora.semelhanca(m.assinatura, mi.assinatura) for i, (mi, _, _) in irmas.items()}
-    vizinhas = sorted(perto, key=lambda i: -perto[i])[:flora.IRMAS_NA_PRANCHA]
+    todas = irmas(comp, m, acervo)
+    perto = {i: (c, flora.semelhanca(m.assinatura, mi.assinatura)) for i, (c, mi, _, _) in todas.items()}
+    vizinhas = sorted(perto, key=lambda i: -perto[i][1])[:flora.IRMAS_NA_PRANCHA]
     linhas = [[rgba, _silhueta(q)]]
     if vizinhas:
-        linhas.append([irmas[i][2] for i in vizinhas])
-        linhas.append([_silhueta(irmas[i][1]) for i in vizinhas])
+        linhas.append([todas[i][3] for i in vizinhas])
+        linhas.append([_silhueta(todas[i][2]) for i in vizinhas])
     alvo = acervo / "criticas" / f"{build.name}.png"
     salvar_png(alvo, grade(linhas, amplia_para(max(i.shape[0] for linha in linhas for i in linha), 300)))
     achados = flora.achados(m, comp.categoria in ARVORES, perto)
     return _gravar(build, {
         "build_id": ler_manifesto(build)["build_id"], "prancha": str(alvo), "medidas": m.numeros(),
-        "irmas": {i: round(perto[i], 3) for i in vizinhas}, "parecida_a_partir_de": flora.PARECIDA,
-        "achados": achados, "ficha": comp.reference,
-        "perguntas": PERGUNTAS, "parecer": None, "veredito": "pendente"})
+        "irmas": {i: {"categoria": perto[i][0], "semelhanca": round(perto[i][1], 3)} for i in vizinhas},
+        "parecida_a_partir_de": flora.PARECIDA, "achados": achados, "ficha": comp.reference,
+        "perguntas": PERGUNTAS if vizinhas else {**PERGUNTAS, "irmas": SEM_IRMA}, "parecer": None,
+        "veredito": "pendente"})
 
 
 def _respostas(arquivo: Path) -> dict[str, dict[str, Any]]:

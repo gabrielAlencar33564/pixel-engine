@@ -125,6 +125,7 @@ def test_a_flora_so_sai_com_a_critica_que_passa(tmp_path: Path, capsys: pytest.C
     assert feita["veredito"] == "pendente" and feita["achados"] == [] and Path(feita["prancha"]).is_file()
     assert feita["parecida_a_partir_de"] == flora.PARECIDA
     assert set(feita["perguntas"]) == set(critica.PERGUNTAS) and feita["ficha"].startswith("Folhosa")
+    assert feita["irmas"] == {} and feita["perguntas"]["irmas"] == critica.SEM_IRMA  # a planta sozinha no acervo
     assert pfe(capsys, "exportar", build)[1]["errors"][0]["code"] == "CRITICA_PENDENTE"
     # o parecer sem as notas, sem quem revisou, e o que manda corrigir
     vazio = tmp_path / "vazio.json"
@@ -151,7 +152,7 @@ def test_o_defeito_medido_nao_passa_com_parecer_bom(tmp_path: Path, capsys: pyte
     build = pfe(capsys, "build", str(maior), "--acervo", acervo)[1]["result"]["build"]
     feita = pfe(capsys, "critica", build)[1]["result"]
     assert [a["codigo"] for a in feita["achados"]] == ["PARECIDA_COM_A_IRMA"]
-    assert feita["irmas"]["arvore_folhosa"] >= flora.PARECIDA
+    assert feita["irmas"]["arvore_folhosa"]["semelhanca"] >= flora.PARECIDA
     dado = pfe(capsys, "critica", build, "--parecer", str(_parecer(tmp_path)), "--por", "agente revisor")[1]["result"]
     assert (dado["veredito"], dado["a_corrigir"]) == ("corrigir", ["PARECIDA_COM_A_IRMA"])
     assert pfe(capsys, "exportar", build)[1]["errors"][0]["code"] == "CRITICA_PENDENTE"
@@ -166,7 +167,48 @@ def test_controle_a_irma_de_outra_construcao_nao_e_acusada(tmp_path: Path, capsy
                                                "tamanho": "0.34"}}])
     build = pfe(capsys, "build", str(gota), "--acervo", acervo)[1]["result"]["build"]
     feita = pfe(capsys, "critica", build)[1]["result"]
-    assert feita["achados"] == [] and 0 < feita["irmas"]["arvore_folhosa"] < flora.PARECIDA
+    assert feita["achados"] == [] and 0 < feita["irmas"]["arvore_folhosa"]["semelhanca"] < flora.PARECIDA
+
+
+def test_a_unica_da_categoria_e_comparada_com_a_do_mesmo_porte(tmp_path: Path,
+                                                               capsys: pytest.CaptureFixture[str]) -> None:
+    """A árvore grande, a única da categoria no acervo, e a pequena da mesma construção e do mesmo porte: a crítica
+    as compara, diz a categoria da irmã e acusa. Controle: pela categoria só (o jeito antigo) não havia irmã."""
+    acervo = str(tmp_path / "acervo")
+    pfe(capsys, "build", str(EXEMPLO), "--acervo", acervo)
+    alta = _arquivo(tmp_path, "arvore_alta", id="arvore_alta", categoria="arvore_grande", tracos=[],
+                    medidas={"h": "3.2m", "a": "1.49m", "copa0": "$h * 0.42", "c": "($h - $copa0) / 2",
+                             "cz": "$copa0 + $c"})
+    feita = pfe(capsys, "critica", pfe(capsys, "build", str(alta), "--acervo", acervo)[1]["result"]["build"])[1]
+    irma = feita["result"]["irmas"]["arvore_folhosa"]
+    assert irma["categoria"] == "arvore_pequena" and irma["semelhanca"] >= flora.PARECIDA
+    assert [a["codigo"] for a in feita["result"]["achados"]] == ["PARECIDA_COM_A_IRMA"]
+    assert "arvore_pequena" in feita["result"]["achados"][0]["medida"]
+    assert feita["result"]["perguntas"] == critica.PERGUNTAS
+    assert all(i["categoria"] != "arvore_grande" for i in feita["result"]["irmas"].values())
+
+
+def _ovo(ident: str, categoria: str, k: float) -> dict[str, Any]:
+    """A planta de um elipsoide só, na escala ``k``: a mesma silhueta em qualquer tamanho."""
+    ovo = {"id": "copa", "peca": "elipsoide", "args": {"centro": ["0", "0", f"{0.45 * k:.3f}m"], "raios": [
+        f"{0.7 * k:.3f}m", f"{0.55 * k:.3f}m", f"{0.45 * k:.3f}m"], "material": "copa_folhosa"}}
+    return {**json.loads(EXEMPLO.read_text(encoding="utf-8")), "id": ident, "categoria": categoria, "nos": [ovo],
+            "tracos": []}
+
+
+def test_controle_a_planta_de_outra_categoria_e_outro_porte_nao_e_irma(tmp_path: Path) -> None:
+    """A moita redonda e a copa redonda coincidem na assinatura e não no cenário: a de outra categoria só é irmã no
+    mesmo porte (comparar com todas as plantas do acervo acusaria a moita)."""
+    (tmp_path / "composicoes").mkdir()
+    (tmp_path / "composicoes" / "copa_redonda.r1.json").write_text(
+        json.dumps(_ovo("copa_redonda", "arvore_grande", 4)), encoding="utf-8")
+    grande = critica.medir(validar(_ovo("copa_redonda", "arvore_grande", 4), Composicao, "teste"))[0]
+    for ident, categoria, k, irma in (("moita", "arbusto", 1, False), ("arvore", "arvore_pequena", 2.5, True)):
+        comp = validar(_ovo(ident, categoria, k), Composicao, "teste")
+        m = critica.medir(comp)[0]
+        assert flora.semelhanca(m.assinatura, grande.assinatura) >= flora.PARECIDA
+        assert ("copa_redonda" in critica.irmas(comp, m, tmp_path)) == irma
+        assert (flora.porte(m, grande) >= flora.MESMO_PORTE) == irma
 
 
 def test_a_previa_ja_mede_a_flora(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
