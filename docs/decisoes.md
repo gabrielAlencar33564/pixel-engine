@@ -650,9 +650,40 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   ficam como estão: mudá-los quebra as composições do acervo); o catálogo tem dois níveis, o resumo e um arquivo por
   família (`pfe catalogo flora`: 19 mil caracteres no lugar dos 85 mil do kit inteiro), em JSON sem espaço a mais; a
   prévia e o catálogo dizem as partes numeradas em faixa (`copa_00..copa_29`).
-- O que sobra: a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
-  fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a agulha da conífera aberta não se distingue da
-  folha; o cinzento da paleta puxa para o lilás; a sombra da copa alta sai em manchas (o elipsoide se lança como
-  uma elipse, sem se alongar com a altura); a semelhança compara só a silhueta (duas
+- O que a segunda medição e o "que sobra" deixaram aberto (pedido do dono, 2026-11-25: um agente por frente, cada
+  um no seu ramo, conferido e trazido para a `main`; nenhuma das pranchas passou ainda por revisor de fora):
+  - **O chorão** (`design/habito.py`): o pendente tem os lóbulos miúdos (8 a mais que os da largura) e o `pende`
+    sai do fuste; o ramo mais curto desce pela parte do fuste que a `cortina` pede (0,75 no pendente; traço novo,
+    de 0 a 1, só da copa em massa: fora dela, recusa `PLANTA`). O de 5 m tem 70 ramos (eram 40) e o mais curto
+    para a 0,38 do fuste (era 0,57). Com a cortina densa, o chorão pode receber o aviso `TRONCO_SUMIDO`.
+  - **O capim de flor:** a lâmina fina derivada abre no máximo 0,35 e cai no máximo 0,08 (abria até 0,9 e caía
+    0,12); na touceira baixa e larga a largura vem do pé, cada lâmina no seu. As pontas da frente, onde o
+    `salpico` põe a flor, foram de 0,18 a 0,39 da altura na tela (40 × 70 cm).
+  - **A altura:** no aberto, no seco e na touceira o alto era o da ponta sorteada na peça (de -22 % a +12 % do
+    pedido). A engine monta o que derivou, mede o alto fora o tronco e acerta: fica abaixo de 2 % ou 1 px.
+  - **O vento no aberto:** o vento só inclinava o tronco. Agora os galhos em volta encurtam até 50 % e um galho
+    bifurcado a mais (`galhos_b`, com as nuvens em `copa_b`) sai a sotavento: com o vento em 1, o meio da
+    folhagem fica de 0,09 a 0,19 da largura além do alto do tronco. Sem vento, os nós são os de antes.
+  - **Os cinzentos** (`dados/estilo_base.json`): a `casca_cinzenta` usava a rampa da ardósia, da pedra e do metal
+    (matiz de 235° a 249°) e lia como cano azulado. Os índices que o oráculo usa não mudam: entram `cinza_fundo`,
+    `cinza_escuro`, `cinza` e `cinza_claro` (50 a 53: de (44,42,40) a (158,153,140), matiz de 30° a 43°) e os
+    materiais `cinza`, `cinza_fundo` e `copa_cinzenta`. A casca cinzenta passa à rampa nova, com o sulco mais
+    longo e fundo e a crista clara ao lado. A `casca_clara` e a `casca_anelada` seguem na rampa lilás (o oráculo
+    usa a clara); a `copa_cinzenta` sozinha lê como pedra, e a planta pelos traços não escolhe a folha cinzenta.
+  - **A agulha da copa aberta** (`pecas_copa.py`): com material de agulha, cada nuvem é um tufo de dois leques
+    pregueados empilhados, de pontas finas (de 12 a 15 pontas na silhueta; a de folha tem de 2 a 7, e não muda).
+    Lê como estrela espinhosa mais que como almofada de pinheiro, e na árvore velha as nuvens se fundem.
+  - **A sombra da copa alta** (`raster/sombra.py`): o volume de folhagem se lança no chão exato, pela luz (era a
+    elipse de cada volume na tela, curta: o choupo de 10 m saía em duas manchas). Os outros elipsoides seguem
+    como no motor antigo (o personagem não muda), e o canvas perdeu a folga `ALTURA_NA_SOMBRA`. Mudam as sombras
+    das árvores (os exemplos `arvore_folhosa` e `arvore_aberta`, a composição `arvore`).
+  - **A irmã de outra categoria** (`application/critica.py`): a única da categoria no acervo ficava sem irmã. A
+    planta se compara com as da mesma categoria e com as de outra no mesmo porte (a figura menor com pelo menos
+    metade da altura da maior: `flora.MESMO_PORTE`). Nos acervos de prova a razão de altura vai de 0,11 a 0,36
+    da árvore à flora baixa (com assinaturas de até 0,75: a moita redonda e a copa redonda) e de 0,52 a 0,88
+    entre touceiras e entre árvores; o limite cai no vão. As irmãs saem com a categoria.
+- O que sobra: a casca clara e a anelada seguem na rampa lilás, e falta o cinza-esverdeado (a sálvia, a
+  oliveira); a folha larga lisa é roliça, não chata; o tom das lâminas vale para a vista S (nas outras três
+  fica do lado errado); o capim de 20 a 40 cm tem 6 a 13 px; a semelhança compara só a silhueta (duas
   plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se
   leem mais, e as de `copa` dão outro desenho.

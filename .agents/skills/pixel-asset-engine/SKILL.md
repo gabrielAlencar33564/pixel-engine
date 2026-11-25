@@ -108,20 +108,23 @@ foliage, branches thinner than the trunk they leave), so nothing floats and the 
 |---|---|
 | `decurrente` | the trunk dissolves into limbs under a round closed crown (the broadleaf) |
 | `excurrente` | one axis to the tip, crown thinning upwards: with `folha: agulha` the conifer in tiers, otherwise the teardrop |
-| `aberto` | visible staggered branches with a cloud of leaves on each tip |
-| `pendente` | a dome with a curtain of hanging twigs (the weeping tree) |
+| `aberto` | visible staggered branches with a cloud of leaves on each tip (with `folha: agulha`, a spiky tuft of needles: the open pine) |
+| `pendente` | a dome of small lobes with a dense curtain of hanging twigs down the clear trunk, near the ground (the weeping tree) |
 | `guarda_sol` | a flat crown on a tall clear trunk |
 | `seco` | trunk and forking branches, no leaves |
 | `moita` | no trunk: one mass on the ground; two when it is 1.6× wider than tall, three from 2.6× |
-| `touceira` | thin blades, each from its own foot spread over the clump (they stay separate, as grass grows): upright when tall and narrow, fanning when low and wide; with `folha: larga`, a rosette of feathered fronds |
+| `touceira` | thin blades, each from its own foot spread over the clump (they stay separate, as grass grows), almost upright and straight (a low wide clump gets its width from the feet), so a `salpico` on `folhas.pontas` gives flowers on top; with `folha: larga`, a rosette of feathered fronds |
 
 `altura` and `largura` are the real measurements. Every value is a string (`"fuste": "0.3"`). Optional: `folha`
 (`larga`: dark green, the default; `miuda`: light green, the default in a `touceira`; `agulha`: dark blue-green),
 `idade` (`jovem`, `adulta`, `velha`: changes trunk, roots and crown), `casca` (a bark material), and, only when the
 species departs from its habit, `fuste` (the share of the height with no crown, 0.05 to 0.8; by habit: `excurrente`
 0.22, `decurrente` 0.38, `seco` 0.40, `aberto` 0.42, `pendente` 0.45, `guarda_sol` 0.55), `esbeltez` (height over
-trunk diameter, 4 to 40; 10 to 15 by habit) and `vento` (-1 to 1: leans the trunk and carries the crown with it). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto`
-and `seco` (a wide `moita`: `copa`, `copa_b`, `copa_c`; a `touceira`: `folhas`). Nodes you add in `nos` come after
+trunk diameter, 4 to 40; 10 to 15 by habit), `cortina` (only on a closed crown: the share of the clear trunk the
+hanging twigs cover, 0 to 1; 0.75 in `pendente`, 0 elsewhere; 0.3 is a short fringe) and `vento` (-1 to 1: leans the
+trunk and carries the crown with it; in `aberto` the crown streams downwind). The sprite has the requested height
+(within 2 % or 1 px). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto` and `seco` (an `aberto` in
+the wind: also `galhos_b` and `copa_b`; a wide `moita`: `copa`, `copa_b`, `copa_c`; a `touceira`: `folhas`). Nodes you add in `nos` come after
 and can cite their anchors: a `salpico` on `copa.superficie` (one node per mass) or on `folhas.pontas`. The preview
 returns the derived nodes in `nos`, with lengths in px (1 m = 32.7 px): to change one argument, copy them into `nos`
 and drop `planta`. Vary a set by habit, proportions, age, wind and seed.
@@ -159,7 +162,7 @@ or a branch tip (lobes recede from the edge: take the trunk up to the crown cent
 ground or on a trunk top. Under a mass crown the `galhos` barely show (they leave their tips for the crown to put a
 tuft on each) and are listed in `escondidas`: that is expected. A trunk is not a cylinder: by default the foot flares at the ground and the stem thickens and thins; give it
 what the species has (`curva` for a young trunk, `raizes` and `nos` for an old one, bark with upright grain,
-`casca_sulcada` brown and `casca_cinzenta` grey, or `casca_anelada` with horizontal rings; `casca_clara` is smooth
+`casca_sulcada` brown and `casca_cinzenta` warm grey (poplar, beech, ash: deep upright furrows with a light ridge), or `casca_anelada` with horizontal rings; `casca_clara` is smooth; for a grey plant, `copa` with `material: copa_cinzenta` and `miolo: cinza_fundo` (node by node; `cinza` is a neutral grey for any smooth part)
 and, on a thin trunk, reads as a pipe). Small bushes and crowns (under ~1.5 m wide) need few large lobes (5 or 6 of
 0.45): with many small ones the relief disappears.
 
@@ -225,10 +228,13 @@ agent. `pfe critica <build> --json` (only the build path: the store is the build
   the composition and go back to step 1 with `pfe atualizar`. An `aviso` (the vanished trunk) asks for the reviewer's
   eye. A defect you believe is measured wrong is an engine defect: stop and report it, do not work
   around it.
-- `irmas`: the three compositions of the same category in the store (built or not) with the closest silhouette, and
-  how close (0 to 1; from `parecida_a_partir_de` up it is a defect). They are read when the critique runs: for a set,
-  save every composition first and critique each build once. A clump has no mass measurement: only its
-  silhouette is compared.
+- `irmas`: the three plants of the store (built or not) with the closest silhouette, among those of the same category
+  and those of another category with the same size on screen (the shorter figure at least half the height of the
+  taller one; `medidas.altura_px`): a clump next to another clump, a small tree next to a large one. Each has its
+  `categoria` and `semelhanca` (0 to 1; from `parecida_a_partir_de` up it is a defect, whatever the category). They
+  are read when the critique runs: for a set, save every composition first and critique each build once. A clump has
+  no mass measurement: only its silhouette is compared. With no sibling at all, the `irmas` question says so: answer
+  `ok` and say there was nothing to compare with.
 - `prancha` (`criticas/<build>.png`): on top, the sprite and its silhouette; below, the siblings and their silhouettes.
 - `perguntas` and `ficha`: what only the eye can answer.
 
