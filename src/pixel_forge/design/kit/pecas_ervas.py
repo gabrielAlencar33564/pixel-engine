@@ -8,12 +8,17 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from ...views.camera import ELEVACAO_MDEG, PROFUNDIDADE_PERMILLE
 from ..construtor import LINE, Parte, ellipse, polyline, q, qv
 from .peca import Arg, Ctx, Peca
 
 QUATRO = ("S", "E", "N", "W")
 TRECHOS = 5  # os trechos do arco da lâmina
 FIO = ("flat", "no_outline")  # a lâmina fina: chapada e sem contorno, mas lança a sombra dela no chão (não é detalhe)
+PENA = ("no_inner_outline", "borda_serrilhada")  # a folha em pena: o corpo roliço, de beira serrilhada
+# a folha larga lisa: chapada (um tom só, o do lado da luz dela), com o contorno de fora; com as faixas de luz e de
+# sombra da peça lisa ela lia como um tubo
+FOLHA_LISA = ("flat", "no_inner_outline")
 SOBE_ANTES = 0.3  # o ponto de controle do arco: a 30 % do alcance a lâmina já está no alto
 ABRE_MENOS = 0.35  # a lâmina mais fechada abre 35 % do pedido (poucas: a maioria abre perto do pedido)
 ABRE_MENOS_A_LARGA = 0.75  # e a folha larga, 75 %: a roseta abre por igual
@@ -25,9 +30,15 @@ RAIO_MINIMO = 32  # o menor raio da folha na IR (q8): 1/8 px
 MIOLO_DA_ROSETA = 0.55  # o raio do miolo escuro no pé das folhas largas, em larguras da folha
 FRENTE_LIVRE = 0.3  # a roseta de folhas largas gira até 0,15 fatia para cada lado de deixar a frente livre (e
 # cada folha sai até 0,15 fatia do lugar dela: a mais próxima da frente fica a 0,2 fatia ou mais)
-# de onde se vê a vista S (o chão a 0,6 e a altura a cos 45°): o ponto do lado de lá não ganha salpico
-CAMERA = (0.0, 0.6, math.sqrt(0.5))
-DE_FRENTE = 0.5  # na vista única, o salpico sorteia entre a metade dos pontos mais virada para a câmera
+# a direção em que a câmera olha, girada com a vista (o chão a cos 45° e a altura a 0,6: a que a projeção achata num
+# ponto): o ponto da massa com a normal nela cai no meio da figura, e o de normal deitada nela, no contorno
+OLHAR = (math.cos(math.radians(ELEVACAO_MDEG / 1000)), PROFUNDIDADE_PERMILLE / 1000)
+BEIRA = 0.3  # o salpico sorteia entre os pontos de normal a menos de ~45° da câmera de uma vista (``_beiras``)
+SUPERFICIE = ".superficie"  # a âncora na face de um volume (a copa): o ponto entra na folhagem
+VENCE = 2.0  # o detalhe vence a superfície que está até 2 px à frente dele (``raster/montagem.py``)
+# o ponto da face entra na folhagem 0,6 do raio dele mais o que o detalhe vence: aparece na face que olha para a
+# câmera até ~53° de lado, e a folhagem o cobre na beira do volume (onde ele cairia no contorno)
+MERGULHO = 0.6
 Vec = tuple[float, float, float]
 X = Arg
 
@@ -50,34 +61,47 @@ def _arco(pe: Vec, az: float, comprimento: float, forma: tuple[float, float, int
     return out
 
 
-def _pena(c: Ctx, pid: str, materiais: tuple[str, str], arco: list[Vec], largura: float) -> None:
-    """A folha em pena: o corpo roliço ao longo do arco, com a beira serrilhada dente a dente (a marca
-    ``borda_serrilhada``, no render), e a nervura escura por cima: cada folha se lê pela nervura dela."""
+def _folha(c: Ctx, pid: str, materiais: tuple[str, str], arco: list[Vec], forma: tuple[float, bool]) -> None:
+    """A folha larga: o corpo ao longo do arco (estreito no pé, largo antes do meio e de ponta fina), no grupo de
+    contorno do nó (sem linha entre as folhas), e a nervura escura por cima: cada folha se lê pela nervura dela. Em
+    pena, o corpo é roliço e a beira sai serrilhada dente a dente (a marca ``borda_serrilhada``, no render); lisa, o
+    corpo é chapado."""
     corpo, nervura = materiais
+    largura, pena = forma
     geo = {"type": "tapered_polyline", "points_q8": [qv(*p) for p in arco],
            "radii_q8": [max(RAIO_MINIMO, q(largura / 2 * k)) for k in LARGURA_NO_ARCO]}
-    c.b.part(pid, corpo, geo, Parte(group=c.grupo, tags=("no_inner_outline", "borda_serrilhada")))
+    c.b.part(pid, corpo, geo, Parte(group=c.grupo, tags=PENA if pena else FOLHA_LISA))
     # a nervura corre por cima do corpo (o raio dele acima do eixo): por dentro, o corpo a cobriria
     alto = [(x, y, z + largura / 2 * k) for (x, y, z), k in zip(arco[:-1], LARGURA_NO_ARCO, strict=False)]
-    c.b.part(f"{pid}_pena", nervura, polyline([qv(*p) for p in alto], 1), Parte(group=c.grupo, tags=LINE))
+    c.b.part(f"{pid}_{'pena' if pena else 'nervura'}", nervura, polyline([qv(*p) for p in alto], 1),
+             Parte(group=c.grupo, tags=LINE))
 
 
-def _lamina(c: Ctx, pid: str, material: str, arco: list[Vec], largura: float) -> None:
-    """A lâmina fina (um traço de 1 px, sem contorno) ou, com largura, a folha: roliça ao longo do arco, estreita
-    no pé, larga antes do meio e de ponta fina, no grupo de contorno do nó (sem linha entre as folhas)."""
-    if largura <= 0:
-        c.b.part(pid, material, polyline([qv(*p) for p in arco], 1), Parte(group=c.grupo, tags=FIO))
-        return
-    geo = {"type": "tapered_polyline", "points_q8": [qv(*p) for p in arco],
-           "radii_q8": [max(RAIO_MINIMO, q(largura / 2 * k)) for k in LARGURA_NO_ARCO]}
-    c.b.part(pid, material, geo, Parte(group=c.grupo, tags=("no_inner_outline",)))
+def _lamina(c: Ctx, pid: str, material: str, arco: list[Vec]) -> None:
+    """A lâmina fina: um traço de 1 px, sem contorno."""
+    c.b.part(pid, material, polyline([qv(*p) for p in arco], 1), Parte(group=c.grupo, tags=FIO))
+
+
+def _lado_da_luz(az: float, azimute_mdeg: int) -> float:
+    """De −1 a 1: quanto a lâmina que abre no azimute ``az`` (do mundo) vai para a esquerda da tela da vista (a luz
+    vem de cima à esquerda da tela em toda vista)."""
+    return -math.sin(az - math.radians(azimute_mdeg / 1000))
+
+
+def _material(a: dict[str, Any], tom: float, pena: bool) -> str:
+    """O material da lâmina pelo tom dela (de −1 a 1); o corpo da folha em pena nunca é do tom escuro (esse é o da
+    nervura, que lê cada folha da fronde). A folha lisa do lado da sombra é escura, e a nervura some nela."""
+    if tom > TOM:
+        return str(a["claro"])
+    return str(a["escuro"] if tom < -TOM and not pena else a["material"])
 
 
 def _touceira(c: Ctx, a: dict[str, Any]) -> None:
     """``n`` lâminas em volta do pé, uma a cada fatia da volta: cada uma com o pé sorteado dentro do ``raio``, o
     comprimento na faixa, a abertura de 35 % a 100 % do pedido (a maioria perto dele) e o tom (o claro do lado da
-    luz da vista S, o escuro do outro, com sorteio). A roseta de folhas largas tem o miolo escuro no pé. Deixa a
-    âncora ``pontas`` (a ponta de cada lâmina)."""
+    luz, o escuro do outro, com sorteio). O lado da luz é o da tela: em cada vista a lâmina toma o tom dela ali (o
+    material da vista S, trocado nas outras). A roseta de folhas largas tem o miolo escuro no pé. Deixa a âncora
+    ``pontas`` (a ponta de cada lâmina)."""
     st, n = c.st, a["n"]
     larga = a["largura"] > 0
     giro = st.randint(0, 999) / 1000
@@ -92,13 +116,18 @@ def _touceira(c: Ctx, a: dict[str, Any]) -> None:
         comprimento = a["altura"][0] + (a["altura"][1] - a["altura"][0]) * st.randint(0, 100) / 100
         abre = min(0.98, a["abre"] * (1 - fecha * (st.randint(0, 100) / 100) ** 2))
         arco = _arco(pe, az, comprimento, (abre, a["cai"], TRECHOS))
-        tom = LADO_DA_LUZ * -math.sin(az) + (1 - LADO_DA_LUZ) * st.randint(-100, 100) / 100
-        material = a["claro"] if tom > TOM else a["escuro"] if tom < -TOM else a["material"]
-        if a["pena"] and larga:  # o corpo nunca é do tom escuro: esse é o da nervura
-            corpo = a["material"] if material == a["escuro"] else material
-            _pena(c, f"{c.pid}_{i:02d}", (corpo, a["escuro"]), arco, a["largura"])
+        sorteio = (1 - LADO_DA_LUZ) * st.randint(-100, 100) / 100
+        pid = f"{c.pid}_{i:02d}"
+        tons = {v: _material(a, LADO_DA_LUZ * _lado_da_luz(az, giro_da_vista) + sorteio, larga and a["pena"])
+                for v, giro_da_vista in c.vistas.items()}
+        material = tons.get("S", next(iter(tons.values())))
+        if larga:
+            _folha(c, pid, (material, a["escuro"]), arco, (a["largura"], a["pena"]))
         else:
-            _lamina(c, f"{c.pid}_{i:02d}", material, arco, a["largura"])
+            _lamina(c, pid, material, arco)
+        for v, outro in tons.items():
+            if outro != material:
+                c.b.na_vista(v, pid, outro)
         pontas.append(arco[-1])
     if larga:  # o miolo da roseta: o pé das folhas largas é o ponto mais escuro da planta
         raio = a["largura"] * MIOLO_DA_ROSETA
@@ -108,16 +137,40 @@ def _touceira(c: Ctx, a: dict[str, Any]) -> None:
     c.deixa("pontas", pontas)
 
 
+def _normais(pts: list[Vec]) -> list[Vec]:
+    """A normal de cada ponto na massa dos pontos (o elipsoide da caixa deles): sai do meio dela."""
+    meio = [(max(p[k] for p in pts) + min(p[k] for p in pts)) / 2 for k in range(3)]
+    meia = [max(1.0, (max(p[k] for p in pts) - min(p[k] for p in pts)) / 2) for k in range(3)]
+    out = []
+    for p in pts:
+        u = [(p[k] - meio[k]) / meia[k] for k in range(3)]
+        tam = math.hypot(*u) or 1.0
+        out.append((u[0] / tam, u[1] / tam, u[2] / tam))
+    return out
+
+
+def _beiras(normais: list[Vec], azimutes: list[int]) -> list[float]:
+    """Quanto cada ponto fica perto do contorno da massa na vista que melhor o vê: 1 menos o quanto a normal dele
+    olha para a câmera dela (0 no meio da figura; 1 no contorno; mais, do lado de lá em toda vista)."""
+    olhar = [(math.sin(math.radians(az / 1000)) * OLHAR[0], math.cos(math.radians(az / 1000)) * OLHAR[0], OLHAR[1])
+             for az in azimutes]
+    return [1 - max(sum(n[k] * m[k] for k in range(3)) / math.hypot(*m) for m in olhar) for n in normais]
+
+
 def _salpico(c: Ctx, a: dict[str, Any]) -> None:
-    """Um ponto de cor em ``n`` dos pontos da âncora ``em``, sorteados; na composição de vista única, só entre os
-    mais virados para a câmera (o ponto do lado de lá ficaria escondido, e o da beira, fora da figura)."""
+    """Um ponto de cor em ``n`` dos pontos da âncora ``em``, sorteados entre os que alguma vista vê de frente, no meio
+    da figura (os ``n`` de menos beira, se não há tantos): o ponto da beira cai no contorno, e o do lado de lá,
+    escondido. Na face de um volume, o ponto entra na folhagem: a vista que vê a face de frente o mostra, e a que a
+    vê de lado (onde ele cairia no contorno) o tem coberto pela folhagem."""
     pts = c.ancora(a["em"])
-    meio = [sum(p[k] for p in pts) / max(1, len(pts)) for k in range(3)]
-    if len(c.vistas) == 1:
-        pts.sort(key=lambda p: -sum((p[k] - meio[k]) * CAMERA[k] for k in range(3)))
-        pts = pts[:max(a["n"], round(DE_FRENTE * len(pts)))]
-    for i in range(min(a["n"], len(pts))):
-        x, y, z = pts.pop(c.st.randint(0, len(pts) - 1))
+    normais = _normais(pts) if pts else []
+    beiras = _beiras(normais, list(c.vistas.values()))
+    ordem = sorted(range(len(pts)), key=lambda k: beiras[k])
+    escolha = [k for j, k in enumerate(ordem) if j < a["n"] or beiras[k] <= BEIRA]
+    afunda = MERGULHO * (a["raio"] + VENCE) if a["em"].endswith(SUPERFICIE) else 0.0
+    for i in range(min(a["n"], len(escolha))):
+        k = escolha.pop(c.st.randint(0, len(escolha) - 1))
+        x, y, z = (pts[k][t] - normais[k][t] * afunda for t in range(3))
         alto = a["raio"] * a["alonga"]
         c.b.part(f"{c.pid}_{i:02d}", a["material"], ellipse(qv(x, y, z), qv(a["raio"], a["raio"], alto)),
                  Parte(group=c.grupo, tags=LINE))
@@ -134,8 +187,8 @@ PECAS_ERVAS = [
                "pé; 0.9 = deitada)", "0.5"),
              X("cai", "escalar", "quanto a ponta cai da altura do arco (0 = reta; 1 = volta à altura do pé)", "0.3"),
              X("largura", "comprimento", "a largura da folha (0 = lâmina fina, de 1 px)", "0"),
-             X("pena", "bool", "a folha larga em pena (a samambaia, a palma): a beira serrilhada e a nervura no "
-               "tom escuro, em vez de lisa", False),
+             X("pena", "bool", "a folha larga em pena (a samambaia, a palma): roliça e de beira serrilhada, em vez "
+               "de chapada e lisa (as duas com a nervura no tom escuro)", False),
              X("raio", "comprimento", "o raio do pé: as lâminas nascem espalhadas nele", "0"),
              X("pe", "ponto", "de onde nasce (o chão, ou o alto de um tronco)", ["0", "0", "0"]),
              X("material", "material", "a lâmina comum", "capim"),
@@ -150,8 +203,9 @@ PECAS_ERVAS = [
                      ("espada", {"altura": ["50cm", "80cm"], "n": "11", "abre": "0.6", "cai": "0",
                                  "largura": "10cm", "material": "agulha", "claro": "agulha_clara",
                                  "escuro": "agulha_escura"})),
-         "tests/test_ervas.py::test_a_touceira_e_de_laminas", (_touceira, _lamina, _pena, _arco), vistas=QUATRO,
-         flora="lamina", ancoras=("pontas",)),
+         "tests/test_ervas.py::test_a_touceira_e_de_laminas",
+         (_touceira, _lamina, _folha, _arco, _lado_da_luz, _material), vistas=QUATRO, flora="lamina",
+         ancoras=("pontas",)),
     Peca("salpico", "Pontos de cor sobre outro nó: a flor e o fruto na superfície de uma copa, a espiga na ponta "
          "de uma lâmina, o broto na ponta de um galho. Pede a âncora de um nó de antes", (
              X("em", "ancora", "onde caem os pontos ('<nó>.superficie', '<nó>.pontas')"),
@@ -161,5 +215,6 @@ PECAS_ERVAS = [
          _salpico, (("flores", {"em": "moita.superficie", "material": "olho_claro", "n": "9"}),
                     ("frutos", {"em": "moita.superficie", "material": "pano_vermelho", "n": "6", "raio": "5cm"}),
                     ("botões", {"em": "moita.superficie", "material": "ambar", "n": "14"})),
-         "tests/test_ervas.py::test_o_salpico_cai_do_lado_da_camera", (_salpico,), vistas=QUATRO, apoio=(MOITA,)),
+         "tests/test_ervas.py::test_o_salpico_cai_do_lado_da_camera", (_salpico, _normais, _beiras), vistas=QUATRO,
+         apoio=(MOITA,)),
 ]

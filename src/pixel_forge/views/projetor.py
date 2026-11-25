@@ -149,10 +149,10 @@ def _projetar(g: Geometry, part: PartDef, pc: _Peca) -> _Projetada:
     return _leque(g, pc, "flat" in part.tags)
 
 
-def _comando(part: PartDef, g: Geometry, pc: _Peca) -> DrawCommand:
-    p = _projetar(g, part, pc)
-    return DrawCommand(part.id, part.material, part.outline_group, tuple(part.tags), p.depth, p.prim, p.surface,
-                       p.facing)
+def _comando(part: PartDef, material: str, pc: _Peca) -> DrawCommand:
+    """O comando da parte, com o ``material`` dela na vista."""
+    p = _projetar(part.geometry, part, pc)
+    return DrawCommand(part.id, material, part.outline_group, tuple(part.tags), p.depth, p.prim, p.surface, p.facing)
 
 
 def order_commands(cmds: list[DrawCommand], rules: list[tuple[str, str]], biases: dict[str, int],
@@ -193,7 +193,7 @@ def project_view(asset: AssetIR, pose: Pose, direction: Direcao, lente: tuple[in
                      f"As vistas dele são {', '.join(asset.views)}.")
     cam = Camera(AZIMUTE_MDEG[direction], asset.canvas.pivot_px, lente)
     offset = pose.render_offset_pos()
-    cmds = [_comando(part, part.geometry,
+    cmds = [_comando(part, view.materials.get(part.id, part.material),
                      _Peca(cam, pose, pose.world[part.bone_id], offset))
             for part in asset.parts if part.id not in view.visibility]
     pontos = {lm.id: _Peca(cam, pose, pose.world[lm.bone_id], offset).tela(lm.point_q8) for lm in asset.landmarks}

@@ -95,11 +95,13 @@ class OcclusionRule(Strict):
 
 
 class ViewSpec(Strict):
-    """O que muda na vista: as partes ocultas, o viés de profundidade e as regras frente/trás."""
+    """O que muda na vista: as partes ocultas, o viés de profundidade, as regras frente/trás e o material da parte
+    que troca de tom com a vista (a luz é da tela: a lâmina clara de uma vista é a escura da oposta)."""
 
     visibility: dict[Id, Literal["hidden"]] = Field(default_factory=dict)
     depth_bias: dict[Id, Annotated[int, Field(ge=-65536, le=65536, strict=True)]] = Field(default_factory=dict)
     occlusion_rules: list[OcclusionRule] = Field(default_factory=list)
+    materials: dict[Id, Id] = Field(default_factory=dict)
 
 
 class CanvasDef(Strict):

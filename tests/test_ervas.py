@@ -1,6 +1,8 @@
 """A flora de lâminas e de pontos (mudança 21): a touceira lê como lâminas e não como massa, a folha larga é mais
-que um traço, a folha em pena é serrilhada, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê. Os
-controles: a moita em massa, a lâmina fina, a folha lisa, o pé no chão e o salpico sorteado na volta toda."""
+que um traço, a folha em pena é serrilhada, a folha lisa é chapada, o claro fica do lado da luz da tela em toda
+vista, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê, por dentro da figura. Os controles: a
+moita em massa, a lâmina fina, a folha lisa sombreada, o lado da luz do mundo, o pé no chão, o ponto na face por
+fora da folhagem e o salpico sorteado na volta toda."""
 
 from __future__ import annotations
 
@@ -18,6 +20,7 @@ from pixel_forge.design.asset import ir_da_composicao
 from pixel_forge.design.escala import PPM
 from pixel_forge.design.kit import pecas_ervas
 from pixel_forge.design.kit.registro import PECAS
+from pixel_forge.design.vistas import AZIMUTE
 from pixel_forge.quality import flora
 from pixel_forge.raster.estilo import estilo_render
 from pixel_forge.raster.renderer import Quadro
@@ -35,7 +38,7 @@ def test_a_touceira_e_de_laminas() -> None:
     for nome, args in PECAS["touceira"].variacoes:
         comp = de_uma_peca("touceira", args)
         assert flora.solidez(_quadro(comp).dono != 0) < 0.8, nome
-        laminas = [p for p in ir_da_composicao(comp).parts if not p.id.endswith(("_pena", "_miolo"))]
+        laminas = [p for p in ir_da_composicao(comp).parts if not p.id.endswith(("_pena", "_nervura", "_miolo"))]
         assert len(laminas) == int(args["n"])
 
 
@@ -95,15 +98,53 @@ def _do_lado_de_la(vistas: tuple[str, ...]) -> tuple[int, int]:
 
 
 def test_o_salpico_cai_do_lado_da_camera() -> None:
-    """Na composição de vista única, nenhum ponto cai atrás da moita, e a câmera vê quase todos."""
+    """Na composição de vista única, nenhum ponto cai atrás da moita."""
     assert _do_lado_de_la(("S",)) == (int(FLORES["n"]), 0)
-    q = _quadro(de_uma_peca("salpico", FLORES))
-    assert sum(1 for p in q.part_table if p.startswith("n_") and q.visiveis.get(p, 0)) >= 0.75 * int(FLORES["n"])
 
 
 def test_controle_na_volta_toda_ha_pontos_do_lado_de_la() -> None:
     """Com as 4 vistas os pontos se espalham pela volta: cada vista mostra os dela."""
     assert _do_lado_de_la(("S", "E", "N", "W"))[1] >= 2
+
+
+def _no_contorno(vistas: tuple[str, ...]) -> tuple[int, int]:
+    """Das flores e dos frutos na moita (seis sementes, cada vista): os que aparecem por dentro da figura e os que
+    tocam o contorno dela."""
+    dentro = contorno = 0
+    for _, args in PECAS["salpico"].variacoes[:2]:
+        for semente in range(6):
+            dado = {**de_uma_peca("salpico", args).model_dump(mode="json"), "semente": semente,
+                    "vistas": dict.fromkeys(vistas, {})}
+            ir = ir_da_composicao(validar(dado, Composicao, "teste"))
+            for v in ir.views:
+                q = quadro_de_repouso(ir, estilo_render(estilo_base()), v)
+                pts = [p for p in q.part_table if p.startswith("n_")]
+                contorno += sum(1 for p in pts if q.na_silhueta.get(p, 0))
+                dentro += sum(1 for p in pts if q.visiveis.get(p, 0) and not q.na_silhueta.get(p, 0))
+    return dentro, contorno
+
+
+def test_o_salpico_cai_por_dentro_da_figura() -> None:
+    """Os pontos da face da copa caem sobre a massa: na vista única, de cada 8 que aparecem por dentro, no máximo um
+    toca o contorno; nas quatro vistas, no máximo um de cada 2 (a folhagem cobre o da beira de cada vista)."""
+    dentro, contorno = _no_contorno(("S",))
+    assert contorno <= dentro / 8
+    dentro, contorno = _no_contorno(("S", "E", "N", "W"))
+    assert contorno <= dentro / 2
+
+
+def test_controle_o_ponto_na_face_cai_no_contorno(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Com o ponto na face do volume, por fora da folhagem (o jeito antigo), o da beira fica no contorno."""
+    monkeypatch.setattr(pecas_ervas, "MERGULHO", 0.0)
+    dentro, contorno = _no_contorno(("S",))
+    assert contorno > dentro / 2
+
+
+def test_controle_sorteado_na_volta_toda_o_ponto_cai_no_contorno(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Sem a escolha dos pontos que a câmera vê no meio da figura, os da beira e os do lado de lá entram."""
+    monkeypatch.setattr(pecas_ervas, "_beiras", lambda normais, _azimutes: [0.0] * len(normais))
+    dentro, contorno = _no_contorno(("S",))
+    assert contorno > dentro / 8
 
 
 def test_o_salpico_na_ponta_das_laminas() -> None:
@@ -169,23 +210,70 @@ def test_controle_so_com_o_sorteio_o_claro_cai_dos_dois_lados(monkeypatch: pytes
     assert esquerda >= 3 and direita >= 3
 
 
+def _claras_em_cada_vista() -> dict[str, tuple[int, int]]:
+    """Na touceira grande de quatro vistas, as lâminas claras de cada vista (o material dela ali) que abrem para a
+    esquerda da tela dessa vista e para a direita."""
+    dado = {**de_uma_peca("touceira", {**CAPIM, "n": "40", "raio": "0"}).model_dump(mode="json"),
+            "vistas": dict.fromkeys(("S", "E", "N", "W"), {})}
+    ir = ir_da_composicao(validar(dado, Composicao, "teste"))
+    out: dict[str, tuple[int, int]] = {}
+    for v, vista in ir.views.items():
+        a = math.radians(AZIMUTE[v] / 1000)
+        lados = [x * math.cos(a) - y * math.sin(a) for p in ir.parts if p.geometry.type == "polyline"
+                 for x, y, _ in [p.geometry.points_q8[-1]] if vista.materials.get(p.id, p.material) == "capim_claro"]
+        out[v] = (sum(1 for x in lados if x < 0), sum(1 for x in lados if x > 0))
+    return out
+
+
+def test_o_claro_das_laminas_fica_do_lado_da_luz_em_toda_vista() -> None:
+    """A luz vem da esquerda da tela em toda vista: a lâmina troca de tom com a vista (o material da vista)."""
+    for v, (esquerda, direita) in _claras_em_cada_vista().items():
+        assert esquerda >= 6 and esquerda >= 3 * direita, v
+
+
+def test_controle_com_o_lado_da_luz_do_mundo_o_claro_vira_nas_outras_vistas(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Com o lado da luz tirado do mundo (o da vista S), na vista N o claro cai todo do lado da sombra."""
+    monkeypatch.setattr(pecas_ervas, "_lado_da_luz", lambda az, _azimute: -math.sin(az))
+    esquerda, direita = _claras_em_cada_vista()["N"]
+    assert direita >= 3 * esquerda
+
 
 FOLHAS = {**CAPIM, "altura": ["60cm", "90cm"], "n": "8", "abre": "0.8", "cai": "0.5", "largura": "16cm", "raio": "0"}
 
 
-def _nervuras_a_mostra(pena: bool) -> int:
-    """As folhas largas com a nervura à mostra (a parte ``_pena`` com pixel)."""
-    q = _quadro(de_uma_peca("touceira", {**FOLHAS, "pena": pena}))
-    return sum(1 for p in q.part_table if p.endswith("_pena") and q.visiveis.get(p, 0) >= 3)
+def _nervuras_a_mostra(largura: str, pena: bool) -> int:
+    """As folhas com a nervura à mostra (a parte ``_pena`` ou ``_nervura`` com pixel)."""
+    q = _quadro(de_uma_peca("touceira", {**FOLHAS, "largura": largura, "pena": pena}))
+    return sum(1 for p in q.part_table if p.endswith(("_pena", "_nervura")) and q.visiveis.get(p, 0) >= 3)
 
 
-def test_a_folha_em_pena_tem_a_nervura_a_mostra() -> None:
-    """Cada folha se lê pela nervura dela, por cima do corpo."""
-    assert _nervuras_a_mostra(True) >= 6
+@pytest.mark.parametrize("pena", [True, False])
+def test_a_folha_larga_tem_a_nervura_a_mostra(pena: bool) -> None:
+    """Cada folha larga, em pena ou lisa, se lê pela nervura dela, por cima do corpo."""
+    assert _nervuras_a_mostra("16cm", pena) >= 6
 
 
-def test_controle_a_folha_lisa_nao_tem_nervura() -> None:
-    assert _nervuras_a_mostra(False) == 0
+def test_controle_a_lamina_fina_nao_tem_nervura() -> None:
+    assert _nervuras_a_mostra("0", False) == 0
+
+
+def _faixa_clara_na_folha_lisa() -> int:
+    """Os pixels do tom claro da rampa nas folhas lisas do material comum: a peça lisa sombreada tem a faixa de luz
+    de um lado e a de sombra do outro (lê como tubo); a chapada é de um tom só, o do meio."""
+    comp = de_uma_peca("touceira", FOLHAS)
+    comuns = {p.id for p in ir_da_composicao(comp).parts if p.material == "capim" and not p.id.endswith("_nervura")}
+    claro = next(m for m in estilo_base().materials if m.id == "capim").ramp[-1]
+    q = _quadro(comp)
+    return sum(int(((q.dono == k + 1) & (q.index == claro)).sum()) for k, p in enumerate(q.part_table) if p in comuns)
+
+
+def test_a_folha_lisa_e_chapada() -> None:
+    assert _faixa_clara_na_folha_lisa() == 0
+
+
+def test_controle_a_folha_lisa_sombreada_tem_a_faixa_de_tubo(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "FOLHA_LISA", ("no_inner_outline",))
+    assert _faixa_clara_na_folha_lisa() >= 5
 
 
 def _mais_perto_da_frente(semente: int) -> float:

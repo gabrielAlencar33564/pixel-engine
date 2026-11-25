@@ -50,6 +50,11 @@ PARTE = Parte()
 class AssetBuilder:
     bones: list[dict[str, Any]] = field(default_factory=list)
     parts: list[dict[str, Any]] = field(default_factory=list)
+    por_vista: dict[str, dict[str, str]] = field(default_factory=dict)  # vista → parte → o material dela ali
+
+    def na_vista(self, vista: str, id: str, material: str) -> None:
+        """Na ``vista``, a parte ``id`` é do ``material`` (o tom que vem do lado da luz na tela)."""
+        self.por_vista.setdefault(vista, {})[id] = material
 
     def bone(self, id: str, parent: str | None, t: list[int], junta: Junta = JUNTA) -> None:
         """Um osso de translação ``t`` (q8) a partir do pai."""
