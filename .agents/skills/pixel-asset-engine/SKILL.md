@@ -56,6 +56,7 @@ A JSON `<id>.r<n>.json` (`<id>` in lowercase, `_` and digits). Fields:
 | `categoria` | the expected size (table below); the engine measures the height and refuses outside the range |
 | `semente` | integer seed; each node's seed comes from it and the node id |
 | `medidas` | names → expressions, used in arguments as `$name` |
+| `planta` | a plant by its traits: the engine derives the nodes (see "A plant by traits"); then `nos` is optional |
 | `nos` | the pieces, in order (see below) |
 | `vistas` | static prop: `{"S": {}}` (2 or 4 cardinals only if requested); walkers: the 8 directions `S SW W NW N NE E SE` |
 | `movimento` | prop: `["static"]` (sway `{"receita": "balanco", ...}` or spin `{"receita": "giro", ...}` if requested); human and quadruped: `["idle", "walk"]`; armed human, also `"attack"` (the sword strike, no loop) |
@@ -95,7 +96,33 @@ covers the top faces, `fendas` cracks the largest ones, and `material` is the fa
 sandstone, with `tom` -1). Another seed gives another rock of the same kind: to vary the scene, vary the seed and the
 shape, not only the size.
 
-**A plant** has no single recipe. Choose the construction from the species sheet; in a set, use more than one:
+**A plant by traits (`planta`):** describe the plant, not the pieces. The engine derives the trunk, branches and
+crown from general rules of plant form (trunk thickness from height, where the crown starts, lobes sized to the
+foliage, branches thinner than the trunk they leave), so nothing floats and the proportions hold at any size:
+
+```json
+"planta": {"habito": "decurrente", "altura": "5m", "largura": "5.2m", "idade": "velha", "folha": "larga"}
+```
+
+| `habito` | What it is |
+|---|---|
+| `decurrente` | the trunk dissolves into limbs under a round closed crown (the broadleaf) |
+| `excurrente` | one axis to the tip, crown thinning upwards: with `folha: agulha` the conifer in tiers, otherwise the teardrop |
+| `aberto` | visible staggered branches with a cloud of leaves on each tip |
+| `pendente` | a dome with a curtain of hanging twigs (the weeping tree) |
+| `guarda_sol` | a flat crown on a tall clear trunk |
+| `seco` | trunk and forking branches, no leaves |
+| `moita` | no trunk: one to three masses on the ground, by width |
+
+`altura` and `largura` are the real measurements. Optional: `folha` (`larga`, `miuda`, `agulha`), `idade` (`jovem`,
+`adulta`, `velha`: changes trunk, roots and crown), `casca` (a bark material), and, only when the species departs from
+its habit, `fuste` (the share of the height with no crown, 0.05 to 0.8), `esbeltez` (height over trunk diameter, 4 to
+40) and `vento` (-1 to 1: leans the trunk and the crown). The derived nodes are `tronco`, `galhos` and `copa` (a wide
+`moita`: `copa`, `copa_b`, `copa_c`); nodes you add in `nos` come after and can cite their anchors (a `salpico` on
+`copa.superficie`). The preview returns the derived nodes in `nos`: to change one argument, copy them into `nos` and
+drop `planta`. Vary a set by habit, proportions, age, wind and seed.
+
+**A plant node by node** (when the traits do not cover it). Choose the construction from the species sheet:
 
 | Construction | Nodes | What it gives |
 |---|---|---|
@@ -119,11 +146,12 @@ made of `elipsoide`, `poligono` or `fios`: the critique flags the egg, the smoot
 
 A mass crown shows its top and covers the trunk from the front: the trunk left on screen is the crown centre height ×
 0.71 minus √((half depth × 0.6)² + (half height × 0.71)²); to show more of it, raise the crown or reduce `fundo`. The
-crown's shadow falls on the ground to the right and is part of the canvas. Take the trunk up to near the crown centre
-(lobes recede from the edge: a trunk that stops at the crown's base leaves it in the air). Under a mass crown the
-`galhos` barely show (they leave their tips for the crown to put a tuft on each) and are listed in `escondidas`: that
-is expected. `galhos` leave from the vertical axis, not from a leaning trunk: keep `inclinacao` small when there are
-branches. A trunk is not a cylinder: by default the foot flares at the ground and the stem thickens and thins; give it
+crown's shadow falls on the ground to the right and is part of the canvas. **Nothing floats** (refusal `LIGACAO`,
+with the gap and the hint): the trunk starts on the ground; `galhos` are born from the axis of the `tronco_em_pe`
+declared before them (following its lean and curve) and must be thinner than it there; a crown must wrap the trunk top
+or a branch tip (lobes recede from the edge: take the trunk up to the crown centre); a `touceira` foot sits on the
+ground or on a trunk top. Under a mass crown the `galhos` barely show (they leave their tips for the crown to put a
+tuft on each) and are listed in `escondidas`: that is expected. A trunk is not a cylinder: by default the foot flares at the ground and the stem thickens and thins; give it
 what the species has (`curva` for a young trunk, `raizes` and `nos` for an old one, bark with upright grain,
 `casca_sulcada` brown and `casca_cinzenta` grey, or `casca_anelada` with horizontal rings; `casca_clara` is smooth
 and, on a thin trunk, reads as a pipe). Small bushes and crowns (under ~1.5 m wide) need few large lobes (5 or 6 of

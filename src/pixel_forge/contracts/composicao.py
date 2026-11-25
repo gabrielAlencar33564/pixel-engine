@@ -1,6 +1,7 @@
 """A composição: o asset descrito em dados (o único formato). O tipo diz o rig (o prop na raiz; o humanoide e o
-quadrúpede no rig do modelo deles); as medidas em unidades de gente; os nós do kit; as vistas; os pontos do jogo; o
-movimento; e os traços que têm de ler no sprite. A revisão é imutável: mudar o desenho é uma revisão nova."""
+quadrúpede no rig do modelo deles); as medidas em unidades de gente; os nós do kit (ou, da planta, os traços de onde
+a engine os deriva); as vistas; os pontos do jogo; o movimento; e os traços que têm de ler no sprite. A revisão é
+imutável: mudar o desenho é uma revisão nova."""
 
 from __future__ import annotations
 
@@ -92,6 +93,23 @@ class Traco(Strict):
     reads_in_silhouette: bool = False
 
 
+class Planta(Strict):
+    """A planta pelos traços dela, em vez de peça por peça: a engine deriva os nós (``design/habito.py``). O hábito
+    é a arquitetura; a altura e a largura, as medidas reais; a folha escolhe a folhagem; a idade muda o tronco e a
+    copa. O fuste (a parte da altura sem copa), a esbeltez (a altura sobre o diâmetro do pé) e o vento (de −1 a 1)
+    só se dizem quando a espécie foge do hábito."""
+
+    habito: Literal["decurrente", "excurrente", "aberto", "pendente", "guarda_sol", "seco", "moita"]
+    altura: Expr
+    largura: Expr
+    folha: Literal["larga", "miuda", "agulha"] = "larga"
+    idade: Literal["jovem", "adulta", "velha"] = "adulta"
+    fuste: Expr | None = None
+    esbeltez: Expr | None = None
+    vento: Expr | None = None
+    casca: Id = "casca_sulcada"
+
+
 class Composicao(Strict):
     # os campos que saíram do formato: a recusa diz o que fazer no lugar
     SAIRAM: ClassVar[dict[str, str]] = {
@@ -106,7 +124,8 @@ class Composicao(Strict):
     categoria: Categoria
     semente: Annotated[int, Field(ge=0, le=999_999, strict=True)]
     medidas: dict[Id, Expr] = Field(default_factory=dict)
-    nos: Annotated[list[No], Field(min_length=1, max_length=64)]
+    planta: Planta | None = None  # os traços de onde a engine deriva os nós (vêm antes dos de ``nos``)
+    nos: Annotated[list[No], Field(max_length=64)] = Field(default_factory=list)
     vistas: dict[Direcao, Vista]
     landmarks: dict[Id, Annotated[list[Expr], Field(min_length=3, max_length=3)]] = Field(default_factory=dict)
     movimento: Annotated[list[Id | Balanco | Giro | Clipe], Field(max_length=96)]

@@ -124,7 +124,10 @@ def construir(comp: Composicao, acervo: Path) -> Build:
     pal = {p.index: (p.rgba[0], p.rgba[1], p.rgba[2], p.rgba[3]) for p in r.est.doc.palette}
     rgbas = [[q.to_rgba(pal) for q in s.quadros] for s in r.sequencias]
     frames = [[_entrada(r, s, i, rgba) for i, rgba in enumerate(qs)] for s, qs in zip(r.sequencias, rgbas, strict=True)]
-    build_id = hash_canonico({"engine": engine, "composicao": comp.model_dump(mode="json"),
+    composicao = comp.model_dump(mode="json")
+    if composicao["planta"] is None:  # a composição sem os traços da planta tem o id que sempre teve
+        del composicao["planta"]
+    build_id = hash_canonico({"engine": engine, "composicao": composicao,
                               "style": r.est.doc.model_dump(mode="json"),
                               "pixels": [f["rgba_sha256"] for fs in frames for f in fs]})
     pasta = acervo / "builds" / f"{r.ir.id}.r{r.ir.revision}.{build_id[:12]}"

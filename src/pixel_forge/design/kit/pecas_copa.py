@@ -12,7 +12,7 @@ from typing import Any
 
 from ...core.rng import Stream
 from ..construtor import Parte, bound_polygon, ellipse, q, qv
-from .peca import Arg, Ctx, Peca
+from .peca import Apoio, Arg, Ctx, Peca
 
 TESTE = "tests/test_flora.py::test_a_copa_e_uma_massa_so"
 QUATRO = ("S", "E", "N", "W")
@@ -31,6 +31,7 @@ RAMO_FINO = 0.045  # o raio do ramo que cai, em fração da meia largura da copa
 PONTA_DO_RAMO = 0.45  # o raio na ponta, em fração do raio no alto
 RAIO_MINIMO = 32  # o menor raio do ramo na IR (q8): 1/8 px
 MIOLO = 0.6  # o miolo escuro, em fração da copa: fecha os vãos entre os lóbulos
+NO_CHAO = 1.5  # a copa cujo fundo chega a esta altura (px) é a moita: nasce do chão
 TUFO_DO_GALHO = 0.8  # o tufo na ponta de um galho, em fração do lóbulo
 PARA_CIMA = 0.3  # o ponto da âncora ``superficie`` sobe tanto da direção de fora (a face de cima do volume)
 SOBE = 1.6  # cada saia da conífera sobe 1,6 passo: entra na de cima
@@ -143,7 +144,9 @@ def _copa(c: Ctx, a: dict[str, Any]) -> None:
     def fora_do_eixo(p: Vec) -> Vec:
         return (p[0] + dx, p[1] + dy, p[2])
 
-    c.b.part(f"{c.pid}_miolo", a["miolo"], ellipse(qv(dx, dy, cz), qv(*(e * MIOLO for e in eixos))),
+    # na copa que chega ao chão (a moita) o miolo assenta nele: os lóbulos recuam da borda, e sem isso ela flutua
+    miolo_z = min(cz, meia_a * MIOLO) if cz - meia_a <= NO_CHAO else cz
+    c.b.part(f"{c.pid}_miolo", a["miolo"], ellipse(qv(dx, dy, miolo_z), qv(*(e * MIOLO for e in eixos))),
              Parte(group=c.grupo))
     f = a["tamanho"] * TUFO_DO_GALHO
     nas_pontas = [((x, y, z), (eixos[0] * f, eixos[1] * f, eixos[2] * f)) for x, y, z in c.ancora(a["pontas"])]
@@ -207,6 +210,20 @@ def _conica(c: Ctx, a: dict[str, Any]) -> None:
                  Parte(group=f"{c.grupo}_{i:02d}", tags=_na_massa(c)))
 
 
+def _tronco_da_copa(args: dict[str, Any]) -> Apoio:
+    """O tronco que segura a copa na prancha: até o centro dela (a copa que chega ao chão, a moita, não tem)."""
+    _, meia_altura, centro = args["copa"]
+    if meia_altura == centro:
+        return ()
+    return (("tronco", "tronco_em_pe", {"altura": centro, "base": "24cm", "topo": "16cm", "casca": "casca_sulcada"}),)
+
+
+def _tronco_da_conifera(args: dict[str, Any]) -> Apoio:
+    """O tronco que segura a conífera na prancha: até dentro da saia de baixo."""
+    return (("tronco", "tronco_em_pe", {"altura": f"{args['base']} + 30cm", "base": "22cm", "topo": "16cm",
+                                        "casca": "casca_sulcada"}),)
+
+
 COPA = X("copa", "ponto", "a copa: meia largura, meia altura e a altura do centro")
 FOLHAGEM = X("material", "material", "a folhagem (copa_folhosa, copa_folha, copa_agulha)", "copa_folhosa")
 PECAS_COPA = [
@@ -236,7 +253,7 @@ PECAS_COPA = [
                                "material": "copa_folha", "miolo": "folha_escura"}),
                  ("moita", {"copa": ["70cm", "45cm", "45cm"], "tufos": "6", "tamanho": "0.45"})),
          TESTE, (_copa, _volumes, _na_massa, tufos, ramos, _lobulos, _raminhos, _sorte), vistas=QUATRO,
-         flora="folhagem", ancoras=("superficie",)),
+         flora="folhagem", ancoras=("superficie",), apoio=_tronco_da_copa),
     Peca("copa_aberta", "A copa aberta: uma nuvem de folhas em cada ponta de galho, com os galhos e o chão à mostra "
          "entre elas (a árvore de galhos abertos, a de copa rala, a velha). Pede as pontas de um nó de antes. Deixa "
          "a superfície", (
@@ -274,5 +291,5 @@ PECAS_COPA = [
                    ("esguia", {"base": "90cm", "altura": "3.6m", "raio": "55cm", "andares": "7", "pontas": "6",
                                "recorte": "0.2", "material": "copa_folhosa"})),
          "tests/test_flora.py::test_a_conifera_lanca_a_sombra_dela", (_conica, _saia, _na_massa, _sorte), vistas=QUATRO,
-         flora="folhagem"),
+         flora="folhagem", apoio=_tronco_da_conifera),
 ]

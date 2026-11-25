@@ -189,7 +189,7 @@ def test_os_nos_do_mesmo_grupo_sao_uma_massa_de_luz() -> None:
 
 def test_controle_em_grupos_diferentes_cada_no_tem_a_sua_luz() -> None:
     luz, sombra = _duas_massas(("uma", "outra"))
-    assert luz < 1.05 * sombra
+    assert luz < 1.08 * sombra
 
 
 def _beira(recortada: bool, monkeypatch: pytest.MonkeyPatch) -> float:

@@ -12,6 +12,7 @@ from ..contracts.composicao import Composicao
 from ..contracts.ir import MAX_CANVAS, AssetIR
 from ..core.recusa import Recusa
 from .escala import PPM
+from .habito import expandida
 from .humano import clipes, ir_do_humano, movimento_do_humano, validar_humano
 from .prop import ir_do_prop, movimento_do_prop, validar_prop
 from .quadrupede import clipes as clipes_do_quadrupede
@@ -19,6 +20,10 @@ from .quadrupede import ir_do_quadrupede, movimento_do_quadrupede, validar_quadr
 
 
 def ir_da_composicao(comp: Composicao) -> AssetIR:
+    comp = expandida(comp)
+    if not comp.nos:
+        raise Recusa("NO", f"Composição '{comp.id}': sem nós nem `planta`.",
+                     "Declare as peças em `nos` ou, da planta, os traços em `planta`.", "/nos")
     if comp.tipo == "humanoide":
         validar_humano(comp)
         dado = ir_do_humano(comp)
@@ -59,6 +64,7 @@ def _conferir_tracos(comp: Composicao, partes: list[str]) -> None:
 
 def movimento(comp: Composicao) -> tuple[dict[str, str], dict[str, int]]:
     """Os clipes que o build gera (o clipe e a receita) e os parâmetros do movimento; o prop é o estático."""
+    comp = expandida(comp)
     if comp.tipo == "humanoide":
         return clipes(comp), movimento_do_humano(comp)
     if comp.tipo == "quadrupede":

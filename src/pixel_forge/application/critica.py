@@ -21,6 +21,7 @@ from ..contracts.composicao import Composicao
 from ..contracts.ir import AssetIR
 from ..core.recusa import Recusa
 from ..design.asset import ir_da_composicao
+from ..design.habito import expandida
 from ..design.kit.registro import PECAS
 from ..export.atlas import Rgba
 from ..export.imagem import salvar_png
@@ -71,9 +72,10 @@ def _mascaras(comp: Composicao, q: Quadro, materiais: dict[str, str]) -> tuple[A
 
 
 def e_flora(comp: Composicao) -> bool:
-    """A planta: a categoria de árvore ou de arbusto, ou qualquer asset com uma peça de folhagem."""
-    return comp.categoria in FLORA or any(no.peca in PECAS and PECAS[no.peca].flora in ("folhagem", "lamina")
-                                          for no in comp.nos)
+    """A planta: a categoria de árvore ou de arbusto, os traços em ``planta``, ou qualquer asset com uma peça de
+    folhagem."""
+    de_planta = any(no.peca in PECAS and PECAS[no.peca].flora in ("folhagem", "lamina") for no in comp.nos)
+    return comp.categoria in FLORA or comp.planta is not None or de_planta
 
 
 def leitura(comp: Composicao, ir: AssetIR, q: Quadro) -> flora.Leitura:
@@ -81,7 +83,7 @@ def leitura(comp: Composicao, ir: AssetIR, q: Quadro) -> flora.Leitura:
     lut = np.zeros(65536, dtype=np.float64)
     for p in estilo_base().palette:
         lut[p.index] = 0.299 * p.rgba[0] + 0.587 * p.rgba[1] + 0.114 * p.rgba[2]
-    folhagem, lenho, figura = _mascaras(comp, q, {p.id: p.material for p in ir.parts})
+    folhagem, lenho, figura = _mascaras(expandida(comp), q, {p.id: p.material for p in ir.parts})
     return flora.ler(folhagem, lenho, figura, lut[q.index])
 
 

@@ -69,7 +69,11 @@ def test_a_folha_em_pena_e_serrilhada() -> None:
 
 
 def _pes(pe: list[str]) -> set[float]:
-    ir = ir_da_composicao(de_uma_peca("touceira", {**CAPIM, "raio": "0", "pe": pe}))
+    """A altura de onde sai cada lâmina, com um tronco de 2 m por baixo (a touceira no ar é recusada)."""
+    dado = de_uma_peca("touceira", {**CAPIM, "raio": "0", "pe": pe}).model_dump(mode="json")
+    tronco = {"id": "tronco", "peca": "tronco_em_pe",
+              "args": {"altura": "2m", "base": "26cm", "topo": "18cm", "casca": "casca"}}
+    ir = ir_da_composicao(validar({**dado, "nos": [tronco, *dado["nos"]]}, Composicao, "teste"))
     return {p.geometry.points_q8[0][2] / 256 for p in ir.parts if p.geometry.type == "polyline"}
 
 

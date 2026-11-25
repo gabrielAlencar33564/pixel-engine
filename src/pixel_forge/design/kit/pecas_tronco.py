@@ -8,7 +8,9 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from ...core.recusa import Recusa
 from ..construtor import Parte, ellipse, q, qv
+from ..escala import PPM
 from .peca import Arg, Ctx, Peca
 
 TESTE = "tests/test_kit.py::test_cada_variacao_monta"
@@ -113,6 +115,27 @@ def _tronco(c: Ctx, a: dict[str, Any]) -> None:
              Parte(bone=c.osso(0.0)[0], group=c.grupo))
     _raizes(c, a, perfil, como)
     _nos(c, a, perfil, como)
+    c.deixa("eixo", [(dx, 0.0, z, r) for z, r, dx in perfil])
+
+
+def _no_eixo(c: Ctx, eixo: list[tuple[float, float, float, float]], z: float, grosso: float) -> float:
+    """Onde o eixo do tronco passa na altura ``z`` (o x dele): o galho nasce ali. Recusa o galho sem tronco, o
+    que sai acima do alto dele e o mais grosso que o tronco nessa altura."""
+    no = c.no or c.pid
+    if not eixo:
+        raise Recusa("LIGACAO", f"Nó '{no}': os galhos não têm tronco de onde sair.",
+                     "Ponha um nó `tronco_em_pe` antes dos galhos: cada galho nasce de um ponto do eixo dele.")
+    if z > eixo[-1][2] + 0.5:
+        raise Recusa("LIGACAO", f"Nó '{no}': um galho sai a {z / PPM:.2f} m, e o tronco acaba em "
+                     f"{eixo[-1][2] / PPM:.2f} m.", "Baixe `base` e `sobe` dos galhos, ou suba a `altura` do tronco.")
+    x, raio = next(((x0 + (x1 - x0) * (z - z0) / (z1 - z0), r0 + (r1 - r0) * (z - z0) / (z1 - z0))
+                    for (x0, _, z0, r0), (x1, _, z1, r1) in zip(eixo, eixo[1:], strict=False) if z <= z1),
+                   (eixo[-1][0], eixo[-1][3]))
+    if grosso > 2 * raio + 0.5:
+        raise Recusa("LIGACAO", f"Nó '{no}': um galho de {grosso / PPM * 100:.0f} cm sai de um tronco de "
+                     f"{2 * raio / PPM * 100:.0f} cm nessa altura ({z / PPM:.2f} m).",
+                     "O galho é mais fino que o tronco de onde sai: afine `largura` ou engrosse o tronco.")
+    return x
 
 
 def _no_caminho(p0: Vec, ctrl: Vec, p1: Vec, s: float) -> Vec:
@@ -135,10 +158,12 @@ def _rolico(c: Ctx, pid: str, pts: list[Vec], diametros: tuple[float, float], ma
 def _galhos(c: Ctx, a: dict[str, Any]) -> None:
     """``n`` galhos em volta do tronco, um a cada fatia da volta a partir da frente (``fase``, em fatias: com 0,5 a
     frente fica livre, e nenhum galho aponta para a câmera): cada um sobe quase a prumo e só então abre até a ponta,
-    dentro da copa. Com ``bifurca``, um galho fino sai a 60 % dele; com ``sobe``, os galhos saem escalonados do
-    tronco. Deixa a âncora ``pontas`` (x, y, z)."""
+    dentro da copa. Cada galho nasce do eixo do tronco declarado antes (onde ele passa nessa altura, com a
+    inclinação e a curva dele) e é mais fino que ele ali. Com ``bifurca``, um galho fino sai a 60 % dele; com
+    ``sobe``, os galhos saem escalonados do tronco. Deixa a âncora ``pontas`` (x, y, z)."""
     meia_l, meia_a, cz = a["copa"]
     st, n = c.st, a["n"]
+    eixo = c.ultima("eixo")
     degrau = st.randint(0, n - 1) if a["sobe"] > 0 else 0
     pontas: list[Vec] = []
     for j in range(n):
@@ -149,10 +174,12 @@ def _galhos(c: Ctx, a: dict[str, Any]) -> None:
         alcance = meia_l * a["alcance"] * st.randint(80, 100) / 100 * (1 - CURTO_NO_ALTO * u)
         r = st.randint(0, 100) / 100
         v = a["ponta_v"][0] + (a["ponta_v"][1] - a["ponta_v"][0]) * (r + ALTO_NO_ALTO * u * (1 - r))
-        p0 = (0.0, 0.0, a["base"] + a["sobe"] * u)
-        p1 = (math.sin(az) * alcance, math.cos(az) * alcance * a["fundo"], cz + v * meia_a)
-        ctrl = (p1[0] * ABRE_NO_ALTO[0], p1[1] * ABRE_NO_ALTO[0], p0[2] + (p1[2] - p0[2]) * ABRE_NO_ALTO[1])
         grosso = a["largura"][0] + (a["largura"][1] - a["largura"][0]) * st.randint(0, 100) / 100
+        sai_a = a["base"] + a["sobe"] * u
+        p0 = (_no_eixo(c, eixo, sai_a, grosso), 0.0, sai_a)  # o galho nasce no eixo do tronco, onde ele estiver
+        p1 = (math.sin(az) * alcance, math.cos(az) * alcance * a["fundo"], cz + v * meia_a)
+        ctrl = (p0[0] + (p1[0] - p0[0]) * ABRE_NO_ALTO[0], p1[1] * ABRE_NO_ALTO[0],
+                p0[2] + (p1[2] - p0[2]) * ABRE_NO_ALTO[1])
         _rolico(c, f"{c.pid}_{j}", [_no_caminho(p0, ctrl, p1, i / TRECHOS) for i in range(TRECHOS + 1)],
                 (grosso, a["ponta"]), a["material"])
         pontas.append(p1)
@@ -190,9 +217,10 @@ PECAS_TRONCO = [
                   ("velho", {"altura": "1.8m", "base": "70cm", "topo": "45cm", "pe": "0.5", "irregular": "0.18",
                              "curva": "6cm", "raizes": "5", "nos": "2", "casca": "casca_sulcada"})),
         "tests/test_flora.py::test_o_pe_do_tronco_abre", (_tronco, _perfil, _no_perfil, _raizes, _nos),
-        vistas=QUATRO, flora="lenho"),
-    Peca("galhos", "Os galhos em volta do tronco, roliços: sobem do tronco e abrem até a ponta, dentro da copa (a "
-         "copa em volumes cobre quase todos; sem copa, é a árvore seca). Deixa as pontas", (
+        vistas=QUATRO, flora="lenho", ancoras=("eixo",)),
+    Peca("galhos", "Os galhos em volta do tronco, roliços: nascem do eixo do tronco declarado antes (pede um "
+         "tronco_em_pe), sobem e abrem até a ponta, dentro da copa (a copa em massa cobre quase todos; sem copa, é a "
+         "árvore seca). Deixa as pontas", (
         X("base", "comprimento", "a altura de onde saem (o alto do tronco)"), COPA,
         X("fundo", "escalar", "a meia profundidade da copa, em fração da meia largura", "1"),
         X("n", "inteiro", "galhos"), X("alcance", "escalar", "onde a ponta cai, em fração da meia largura", "0.6"),
@@ -210,6 +238,7 @@ PECAS_TRONCO = [
                   ("secos", {"base": "1.2m", "copa": COPA_V, "n": "4", "alcance": "0.8", "ponta_v": ["0", "0.8"],
                              "largura": ["10cm", "14cm"], "ponta": "3cm", "bifurca": "1",
                              "material": "casca_clara"})),
-        "tests/test_flora.py::test_os_galhos_abrem_em_volta_do_tronco", (_galhos, _rolico, _no_caminho),
-        vistas=QUATRO, flora="lenho", ancoras=("pontas",)),
+        "tests/test_flora.py::test_os_galhos_abrem_em_volta_do_tronco", (_galhos, _rolico, _no_caminho, _no_eixo),
+        vistas=QUATRO, flora="lenho", ancoras=("pontas",),
+        apoio=(("tronco", "tronco_em_pe", {"altura": "2.4m", "base": "30cm", "topo": "18cm", "casca": "casca"}),)),
 ]

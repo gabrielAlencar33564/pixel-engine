@@ -1,12 +1,12 @@
 {
  "id": "arvore_folhosa", "revision": 1,
  "description": "Árvore folhosa de quintal: tronco curto e a copa redonda em tufos, que o cobre pela frente",
- "reference": "Folhosa jovem de quintal: 3 m de altura, copa redonda de 2,8 m com a base a 1,25 m, tronco de 30 cm; a vida está nos tufos de folha com a luz em cima, no tronco à mostra sob a copa e na sombra dela no chão",
+ "reference": "Folhosa jovem de quintal: 3 m de altura, copa redonda de 2,8 m com a base a 1,25 m, tronco de 30 cm que entra na copa até o centro dela; a vida está nos tufos de folha com a luz em cima, no tronco à mostra sob a copa e na sombra dela no chão",
  "tipo": "prop", "categoria": "arvore_pequena", "semente": 77,
  "medidas": {"h": "3m", "a": "1.4m", "copa0": "$h * 0.42", "c": "($h - $copa0) / 2", "cz": "$copa0 + $c"},
  "nos": [
   {"id": "tronco", "peca": "tronco_em_pe", "grupo": "tronco",
-   "args": {"altura": "$copa0 + 20cm", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca_sulcada"}},
+   "args": {"altura": "$cz", "base": "30cm", "topo": "20cm", "inclinacao": "4cm", "casca": "casca_sulcada"}},
   {"id": "copa", "peca": "copa", "grupo": "copa", "args": {"copa": ["$a", "$c", "$cz"]}}
  ],
  "vistas": {"S": {}}, "landmarks": {"sort_front": ["0", "0", "0"]},

@@ -15,6 +15,7 @@ from ..contracts.composicao import Composicao
 from ..core.direcoes import DIRECOES
 from ..design.asset import ir_da_composicao
 from ..design.escala import ESTATURA_M
+from ..design.habito import expandida
 from ..design.porte import altura_m, conferir_porte
 from ..export.imagem import salvar_png
 from ..quality.quadro import conferir_quadro, conferir_tracos, leitura_dos_tracos
@@ -60,6 +61,8 @@ def previa(comp: Composicao, acervo: Path) -> dict[str, Any]:
            "partes": em_faixas([p.id for p in ir.parts]),
            "escondidas": {d: ps for d, ps in escondidas.items() if ps},
            "tracos": leitura_dos_tracos(comp.tracos, por_vista)}
+    if comp.planta is not None:  # os nós que a engine derivou dos traços: para conferir, ou copiar e mexer
+        out["nos"] = [n.model_dump(mode="json", exclude_defaults=True) for n in expandida(comp).nos]
     if critica.e_flora(comp):  # a flora já sai medida: os achados da crítica, sem as irmãs do acervo
         out["critica"] = critica.da_previa(comp, ir, quadros.get("S", next(iter(quadros.values()))))
     return {**out, "segundos": round(time.perf_counter() - t0, 2)}

@@ -603,6 +603,21 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   tufos mudaram de lugar); a sexta passou o arbusto. As dez plantas da prova têm pacote exportado e verificado; os
   sete das primeiras rodadas são de builds do motor de então, e refeitos agora dão outro desenho e pedem a crítica
   de novo. A samambaia sai com o aviso de um pedaço solto (um dente da beira serrilhada que se destaca).
+- A ligação (pedido do dono: nada flutuando, o galho parte de um nó): o `tronco_em_pe` deixa o eixo dele (o x, a
+  altura e o raio em cada estação); os `galhos` nascem do eixo do tronco declarado antes, onde ele passa nessa
+  altura (antes saíam do prumo, e no tronco inclinado nasciam fora dele), e são recusados sem tronco, acima do alto
+  dele ou mais grossos que ele ali. `design/ligacao.py` confere na geometria do mundo, antes de desenhar, que todo nó
+  de planta toca o chão, uma peça que não é de planta ou outro nó já ligado (recusa `LIGACAO`, com o vão e a dica):
+  a copa acima de um tronco curto passava, coberta pela frente. A copa que chega ao chão assenta o miolo nele (os
+  lóbulos recuam da borda, e a moita ficava a 3 a 6 px do chão). Os galhos não ganharam argumento (já têm os 12 do
+  teto): a ligação é com o tronco de antes.
+- O hábito (pedido do dono: os princípios da forma das plantas, com menos argumentos): o campo `planta` da composição
+  descreve a planta pelos traços (o hábito, a altura, a largura, a folha, a idade e, se a espécie foge do hábito, o
+  fuste, a esbeltez e o vento), e `design/habito.py` deriva os nós. São traços gerais, não espécies: a esbeltez dá
+  a grossura do tronco, o fuste diz onde a copa começa, o lóbulo tem o tamanho da folhagem (de 5 a 12 pela largura
+  da copa na tela), o galho tem de metade a três quartos do tronco onde sai o mais alto, o tronco entra na copa. A
+  composição pelos traços tem um quarto ou menos do tamanho da escrita peça por peça, e a prévia devolve os nós
+  derivados. O campo novo não entra no id do build de quem não o usa.
 - O que o agente lê (pedido do dono: gastar menos tokens): a skill e as regras estão em inglês (os identificadores
   ficam como estão: mudá-los quebra as composições do acervo); o catálogo tem dois níveis, o resumo e um arquivo por
   família (`pfe catalogo flora`: 19 mil caracteres no lugar dos 85 mil do kit inteiro), em JSON sem espaço a mais; a

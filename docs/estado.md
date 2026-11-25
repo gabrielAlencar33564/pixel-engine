@@ -13,9 +13,11 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 - **Movimento:** o parado, a passada e o golpe de espada (sem laço) do humano, o parado e o passo do quadrúpede, o
   balanço e o giro do prop.
 - **CLI** `pfe` no acervo (`~/.pixel-forge/acervo`), sem projeto: `previa`, `radiografia`, `checar`, `build`,
-  `critica`, `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** com o formulário de
-  pedido e 5 exemplos. A planta só sai com a crítica: medida, comparada com as irmãs do acervo e revisada por outro
-  agente.
+  `critica`, `exportar`, `olhar`, `catalogo`, `conjunto`, `revisar`, `atualizar`. **Skill única** (em inglês) com o
+  formulário de pedido e 5 exemplos. A planta só sai com a crítica: medida, comparada com as irmãs do acervo e
+  revisada por outro agente.
+- **A planta pelos traços:** o campo `planta` (o hábito, a altura, a largura, a folha, a idade) de onde a engine
+  deriva o tronco, os galhos e a copa; e a recusa `LIGACAO` do que fica no ar (o galho nasce do eixo do tronco).
 
 ## Números contra a linha de base
 

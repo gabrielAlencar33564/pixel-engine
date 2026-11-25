@@ -16,6 +16,7 @@ from .kit.movimento import Elo, sway_chain
 from .kit.peca import CAMADAS_DO_NO, Ctx, ler_args
 from .kit.pilha import Pilha
 from .kit.registro import PECAS
+from .ligacao import conferir_ligacao
 from .vistas import (
     AZIMUTE,
     N_VISTAS,
@@ -98,9 +99,12 @@ def _ossos(b: AssetBuilder, comp: Composicao, env: dict[str, float]) -> tuple[li
     return cadeia, centro
 
 
-def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[list[Elo], Any]) -> list[Any]:
-    """Os nós na ordem do arquivo, cada repetição com a semente dela, no osso do nó; devolve as regras das pilhas."""
+def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[list[Elo], Any]
+         ) -> tuple[list[Any], dict[str, tuple[str, str]]]:
+    """Os nós na ordem do arquivo, cada repetição com a semente dela, no osso do nó; devolve as regras das pilhas e,
+    de cada parte, o nó que a desenhou e o papel dele na planta."""
     cadeia, centro_giro = ossos
+    donos: dict[str, tuple[str, str]] = {}
     pilhas: dict[str, Pilha] = {}
     regras: list[dict[str, Any]] = []
     ancoras: dict[str, list[Any]] = {}
@@ -118,8 +122,9 @@ def _nos(b: AssetBuilder, comp: Composicao, env: dict[str, float], ossos: tuple[
                 raise Recusa("NO_VAZIO", f"Nó '{pid}': a peça '{no.peca}' não desenhou nada com esses argumentos.",
                              "Confira as medidas dela no catálogo (a cota, o comprimento, a largura): o que ela cobre "
                              "ficou vazio.", f"/nos/{i}/args")
+            donos.update({p["id"]: (no.id, peca.flora) for p in b.parts[n0:]})
             reparentar(b.parts[n0:], no.osso, cadeia, centro_giro)
-    return regras + [r for s in pilhas.values() for r in s.rules()]
+    return regras + [r for s in pilhas.values() for r in s.rules()], donos
 
 
 def _vistas(comp: Composicao, b: AssetBuilder, regras: list[Any]) -> dict[str, Any]:
@@ -137,7 +142,7 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     env = medidas(comp)
     b = AssetBuilder()
     ossos = _ossos(b, comp, env)
-    regras = _nos(b, comp, env, ossos)
+    regras, donos = _nos(b, comp, env, ossos)
     ids = [p["id"] for p in b.parts]
     repetidos = sorted({x for x in ids if ids.count(x) > 1})
     if repetidos:
@@ -147,6 +152,8 @@ def ir_do_prop(comp: Composicao) -> dict[str, Any]:
     folga = 3 + (bal.desloca_px if bal else 0)
     lms = [{"id": nome, "bone_id": "root", "point_q8": qv(*(valor(t, env) for t in ponto))}
            for nome, ponto in comp.landmarks.items()]
-    canvas = canvas_do_prop(no_mundo(b.parts, b.bones), folga, tuple(AZIMUTE[v] for v in comp.vistas))
+    mundo = no_mundo(b.parts, b.bones)
+    conferir_ligacao(mundo, donos)
+    canvas = canvas_do_prop(mundo, folga, tuple(AZIMUTE[v] for v in comp.vistas))
     return {"id": comp.id, "revision": comp.revision, "bones": b.bones, "parts": b.parts, "landmarks": lms,
             "canvas": canvas, "views": _vistas(comp, b, regras)}
