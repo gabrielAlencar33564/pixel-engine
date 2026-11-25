@@ -173,8 +173,11 @@ agente. `pfe critica <build> --json` (só o caminho do build: o acervo é o dele
 - `perguntas` e `ficha`: o que só o olho responde.
 
 Quem responde às perguntas não é quem compôs. Passe a outro agente (um subagente sem a sua conversa) só a prancha, a
-ficha e as perguntas, sem a sua explicação; ele olha a imagem e responde cada pergunta com `ok` e uma nota do que
-viu. Grave as respostas dele num arquivo e registre:
+ficha e as perguntas, sem a sua explicação. Diga a ele o que a prancha é (ampliada até 4×; o sprite e a silhueta em
+cima, as irmãs embaixo), a escala (o humano de 1,65 m tem ~44 px), de onde vem a luz, e que julgue como o jogador
+que vê o sprite no cenário: o defeito que se nota reprova; o detalhe da ficha que não cabe em poucos pixels vai só
+na nota. Ele olha a imagem e responde cada pergunta com `ok` e uma nota do que viu. Grave as respostas dele num
+arquivo e registre:
 
 ```json
 {"respostas": {"silhueta": {"ok": true, "nota": "copa larga e baixa sobre um tronco curto: lê como árvore de quintal"},
