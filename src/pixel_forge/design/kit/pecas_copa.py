@@ -24,7 +24,7 @@ RAMINHO = 0.14  # o raminho na borda do lóbulo, em fração da copa
 VARIA = 2.5  # o tamanho do lóbulo varia ``irregular`` vezes isto
 RECUA = 1.2  # e o lóbulo recua da borda da copa até ``irregular`` vezes isto
 RAMOS_QUE_CAEM = 3  # por lóbulo
-ONDE_CAEM = (0.6, 0.95)  # a que distância do eixo cai cada ramo, em fração da copa (sorteada na faixa)
+ONDE_CAEM = (0.5, 0.85)  # a que distância do eixo cai cada ramo, em fração da copa (sorteada na faixa)
 RAMO_FINO = 0.045  # o raio do ramo que cai, em fração da meia largura da copa (1 px no mínimo)
 PONTA_DO_RAMO = 0.45  # o raio na ponta, em fração do raio no alto
 RAIO_MINIMO = 32  # o menor raio do ramo na IR (q8): 1/8 px
@@ -91,7 +91,7 @@ def tufos(st: Stream, a: dict[str, Any]) -> list[tuple[Vec, Vec]]:
 
 def ramos(st: Stream, a: dict[str, Any]) -> list[tuple[Vec, Vec, float]]:
     """Os ramos que caem (``pende``): uma cortina em volta da copa, três por lóbulo, cada um de dentro da folhagem
-    (logo acima do meio da copa) até ``pende`` meias alturas abaixo do meio (o quanto desce é sorteado, e nenhum
+    (o meio da copa) até ``pende`` meias alturas abaixo do meio (o quanto desce é sorteado, e nenhum
     entra no chão). Devolve o alto, a ponta e o raio de cada um."""
     meia_l, meia_a, cz = a["copa"]
     n = RAMOS_QUE_CAEM * a["tufos"] if a["pende"] > 0 else 0
@@ -101,7 +101,7 @@ def ramos(st: Stream, a: dict[str, Any]) -> list[tuple[Vec, Vec, float]]:
         az = 2 * math.pi * (i + giro + 0.35 * _sorte(st)) / n
         longe = ONDE_CAEM[0] + (ONDE_CAEM[1] - ONDE_CAEM[0]) * abs(_sorte(st))
         x, y = math.sin(az) * meia_l * longe, math.cos(az) * meia_l * a["fundo"] * longe
-        alto = cz + 0.1 * meia_a * math.sqrt(1 - longe * longe)
+        alto = cz + 0.05 * meia_a
         ponta = max(0.0, cz - meia_a * a["pende"] * (0.45 + 0.55 * abs(_sorte(st))))
         raio = max(1.0, meia_l * RAMO_FINO * (0.7 + 0.6 * abs(_sorte(st))))
         out.append(((x, y, alto), (x * 1.04, y * 1.04, ponta), raio))
