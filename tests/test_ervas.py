@@ -6,6 +6,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import pytest
+
 from pixel_forge.application.catalogo import de_uma_peca
 from pixel_forge.application.estilo import estilo_base
 from pixel_forge.application.quadros import quadro_de_repouso
@@ -13,6 +15,7 @@ from pixel_forge.contracts.carregar import validar
 from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.design.asset import ir_da_composicao
 from pixel_forge.design.escala import PPM
+from pixel_forge.design.kit import pecas_ervas
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.quality import flora
 from pixel_forge.raster.estilo import estilo_render
@@ -105,3 +108,37 @@ def test_o_salpico_na_ponta_das_laminas() -> None:
         Composicao, "teste")
     q = _quadro(comp)
     assert sum(1 for p in q.part_table if p.startswith("flor_") and q.visiveis.get(p, 0)) >= 4
+
+
+def _sombra_no_chao() -> int:
+    """Os pixels da sombra que a touceira lança no chão."""
+    style = estilo_base()
+    q = _quadro(de_uma_peca("touceira", {**CAPIM, "altura": ["50cm", "80cm"]}))
+    chao = next(m for m in style.materials if m.id == "sombra").ramp[0]
+    return int(((q.index == chao) & (q.alpha == 255) & (q.dono == 0)).sum())
+
+
+def test_a_touceira_lanca_a_sombra_dela() -> None:
+    """A lâmina fina não é detalhe: a sombra dela no chão assenta a planta."""
+    assert _sombra_no_chao() >= 20
+
+
+def test_controle_a_lamina_de_detalhe_nao_lanca_sombra(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "FIO", ("flat", "detail", "no_outline"))
+    assert _sombra_no_chao() == 0
+
+
+def _raios_do_ponto(**args: str) -> tuple[int, int]:
+    ir = ir_da_composicao(de_uma_peca("salpico", {**FLORES, **args}))
+    raios = next(p.geometry.radii_q8 for p in ir.parts if p.id.startswith("n_") and p.geometry.type == "ellipse")
+    return raios[0], raios[2]
+
+
+def test_o_ponto_alongado_e_a_espiga_em_pe() -> None:
+    largo, alto = _raios_do_ponto(alonga="3")
+    assert abs(alto - 3 * largo) <= 2  # q8: 1/128 px de arredondamento
+
+
+def test_controle_por_padrao_o_ponto_e_redondo() -> None:
+    largo, alto = _raios_do_ponto()
+    assert alto == largo

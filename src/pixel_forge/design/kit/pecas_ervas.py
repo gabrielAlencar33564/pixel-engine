@@ -13,13 +13,14 @@ from .peca import Arg, Ctx, Peca
 
 QUATRO = ("S", "E", "N", "W")
 TRECHOS = 5  # os trechos do arco da lâmina
+FIO = ("flat", "no_outline")  # a lâmina fina: chapada e sem contorno, mas lança a sombra dela no chão (não é detalhe)
 SOBE_ANTES = 0.3  # o ponto de controle do arco: a 30 % do alcance a lâmina já está no alto
 ABRE_MENOS = 0.35  # a lâmina mais fechada abre 35 % do pedido (poucas: a maioria abre perto do pedido)
 TOM = 0.4  # a lâmina sai clara ou escura quando o sorteio dela (de −1 a 1) passa disto
 # a largura da folha em cada ponto do arco (fração da largura): estreita no pé, larga antes do meio, ponta fina
 LARGURA_NO_ARCO = (0.3, 0.6, 1.0, 0.9, 0.55, 0.15)
 RAIO_MINIMO = 32  # o menor raio da folha na IR (q8): 1/8 px
-PASSO_DA_PENA = 1.5  # a folha em pena tem um dente a cada 1,5 px do comprimento dela
+PASSO_DA_PENA = 2.5  # a folha em pena tem um dente a cada 2,5 px do comprimento dela: o chão aparece entre eles
 MAX_DENTES = 60  # até 60 (o traço tem até 64 pontos)
 # de onde se vê a vista S (o chão a 0,6 e a altura a cos 45°): o ponto do lado de lá não ganha salpico
 CAMERA = (0.0, 0.6, math.sqrt(0.5))
@@ -59,15 +60,15 @@ def _pena(c: Ctx, pid: str, material: str, folha: tuple[list[Vec], float, float]
         k = LARGURA_NO_ARCO[j] + (LARGURA_NO_ARCO[j + 1] - LARGURA_NO_ARCO[j]) * (onde - j)
         lado = k if i % 2 else -k
         zigue.append((p[0] + dx * lado, p[1] + dy * lado, p[2]))
-    c.b.part(pid, material, polyline([qv(*p) for p in fino[::2] + fino[-1:]], 1), Parte(group=c.grupo, tags=LINE))
-    c.b.part(f"{pid}_pena", material, polyline([qv(*p) for p in zigue], 1), Parte(group=c.grupo, tags=LINE))
+    c.b.part(pid, material, polyline([qv(*p) for p in fino[::2] + fino[-1:]], 1), Parte(group=c.grupo, tags=FIO))
+    c.b.part(f"{pid}_pena", material, polyline([qv(*p) for p in zigue], 1), Parte(group=c.grupo, tags=FIO))
 
 
 def _lamina(c: Ctx, pid: str, material: str, arco: list[Vec], largura: float) -> None:
     """A lâmina fina (um traço de 1 px, sem contorno) ou, com largura, a folha: roliça ao longo do arco, estreita
     no pé, larga antes do meio e de ponta fina, no grupo de contorno do nó (sem linha entre as folhas)."""
     if largura <= 0:
-        c.b.part(pid, material, polyline([qv(*p) for p in arco], 1), Parte(group=c.grupo, tags=LINE))
+        c.b.part(pid, material, polyline([qv(*p) for p in arco], 1), Parte(group=c.grupo, tags=FIO))
         return
     geo = {"type": "tapered_polyline", "points_q8": [qv(*p) for p in arco],
            "radii_q8": [max(RAIO_MINIMO, q(largura / 2 * k)) for k in LARGURA_NO_ARCO]}
@@ -110,7 +111,8 @@ def _salpico(c: Ctx, a: dict[str, Any]) -> None:
         pts = pts[:max(a["n"], round(DE_FRENTE * len(pts)))]
     for i in range(min(a["n"], len(pts))):
         x, y, z = pts.pop(c.st.randint(0, len(pts) - 1))
-        c.b.part(f"{c.pid}_{i:02d}", a["material"], ellipse(qv(x, y, z), qv(a["raio"], a["raio"], a["raio"])),
+        alto = a["raio"] * a["alonga"]
+        c.b.part(f"{c.pid}_{i:02d}", a["material"], ellipse(qv(x, y, z), qv(a["raio"], a["raio"], alto)),
                  Parte(group=c.grupo, tags=LINE))
 
 
@@ -147,7 +149,8 @@ PECAS_ERVAS = [
          "de uma lâmina, o broto na ponta de um galho. Pede a âncora de um nó de antes", (
              X("em", "ancora", "onde caem os pontos ('<nó>.superficie', '<nó>.pontas')"),
              X("material", "material", "a cor do ponto"), X("n", "inteiro", "quantos pontos", "8"),
-             X("raio", "comprimento", "o raio do ponto (3 cm = 1 px)", "3cm")),
+             X("raio", "comprimento", "o raio do ponto (3 cm = 1 px)", "3cm"),
+             X("alonga", "escalar", "a altura do ponto, em raios (1 = redondo; 3 = a espiga em pé)", "1")),
          _salpico, (("flores", {"em": "moita.superficie", "material": "olho_claro", "n": "9"}),
                     ("frutos", {"em": "moita.superficie", "material": "pano_vermelho", "n": "6", "raio": "5cm"}),
                     ("botões", {"em": "moita.superficie", "material": "ambar", "n": "14"})),

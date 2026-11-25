@@ -50,24 +50,6 @@ COPA_DO_EXEMPLO = (1.4, 0.87)  # a meia largura e a meia altura da copa do exemp
 Mascara = np.ndarray[Any, np.dtype[np.bool_]]
 
 
-def _pedacos(m: Mascara) -> int:
-    """As ilhas da máscara (vizinhança de 4)."""
-    falta = m.copy()
-    n = 0
-    while falta.any():
-        y, x = np.argwhere(falta)[0]
-        pilha = [(int(y), int(x))]
-        falta[y, x] = False
-        n += 1
-        while pilha:
-            a, b = pilha.pop()
-            for c, d in ((a + 1, b), (a - 1, b), (a, b + 1), (a, b - 1)):
-                if 0 <= c < falta.shape[0] and 0 <= d < falta.shape[1] and falta[c, d]:
-                    falta[c, d] = False
-                    pilha.append((c, d))
-    return n
-
-
 def leitura(comp: Composicao, copa: str = "copa") -> dict[str, float]:
     """A copa na tela, na vista S: as ilhas dela, quanto enche a elipse da caixa dela, a altura sobre a largura, a
     altura da sombra no chão sobre a largura da copa, os pixels do tronco à mostra e as partes do asset."""
@@ -83,7 +65,7 @@ def leitura(comp: Composicao, copa: str = "copa") -> dict[str, float]:
     q = quadro_de_repouso(ir, est, "S")
     chao = q.index == est.materials["sombra"].ramp[0]
     sombra = np.nonzero((chao & (q.alpha == 255)).any(axis=1))[0]
-    return {"pedacos": _pedacos(massa), "cheia": float((massa & elipse).sum() / elipse.sum()),
+    return {"pedacos": flora.ilhas(massa), "cheia": float((massa & elipse).sum() / elipse.sum()),
             "alto_sobre_largo": h / w,
             "sombra_sobre_largo": (int(sombra.max() - sombra.min()) + 1) / w if sombra.size else 0.0,
             "tronco": q.visiveis.get("tronco", 0), "partes": len(ir.parts),
@@ -121,7 +103,7 @@ def test_a_copa_e_uma_massa_so() -> None:
     m = leitura(ler(EXEMPLO, Composicao))
     a, c = COPA_DO_EXEMPLO
     de_cima = math.hypot(a * SD, c * CE) / a  # o elipsoide da copa na câmera: 0,74 (de frente, chapado: 0,44)
-    assert m["pedacos"] == 1 and 0.7 <= m["cheia"] < 0.9 and m["partes"] <= 40
+    assert m["pedacos"] == 1 and 0.6 <= m["cheia"] < 0.9 and m["partes"] <= 40
     assert abs(m["alto_sobre_largo"] - de_cima) <= 0.1
 
 
@@ -136,7 +118,7 @@ def test_a_copa_cobre_o_tronco_e_lanca_a_sombra_dela() -> None:
 def test_controle_a_copa_de_discos_chapados_e_acusada() -> None:
     m = leitura(_copa_de_discos())
     a, c = COPA_DO_EXEMPLO
-    assert m["pedacos"] > 1 and m["cheia"] < 0.7
+    assert m["pedacos"] > 1 and m["cheia"] < 0.6
     assert abs(m["alto_sobre_largo"] - math.hypot(a * SD, c * CE) / a) > 0.1
     assert m["sombra_sobre_largo"] < 0.35
 
@@ -164,16 +146,69 @@ def test_a_altura_da_copa_e_a_pedida() -> None:
 def test_os_ramos_que_caem_fazem_a_cortina() -> None:
     """Com ``pende``, ramos finos caem em volta da copa (na frente, atrás e dos lados), de dentro da folhagem até
     abaixo do elipsoide, sem entrar no chão."""
-    a = {**COPA_DE_TESTE, "pende": 1.8}
-    cortina = ramos(Stream(1), a)
-    assert len(cortina) == 3 * a["tufos"] and all(0 <= ponta[2] < alto[2] for alto, ponta, _ in cortina)
-    assert all(alto[2] >= 60.0 for alto, _, _ in cortina) and min(ponta[2] for _, ponta, _ in cortina) < 30.0 - 5
-    assert min(alto[1] for alto, _, _ in cortina) < -10 and max(alto[1] for alto, _, _ in cortina) > 10
-    assert max(raio for _, _, raio in cortina) < min(r[0] for _, r in tufos(Stream(1), a)[:7]) / 3
+    a = {**COPA_DE_TESTE, "pende": 2.5}
+    lobulos = tufos(Stream(1), a)[:7]
+    cortina = ramos(Stream(1), a, lobulos)
+    centros = {c[2] for c, _ in sorted(lobulos, key=lambda v: v[0][2])[:4]}
+    assert len(cortina) == 3 * 4 and all(alto[2] in centros for alto, _, _ in cortina)  # saem de dentro dos lóbulos
+    pontas = [ponta[2] for _, ponta, _ in cortina]
+    assert min(pontas) > 0 and max(pontas) - min(pontas) >= 3  # nenhum chega ao chão, e a barra é desigual
+    assert min(pontas) < min(c[2] - r[2] for c, r in lobulos) - 5
+    assert max(raio for _, _, raio in cortina) < min(r[0] for _, r in lobulos) / 3
 
 
 def test_controle_sem_pende_nao_ha_ramo_caindo() -> None:
-    assert ramos(Stream(1), COPA_DE_TESTE) == []
+    assert ramos(Stream(1), COPA_DE_TESTE, tufos(Stream(1), COPA_DE_TESTE)[:7]) == []
+
+
+def _duas_massas(grupos: tuple[str, str]) -> tuple[float, float]:
+    """Dois nós de copa lado a lado (o ``desvio``): a luminância média do nó da esquerda e a do nó da direita."""
+    nos = [{"id": f"copa_{lado}", "peca": "copa", "grupo": grupo,
+            "args": {"copa": ["60cm", "50cm", "50cm"], "desvio": [desvio, "0"]}}
+           for lado, grupo, desvio in (("a", grupos[0], "-70cm"), ("b", grupos[1], "70cm"))]
+    comp = validar({**json.loads(EXEMPLO.read_text(encoding="utf-8")), "categoria": "arbusto", "nos": nos,
+                    "tracos": []}, Composicao, "teste")
+    ir, style = ir_da_composicao(comp), estilo_base()
+    q = quadro_de_repouso(ir, estilo_render(style), "S")
+    brilho = np.zeros(65536)
+    for p in style.palette:
+        brilho[p.index] = 0.299 * p.rgba[0] + 0.587 * p.rgba[1] + 0.114 * p.rgba[2]
+    medias = []
+    for lado in ("copa_a", "copa_b"):
+        dele = np.isin(q.dono, [i + 1 for i, p in enumerate(q.part_table) if p.startswith(lado)])
+        medias.append(float(brilho[q.index][dele].mean()))
+    return medias[0], medias[1]
+
+
+def test_os_nos_do_mesmo_grupo_sao_uma_massa_de_luz() -> None:
+    """A moita de duas massas: a do lado da luz é mais clara que a outra."""
+    luz, sombra = _duas_massas(("moita", "moita"))
+    assert luz >= 1.1 * sombra
+
+
+def test_controle_em_grupos_diferentes_cada_no_tem_a_sua_luz() -> None:
+    luz, sombra = _duas_massas(("uma", "outra"))
+    assert luz < 1.05 * sombra
+
+
+def _beira(recortada: bool, monkeypatch: pytest.MonkeyPatch) -> float:
+    """Os pixels da beira da folhagem do exemplo sobre os pixels dela."""
+    if not recortada:
+        monkeypatch.setattr(pecas_copa, "_na_massa", lambda c: ("volume_sphere", f"massa_{c.grupo}"))
+    comp = ler(EXEMPLO, Composicao)
+    q = quadro_de_repouso(ir_da_composicao(comp), estilo_render(estilo_base()), "S")
+    folhas = np.isin(q.dono, [i + 1 for i, p in enumerate(q.part_table) if p.startswith("copa_")])
+    dentro = folhas.copy()
+    dentro[1:] &= folhas[:-1]
+    dentro[:-1] &= folhas[1:]
+    dentro[:, 1:] &= folhas[:, :-1]
+    dentro[:, :-1] &= folhas[:, 1:]
+    return float((folhas & ~dentro).sum()) / float(folhas.sum())
+
+
+def test_a_beira_da_folhagem_e_recortada(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A borda de cada volume sai em folhas: a folhagem tem bem mais beira que a dos volumes lisos (o controle)."""
+    assert _beira(True, monkeypatch) >= 1.25 * _beira(False, monkeypatch)
 
 
 def _copa_alta_e_estreita() -> int:

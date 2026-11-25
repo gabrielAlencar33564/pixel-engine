@@ -87,11 +87,12 @@ tela 0,6 px por px); a luz vem de cima e da esquerda, e a sombra no chão cai à
 | os andares | `tronco_em_pe` + `copa_conica` | a conífera de saias recortadas; `pontas`, `recorte` e `cai` dão a saia cheia ou a magra |
 | a roseta no alto | `tronco_em_pe` + `touceira` com o `pe` no alto do tronco, `largura` e `pena` | a palma (em pena), a folha em espada (lisa) |
 | a seca | `tronco_em_pe` + `galhos` | a árvore sem folha |
-| a moita | `copa` no chão, sem tronco | o arbusto; com `salpico` na `superficie` dela, a flor e o fruto |
-| a touceira | `touceira` | lâminas: finas, o capim e o junco; com `largura` e `pena`, a samambaia; com `salpico` nas `pontas`, a flor do campo e a espiga (a flor pede a lâmina quase reta: `cai` até 0.1) |
+| a moita | `copa` no chão, sem tronco | o arbusto; com `salpico` na `superficie` dela, a flor e o fruto; a moita de duas ou três massas são nós de `copa` com `desvio`, no mesmo `grupo` |
+| a touceira | `touceira` | lâminas: finas, o capim e o junco; com `largura` e `pena`, a samambaia; com `salpico` nas `pontas`, a flor do campo e a espiga (a flor pede a lâmina quase reta, `cai` até 0.1; a espiga em pé, `alonga` 3) |
 
-A folhagem de um nó é uma massa de luz só (o claro em cima e à esquerda), e cada lóbulo é um relevo nela. Tudo é
-sorteado pela semente: outra semente dá outra planta da mesma espécie. **Para variar o cenário,** duas plantas do
+A folhagem é uma massa de luz só (o claro em cima e à esquerda) por `grupo`: os nós de folhagem do mesmo grupo
+clareiam e escurecem juntos, cada lóbulo é um relevo na massa, e a beira de cada um sai recortada em folhas. O
+`desvio` tira a copa do eixo (a copa de um lado só, a árvore batida pelo vento). Tudo é sorteado pela semente: outra semente dá outra planta da mesma espécie. **Para variar o cenário,** duas plantas do
 mesmo conjunto não saem da mesma receita com outra semente e outro tamanho: varie a construção, o `perfil`, a
 proporção da copa, o tronco (a `curva`, a `inclinacao`, as `raizes`, dois troncos) e a folhagem; dentro da mesma
 espécie, a semente e o `irregular`. A crítica (seção 6) mede a silhueta contra as irmãs do acervo e acusa a parecida.

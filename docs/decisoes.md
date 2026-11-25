@@ -561,9 +561,19 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   (viraram a cortina); a samambaia lia como aranha (a folha em pena); a dica da folhagem lisa mandava usar a peça
   que já se usava. A skill ganhou o que faltava (o tronco até o centro da copa, o `pende`, a flor na lâmina reta,
   a erva em `objeto`, o que a crítica compara).
-- O que sobra: a copa de poucos lóbulos grandes ainda lê lisa (0,96 a 0,97); a folha larga lisa é roliça, não chata;
-  a folha em pena não tem contorno nem lança sombra (são traços); o tom das lâminas é sorteado (sem lado da luz); o
-  capim de 20 a 40 cm tem 6 a 13 px e lê como rabisco; a `copa` não se desloca do eixo (a copa de um lado só sai
-  pela inclinação do tronco); a agulha da conífera aberta não se distingue da folha; a semelhança compara só a
-  silhueta (duas plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com
-  `saia` não se leem mais, e as de `copa` dão outro desenho.
+- A revisão de fora (outro agente, só com as pranchas da crítica e as fichas): passou 2 das 10 plantas e mandou
+  corrigir 8; os pareceres estão registrados. O defeito que mais se repetiu era do motor: a folhagem era sempre um
+  volume liso e arredondado com contorno (lia como brócolis, pedra, picolé). O que foi corrigido na causa:
+  - a beira de cada volume de folhagem sai recortada (a marca `borda_de_folha`, em `raster/montagem.py`: da faixa de
+    2 px da borda saem 42 % das células de 2 px, contadas do canto da máscara), e o miolo escuro aparece nos vãos;
+  - a massa de luz é do grupo de contorno, não do nó (as bolas da moita de vários nós tinham cada uma a sua luz);
+  - a `copa` ganhou o `desvio` (sai do eixo: a moita de duas massas, a copa de um lado só);
+  - os ramos que caem saem de dentro dos lóbulos de baixo e param a alturas desiguais, sem chegar ao chão (eram
+    barras iguais até o chão, e duas despontavam por cima da copa);
+  - a lâmina fina deixou de ser detalhe e lança a sombra dela (as ervas flutuavam); a pena tem um dente a cada
+    2,5 px (a de 1,5 px virava mancha chapada); o `salpico` ganhou o `alonga` (a espiga em pé).
+- O que sobra: a raiz à mostra do tronco é um espinho reto (mudança 20); a folha larga lisa é roliça, não chata; a
+  folha em pena não tem contorno; o tom das lâminas é sorteado (sem lado da luz); o capim de 20 a 40 cm tem 6 a
+  13 px; a agulha da conífera aberta não se distingue da folha; a semelhança compara só a silhueta (duas plantas de
+  silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se leem mais,
+  e as de `copa` dão outro desenho.
