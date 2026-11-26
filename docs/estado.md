@@ -19,6 +19,8 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
 - **A planta pelos traços:** o campo `planta` (o hábito, a altura, a largura, a folha, a idade) de onde a engine
   deriva o tronco, os galhos e a copa; e a recusa `LIGACAO` do que fica no ar (o galho nasce do eixo do tronco).
   A ligação é da estrutura, conferida na geometria: o pixel não se junta, e as lâminas do capim ficam separadas.
+  Na última prova de fora (dez plantas só pela skill, 2026-11-25) nove saíram pelos traços com uma prévia cada;
+  o revisor de fora passou cinco e devolveu cinco (a samambaia, o chorão, a oliveira, os dois arbustos).
 
 ## Números contra a linha de base
 

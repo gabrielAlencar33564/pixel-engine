@@ -715,6 +715,21 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
     pedra: entram `cinza_verde_fundo` a `cinza_verde_claro` (54 a 57, matiz de 85° a 105°), a copa cinzenta
     passa a essa rampa e a planta pelos traços ganha `folha: cinzenta`. Entram a `casca_alva` (lisa) e a
     `casca_alva_anelada` (a bétula) na rampa neutra; a `casca_clara` (no oráculo) e a `casca_anelada` ficam.
+- A terceira medição (as mesmas dez plantas, outro agente sem contexto, depois das duas rodadas, em
+  `~/.pixel-forge/acervo-prova-habito3`): 138 mil tokens, 46 chamadas de ferramenta, 35 de `pfe` (13 prévias),
+  5,8 min, 9 das 10 pelos traços, nenhum achado, nenhum `pfe atualizar`. As quatro medições: 188 mil / 86 / 65 /
+  12,2 min (peça por peça); 153 mil / 69 / 54 / 9,9 min; 154 mil / 52 / 46 / 7,7 min; 138 mil / 46 / 35 /
+  5,8 min. A que saiu dos traços foi a oliveira: no hábito aberto nenhum traço mexe no tamanho da nuvem, e a
+  velha de copa rala saía com nuvens pequenas em varetas. A skill passou a dizer o que as medidas da crítica
+  são, que o nó posto sobre as pontas soma à altura e que as irmãs são até três.
+- A revisão de fora dessas dez (outro agente, sem contexto, pelo olho do jogador; pareceres em
+  `acervo-prova-habito3/revisao/`): cinco passam (o carvalho, o abeto, o choupo, o junco, o capim de flores) e
+  cinco voltam. A samambaia: frondes de 1 px com o contorno quase preto em volta de um miolo em bola (lê como
+  aranha), sem pena nem arco, e em verde-limão. O chorão: o domo é a copa do carvalho em verde-limão (couve-flor)
+  com a franja de barras retas só embaixo (água-viva). A oliveira: o tronco liso e cônico até a metade da altura,
+  e 4,3 m contra os 3,2 m da ficha (foi composta nó por nó). O arbusto de frutos: as bagas são retângulos
+  chapados de 2 a 4 px, soltos. O arbusto claro: duas massas em linha com um vale (amendoim), não três corcovas.
+  Nenhuma dessas a crítica da máquina acusou.
 - O que sobra: a casca clara e a anelada seguem lilases (as alvas são a escolha neutra); o traço da agulha é
   sempre deitado (a textura do volume não tem direção) e cruza a ponta caída do pinheiro; no chorão de 5 m os
   ramos têm 6 a 7 px no alto e a cortina é rala e reta; a nervura some na folha lisa escura; no capim pequeno

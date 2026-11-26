@@ -124,7 +124,7 @@ species departs from its habit, `fuste` (the share of the height with no crown, 
 trunk diameter, 4 to 40; 10 to 15 by habit), `cortina` (only on a closed crown: the share of the clear trunk the
 hanging twigs cover, 0 to 1; 0.75 in `pendente`, 0 elsewhere; 0.3 is a short fringe) and `vento` (-1 to 1: leans the
 trunk and carries the crown with it; in `aberto` the crown streams downwind). The sprite has the requested height
-(within 2 % or 1 px). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto` and `seco` (an `aberto` in
+(within 2 % or 1 px; nodes you add on top, such as seed heads on the tips, add to it). The derived nodes are `tronco` and `copa`, plus `galhos` in `aberto` and `seco` (an `aberto` in
 the wind: also `galhos_b` and `copa_b`; a wide `moita`: `copa`, `copa_b`, `copa_c`; a `touceira`: `folhas`). Nodes you add in `nos` come after
 and can cite their anchors: a `salpico` on `copa.superficie` (one node per mass) or on `folhas.pontas`. The preview
 returns the derived nodes in `nos`, with lengths in px (1 m = 32.7 px): to change one argument, copy them into `nos`
@@ -224,12 +224,15 @@ composition: follow the hint and fix it. A `MOTOR` refusal is an engine defect, 
 A plant (tree, shrub, any asset with `copa` or `touceira`) only ships after being measured and reviewed by another
 agent. `pfe critica <build> --json` (only the build path: the store is the build's) returns:
 
-- `medidas` and `achados`: each finding has `codigo`, `gravidade`, `medida` and `dica`. A `defeito` (foliage that is
+- `medidas` and `achados`: the numbers are the engine's (`solidez`: how much the foliage fills its convex hull, a
+  defect from 0.985; `simetria`: how much it matches its mirror, from 0.95; `luz`: how much the bright side faces the
+  light, below 0.02; `ilhas`: separate pieces, never a defect); only what is listed in `achados` counts. Each finding
+  has `codigo`, `gravidade`, `medida` and `dica`. A `defeito` (foliage that is
   smooth, mirrored or without a bright side; a silhouette equal to a sibling's) stops the critique from passing: fix
   the composition and go back to step 1 with `pfe atualizar`. An `aviso` (the vanished trunk) asks for the reviewer's
   eye. A defect you believe is measured wrong is an engine defect: stop and report it, do not work
   around it.
-- `irmas`: the three plants of the store (built or not) with the closest silhouette, among those of the same category
+- `irmas`: up to three plants of the store (built or not) with the closest silhouette, among those of the same category
   and those of another category with the same size on screen (the shorter figure at least half the height of the
   taller one; `medidas.altura_px`): a clump next to another clump, a small tree next to a large one. Each has its
   `categoria` and `semelhanca` (0 to 1; from `parecida_a_partir_de` up it is a defect, whatever the category). They
