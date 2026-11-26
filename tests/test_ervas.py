@@ -1,14 +1,18 @@
 """A flora de lâminas e de pontos (mudança 21): a touceira lê como lâminas e não como massa, a folha larga é mais
 que um traço, a folha em pena é serrilhada, a folha lisa é chapada, o claro fica do lado da luz da tela em toda
-vista, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê, por dentro da figura. Os controles: a
-moita em massa, a lâmina fina, a folha lisa sombreada, o lado da luz do mundo, o pé no chão, o ponto na face por
-fora da folhagem e o salpico sorteado na volta toda."""
+vista, a palma nasce no alto do tronco, e o salpico cai onde a câmera vê, por dentro da figura; nas pontas, a flor
+fica no alto e as flores não se amontoam; nenhuma folha larga aponta para a câmera de uma vista; a nervura corre no
+eixo, e as folhas lisas vizinhas não se juntam. Os controles: a moita em massa, a lâmina fina, a folha lisa
+sombreada, o lado da luz do mundo, o pé no chão, o ponto na face por fora da folhagem, o salpico sorteado na volta
+toda, a escolha das pontas pela normal, a flor sem distância, a frente livre só na S, a nervura erguida e a folha
+lisa no grupo do nó com o tom sorteado."""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
+import numpy as np
 import pytest
 
 from pixel_forge.application.catalogo import de_uma_peca
@@ -291,6 +295,7 @@ def test_nenhuma_folha_larga_aponta_para_a_camera() -> None:
 
 def test_controle_com_o_giro_solto_uma_folha_aponta_para_a_camera(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(pecas_ervas, "FRENTE_LIVRE", 1.0)
+    monkeypatch.setattr(pecas_ervas, "FOLGA", 0.0)
     assert min(_mais_perto_da_frente(s) for s in range(12)) < 0.2 * 360 / 8 - 0.5
 
 
@@ -307,3 +312,194 @@ def test_a_roseta_de_folhas_largas_tem_o_miolo_escuro() -> None:
 
 def test_controle_a_touceira_de_laminas_finas_nao_tem_miolo() -> None:
     assert _miolo_a_mostra("0") == 0
+
+
+# a flor nas pontas: o capim derivado pelo hábito (três portes) e o composto à mão (o do kit)
+CAPINS_DE_FLOR = tuple({"planta": {"habito": "touceira", "altura": h, "largura": w}, "nos": []}
+                       for h, w in (("40cm", "70cm"), ("45cm", "60cm"), ("30cm", "60cm"))) + (
+    {"nos": [{"id": "folhas", "peca": "touceira", "args": CAPIM}]},)
+
+
+def _com_flores(caso: dict[str, Any], semente: int, flores: tuple[str, ...] = ("5",)) -> Any:
+    """A IR da touceira ``caso`` com um ``salpico`` de ``n`` flores nas pontas dela para cada ``n`` de ``flores``."""
+    nos = [*caso["nos"], *({"id": f"flor{j}", "peca": "salpico",
+                            "args": {"em": "folhas.pontas", "material": "olho_claro", "n": n}}
+                           for j, n in enumerate(flores))]
+    dado = {**de_uma_peca("touceira", CAPIM).model_dump(mode="json"), "categoria": "objeto", "semente": semente,
+            **caso, "nos": nos}
+    return ir_da_composicao(validar(dado, Composicao, "teste"))
+
+
+def _altura_das_flores(caso: dict[str, Any]) -> float:
+    """A altura média na tela da vista S das flores, em alturas da touceira (0 = o pé; 1 = o alto), em seis sementes:
+    da câmera de cima a 45°, o z sobe e o y (para a câmera) desce."""
+    alturas: list[float] = []
+    for semente in range(6):
+        ir = _com_flores(caso, semente)
+        alto = max(z * math.sqrt(0.5) - y * 0.6 for p in ir.parts if p.geometry.type == "polyline"
+                   for _, y, z in p.geometry.points_q8)
+        alturas += [(p.geometry.center_q8[2] * math.sqrt(0.5) - p.geometry.center_q8[1] * 0.6) / alto
+                    for p in ir.parts if p.geometry.type == "ellipse"]
+    return sum(alturas) / len(alturas)
+
+
+def _escolha_antiga(c: Any, pts: list[Any], a: dict[str, Any]) -> list[int]:
+    """O jeito antigo nas pontas: o da face de um volume (as de normal virada para a câmera, que descem na tela)."""
+    beiras = pecas_ervas._beiras(pecas_ervas._normais(pts), list(c.vistas.values()))
+    ordem = sorted(range(len(pts)), key=lambda k: beiras[k])
+    escolha = [k for j, k in enumerate(ordem) if j < a["n"] or beiras[k] <= pecas_ervas.BEIRA]
+    return [escolha.pop(c.st.randint(0, len(escolha) - 1)) for _ in range(min(a["n"], len(escolha)))]
+
+
+def test_a_flor_nas_pontas_fica_no_alto_da_touceira() -> None:
+    """Nas pontas, o salpico vai para as mais altas na tela: a ponta que abre para a câmera desce, e a flor nela
+    ficava na altura do pé."""
+    for caso in CAPINS_DE_FLOR:
+        assert _altura_das_flores(caso) >= 0.6, caso
+
+
+def test_controle_pela_normal_a_flor_cai_embaixo(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "_nas_pontas", _escolha_antiga)
+    for caso in CAPINS_DE_FLOR:
+        assert _altura_das_flores(caso) < 0.5, caso
+
+
+def _flores_juntas() -> int:
+    """Os pares de flores a menos de dois raios e 1 px uma da outra na tela da vista S, com dois salpicos de quatro
+    flores nas mesmas pontas do capim de 40 × 70 cm (a margarida e o ranúnculo), em seis sementes."""
+    juntas = 0
+    for semente in range(6):
+        ir = _com_flores(CAPINS_DE_FLOR[0], semente, ("4", "4"))
+        tela = [pecas_ervas._na_tela((x / 256, y / 256, z / 256), 0) for x, y, z in
+                (p.geometry.center_q8 for p in ir.parts if p.geometry.type == "ellipse")]
+        juntas += sum(1 for i, p in enumerate(tela) for o in tela[i + 1:] if math.dist(p, o) < 2 * 0.03 * PPM + 1)
+    return juntas
+
+
+def test_as_flores_nas_pontas_nao_se_amontoam() -> None:
+    """Cada flor fica longe das outras, as do mesmo salpico e as de outro nas mesmas pontas."""
+    assert _flores_juntas() == 0
+
+
+def test_controle_sem_a_distancia_as_flores_caem_juntas(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "LONGE", -1e9)
+    assert _flores_juntas() >= 10
+
+
+def _mais_perto_de_uma_camera(vistas: tuple[str, ...]) -> float:
+    """Em fatias da volta: o menor ângulo entre uma folha larga e a câmera de uma das ``vistas``, de 5 a 11 folhas e
+    seis sementes."""
+    menor = 1.0
+    for n in range(5, 12):
+        dado = de_uma_peca("touceira", {**FOLHAS, "n": str(n)}).model_dump(mode="json")
+        for semente in range(6):
+            ir = ir_da_composicao(validar({**dado, "semente": semente, "vistas": dict.fromkeys(vistas, {})},
+                                          Composicao, "teste"))
+            for x, y, _ in (p.geometry.points_q8[-1] for p in ir.parts if p.geometry.type == "tapered_polyline"):
+                for v in vistas:
+                    d = (math.degrees(math.atan2(x, y)) - AZIMUTE[v] / 1000 + 180) % 360 - 180
+                    menor = min(menor, abs(d) / (360 / n))
+    return menor
+
+
+def test_nenhuma_folha_larga_aponta_para_a_camera_de_uma_vista() -> None:
+    """Em toda vista declarada, a folha mais perto da câmera fica a 0,2 fatia ou mais dela (só com a S, as outras
+    ficavam livres por acaso, com ``n`` múltiplo de 4)."""
+    for vistas in (pecas_ervas.QUATRO, ("S", "E")):
+        assert _mais_perto_de_uma_camera(vistas) >= 0.2 - 0.01, vistas
+
+
+def test_controle_com_a_frente_livre_so_na_s_uma_folha_aponta_para_outra_camera(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "FOLGA", 0.0)
+    monkeypatch.setattr(pecas_ervas, "_vao", lambda _cameras, _n: (0.5, 1.0))
+    assert _mais_perto_de_uma_camera(pecas_ervas.QUATRO) < 0.05
+
+
+def _rosetas_da_vista_s() -> list[Any]:
+    out = []
+    for n in range(5, 12):
+        dado = de_uma_peca("touceira", {**FOLHAS, "n": str(n)}).model_dump(mode="json")
+        out += [ir_da_composicao(validar({**dado, "semente": s}, Composicao, "teste")).parts for s in range(6)]
+    return out
+
+
+def test_a_roseta_da_vista_unica_s_nao_muda(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Na composição de vista única S a frente já ficava livre: o empurrão das câmeras não mexe em folha nenhuma."""
+    antes = _rosetas_da_vista_s()
+    monkeypatch.setattr(pecas_ervas, "FOLGA", 0.0)
+    assert _rosetas_da_vista_s() == antes
+
+
+ESPADA = PECAS["touceira"].variacoes[3][1]
+LISAS = ({**FOLHAS, "pena": False}, ESPADA)
+
+
+def _lado_da_nervura() -> float:
+    """Onde a nervura cai na folha lisa larga, na vista S: em cada coluna, (os px da folha abaixo dela − os acima)
+    sobre a soma (0 = no meio; 1 = no alto da folha), na média de quatro sementes."""
+    lados = []
+    dado = de_uma_peca("touceira", {**FOLHAS, "pena": False}).model_dump(mode="json")
+    for semente in range(4):
+        q = _quadro(validar({**dado, "semente": semente}, Composicao, "teste"))
+        for k, p in enumerate(q.part_table):
+            if not p.endswith("_nervura"):
+                continue
+            folha = (q.dono == k + 1) | (q.dono == q.part_table.index(p.removesuffix("_nervura")) + 1)
+            for y, x in zip(*(q.dono == k + 1).nonzero(), strict=True):
+                cima = baixo = 0
+                while y - cima > 0 and folha[y - cima - 1, x]:
+                    cima += 1
+                while y + baixo + 1 < folha.shape[0] and folha[y + baixo + 1, x]:
+                    baixo += 1
+                if cima + baixo >= 3:
+                    lados.append((baixo - cima) / (cima + baixo))
+    return sum(lados) / len(lados)
+
+
+def test_a_nervura_corre_no_eixo_da_folha() -> None:
+    """A nervura corre no eixo e vem à frente do corpo no z-buffer: na folha deitada ela fica no meio."""
+    assert abs(_lado_da_nervura()) <= 0.3
+
+
+def test_controle_a_nervura_erguida_corre_no_alto_da_folha(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito antigo: a nervura erguida o raio do corpo acima do eixo (para o corpo não a cobrir)."""
+    monkeypatch.setattr(pecas_ervas, "_nervura", lambda arco, largura: (
+        [(x, y, z + largura / 2 * k) for (x, y, z), k in zip(arco[:-1], pecas_ervas.LARGURA_NO_ARCO, strict=False)],
+        0))
+    assert _lado_da_nervura() >= 0.3
+
+
+def _juntas(args: dict[str, Any]) -> float:
+    """Das beiras entre os corpos de duas folhas vizinhas na vista S, a fração em que as duas saem do mesmo tom (o
+    tom de cada uma é o mais comum nela; a linha entre elas não conta), em seis sementes."""
+    juntas = beiras = 0
+    for semente in range(6):
+        q = _quadro(validar({**de_uma_peca("touceira", args).model_dump(mode="json"), "semente": semente},
+                            Composicao, "teste"))
+        dono = q.dono.astype(np.int64)
+        cheio = np.full(len(q.part_table) + 1, -1)
+        for k, p in enumerate(q.part_table):
+            if not p.endswith(("_nervura", "_miolo")) and (q.dono == k + 1).any():
+                cheio[k + 1] = np.bincount(q.index[q.dono == k + 1]).argmax()
+        corpo = q.index == cheio[dono]
+        for dy, dx in ((0, 1), (1, 0)):
+            h, w = dono.shape[0] - dy, dono.shape[1] - dx
+            vizinhas = corpo[:h, :w] & corpo[dy:, dx:] & (dono[:h, :w] != dono[dy:, dx:])
+            beiras += int(vizinhas.sum())
+            juntas += int((vizinhas & (q.index[:h, :w] == q.index[dy:, dx:])).sum())
+    return juntas / beiras
+
+
+def test_as_folhas_lisas_vizinhas_nao_se_juntam_numa_mancha() -> None:
+    """A folha lisa não repete o tom da vizinha na volta, e a larga tem o contorno dela: a beira entre duas folhas
+    quase nunca é do mesmo tom dos dois lados."""
+    for args in LISAS:
+        assert _juntas(args) <= 0.25, args["largura"]
+
+
+def test_controle_no_mesmo_grupo_e_no_tom_sorteado_as_folhas_se_juntam(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(pecas_ervas, "_outro_tom", lambda _a, tom, _lado, _vizinhas: tom)
+    monkeypatch.setattr(pecas_ervas, "COM_CONTORNO", 1e9)
+    for args in LISAS:
+        assert _juntas(args) >= 0.3, args["largura"]

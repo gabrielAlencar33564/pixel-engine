@@ -51,10 +51,16 @@ class AssetBuilder:
     bones: list[dict[str, Any]] = field(default_factory=list)
     parts: list[dict[str, Any]] = field(default_factory=list)
     por_vista: dict[str, dict[str, str]] = field(default_factory=dict)  # vista → parte → o material dela ali
+    a_frente: dict[str, int] = field(default_factory=dict)  # parte → o quanto ela vem para a câmera (q8), toda vista
 
     def na_vista(self, vista: str, id: str, material: str) -> None:
         """Na ``vista``, a parte ``id`` é do ``material`` (o tom que vem do lado da luz na tela)."""
         self.por_vista.setdefault(vista, {})[id] = material
+
+    def adianta(self, id: str, q8: int) -> None:
+        """A parte ``id`` vem ``q8`` para a câmera no z-buffer de toda vista, sem sair do lugar na tela (a nervura no
+        eixo da folha, à frente do corpo roliço dela)."""
+        self.a_frente[id] = q8
 
     def bone(self, id: str, parent: str | None, t: list[int], junta: Junta = JUNTA) -> None:
         """Um osso de translação ``t`` (q8) a partir do pai."""

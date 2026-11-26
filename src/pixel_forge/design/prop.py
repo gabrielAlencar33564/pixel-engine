@@ -133,7 +133,7 @@ def _vistas(comp: Composicao, b: AssetBuilder, regras: list[Any]) -> dict[str, A
         az = AZIMUTE[d]
         v: dict[str, Any] = {"occlusion_rules": regras_da_vista(b.parts, regras, az),
                              "visibility": dict.fromkeys(vista.ocultas, "hidden"),
-                             "materials": dict(b.por_vista.get(d, {}))}
+                             "materials": dict(b.por_vista.get(d, {})), "depth_bias": dict(b.a_frente)}
         out[d] = v
     return out
 
