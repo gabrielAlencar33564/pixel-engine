@@ -690,7 +690,35 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
     vista S e as composições de vista única não mudam). A folha larga lisa é chapada (as faixas da peça lisa a
     faziam ler como tubo), com a nervura escura como a da pena. O capim de 20 a 40 cm (5 a 9 px de alto na tela)
     é limite da resolução: lê com poucas lâminas e `cai` 0, e nada mudou.
-- O que sobra: a casca clara e a anelada seguem na rampa lilás, e falta o cinza-esverdeado (a sálvia, a
-  oliveira); a semelhança compara só a silhueta (duas
+- A segunda rodada (as sobras que cada agente apontou em arquivo de outro; três agentes, conferidos e trazidos):
+  - **A âncora `superficie`** (`pecas_copa.py`): cada volume da copa deixa, além do ponto para fora e para cima, o
+    ponto de frente de cada vista declarada, os que nenhum outro volume contém. Na vista S, em seis sementes, os
+    frutos da moita do kit aparecem 31 de 36 (eram 24, com 3 no contorno) e as flores 51 de 54 (eram 36, com 6),
+    nenhum no contorno; na árvore, 60 de 60 (eram 50, com 10). Nas quatro vistas o contorno cai (moita de 36 para
+    23, árvore de 83 para 57): o ponto de frente de uma vista fica de perfil nas laterais. Dois controles das
+    ervas mudaram com ela (o do `MERGULHO` volta também a âncora de um ponto; o do lado de lá soma seis sementes).
+  - **A cortina do chorão:** a ponta desce até 0,024 a 0,084 da altura de onde o ramo sai (era 0,07 a 0,25), com
+    o raio de 0,035 da meia largura (0,7 px no mínimo) e a ponta a 0,3 dele: eram barras. Com 8 ramos por lóbulo
+    lia melhor como véu, mas desfazia o controle do hábito; ficou em 5.
+  - **A flor nas pontas** (`pecas_ervas.py`): o `salpico` nas pontas sorteia entre a metade mais alta na tela das
+    vistas declaradas, cada flor a dois raios e 1 px das outras (as de outro salpico nas mesmas pontas também).
+    Na vista S a flor foi de 0,27-0,53 a 0,68-0,78 da altura da touceira; nas quatro vistas fica em 0,5-0,7 (toda
+    ponta abre para a câmera de alguma vista).
+  - **A folha larga:** a roseta gira no meio do maior vão entre as câmeras declaradas, e nenhuma folha fica a
+    menos de 0,2 fatia de uma câmera (só a S tinha a frente livre; a vista única S não muda). A nervura corre no
+    eixo e vem à frente do corpo (`AssetBuilder.adianta`, o `depth_bias` da vista). A folha lisa não repete o tom
+    da vizinha, e a de 5 px ou mais tem o contorno dela: a beira entre folhas do mesmo tom foi de 0,40 a
+    0,11-0,21 na espada e de 0,57 a 0 na roseta de cinco folhas de 30 cm.
+  - **A agulha, a folha cinzenta e as cascas alvas** (`estilo_base.json`, `habito.py`): a `copa_agulha` tinha a
+    textura da folha larga e passou ao traço deitado de 3 a 6 px (a troca de tom na vertical foi de 1,04 e 0,95
+    a 1,66 e 1,43 da horizontal, na conífera e no pinheiro aberto). A `copa_cinzenta` no cinza neutro lia como
+    pedra: entram `cinza_verde_fundo` a `cinza_verde_claro` (54 a 57, matiz de 85° a 105°), a copa cinzenta
+    passa a essa rampa e a planta pelos traços ganha `folha: cinzenta`. Entram a `casca_alva` (lisa) e a
+    `casca_alva_anelada` (a bétula) na rampa neutra; a `casca_clara` (no oráculo) e a `casca_anelada` ficam.
+- O que sobra: a casca clara e a anelada seguem lilases (as alvas são a escolha neutra); o traço da agulha é
+  sempre deitado (a textura do volume não tem direção) e cruza a ponta caída do pinheiro; no chorão de 5 m os
+  ramos têm 6 a 7 px no alto e a cortina é rala e reta; a nervura some na folha lisa escura; no capim pequeno
+  oito flores não cabem afastadas; a roseta de poucas folhas muito largas lê como estrela; a nuvem de agulha
+  lê como estrela espinhosa; a semelhança compara só a silhueta (duas
   plantas de silhuetas iguais e cores diferentes são acusadas). As composições antigas do acervo com `saia` não se
   leem mais, e as de `copa` dão outro desenho.

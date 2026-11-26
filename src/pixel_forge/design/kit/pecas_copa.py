@@ -305,7 +305,7 @@ PECAS_COPA = [
                "um lado só; a moita de duas massas, com dois nós no mesmo grupo)", ["0", "0"]),
              X("pontas", "ancora", "as pontas dos galhos onde sai um tufo a mais ('<nó>.pontas')", ""),
              FOLHAGEM, X("miolo", "material", "o miolo escuro entre os lóbulos (folha_escura com a copa_folha, "
-                         "cinza_fundo com a copa_cinzenta)", "folhosa_funda")),
+                         "cinza_verde_fundo com a copa_cinzenta)", "folhosa_funda")),
          _copa, (("redonda", {"copa": ["1.2m", "1m", "1.9m"]}),
                  ("gota", {"copa": ["85cm", "1.4m", "2.1m"], "tufos": "11", "tamanho": "0.34", "perfil": "0.9",
                            "material": "copa_folha", "miolo": "folha_escura"}),

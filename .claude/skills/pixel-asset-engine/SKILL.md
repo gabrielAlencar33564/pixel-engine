@@ -116,7 +116,8 @@ foliage, branches thinner than the trunk they leave), so nothing floats and the 
 | `touceira` | thin blades, each from its own foot spread over the clump (they stay separate, as grass grows), almost upright and straight (a low wide clump gets its width from the feet), so a `salpico` on `folhas.pontas` gives flowers on top; with `folha: larga`, a rosette of feathered fronds |
 
 `altura` and `largura` are the real measurements. Every value is a string (`"fuste": "0.3"`). Optional: `folha`
-(`larga`: dark green, the default; `miuda`: light green, the default in a `touceira`; `agulha`: dark blue-green),
+(`larga`: dark green, the default; `miuda`: light green, the default in a `touceira`; `agulha`: dark blue-green, in
+fine level needle strokes; `cinzenta`: grey-green, the silvery foliage of olive and sage),
 `idade` (`jovem`, `adulta`, `velha`: changes trunk, roots and crown), `casca` (a bark material), and, only when the
 species departs from its habit, `fuste` (the share of the height with no crown, 0.05 to 0.8; by habit: `excurrente`
 0.22, `decurrente` 0.38, `seco` 0.40, `aberto` 0.42, `pendente` 0.45, `guarda_sol` 0.55), `esbeltez` (height over
@@ -138,8 +139,8 @@ and drop `planta`. Vary a set by habit, proportions, age, wind and seed.
 | tiers | `tronco_em_pe` + `copa_conica` | the conifer with jagged skirts; `pontas`, `recorte` and `cai` give a full or a thin skirt |
 | rosette on top | `tronco_em_pe` + `touceira` with `pe` at the trunk top, `largura` and `pena` | the palm (feathered), the sword leaf (smooth) |
 | dead | `tronco_em_pe` + `galhos` | the leafless tree |
-| bush | `copa` on the ground, no trunk | the shrub; with `salpico` on its `superficie`, flowers and fruit (on the points a view sees face-on, tucked into the foliage); a bush of two or three masses is several `copa` nodes with `desvio`, in the same `grupo` |
-| clump | `touceira` | blades: thin, grass and reeds (grass of 20-40 cm is 5-9 px tall on screen: few blades, `n` at most the width in px / 2, and `cai` 0); with `largura` and `pena`, the fern; with `largura` and no `pena`, flat sword leaves with a dark midrib; with `salpico` on the `pontas`, wild flowers and seed heads (a flower needs an almost straight blade, `cai` up to 0.1; an upright seed head, `alonga` 3) |
+| bush | `copa` on the ground, no trunk | the shrub; with `salpico` on its `superficie`, flowers and fruit (every volume leaves the point each declared view sees head-on, and the dot is tucked into the foliage: declare the views the asset ships with before tuning `n`); a bush of two or three masses is several `copa` nodes with `desvio`, in the same `grupo` |
+| clump | `touceira` | blades: thin, grass and reeds (grass of 20-40 cm is 5-9 px tall on screen: few blades, `n` at most the width in px / 2, and `cai` 0); with `largura` and `pena`, the fern; with `largura` and no `pena`, flat sword leaves with a dark midrib on the axis (from 15 cm wide each leaf has its own outline; five very wide leaves read as a star: use more, narrower ones); with `salpico` on the `pontas`, wild flowers and seed heads on the tips highest on screen, kept apart, also from another `salpico` on the same tips (a flower needs an almost straight blade, `cai` up to 0.1; an upright seed head, `alonga` 3; with four views a tip high in one view is low in another, so the flowers sit at mid-height) |
 
 Foliage is one mass of light (bright on top and on the left) per `grupo`: foliage nodes in the same group brighten and
 darken together, each lobe is a relief on the mass, and each lobe's edge is cut into leaves. `desvio` moves the crown
@@ -162,7 +163,7 @@ or a branch tip (lobes recede from the edge: take the trunk up to the crown cent
 ground or on a trunk top. Under a mass crown the `galhos` barely show (they leave their tips for the crown to put a
 tuft on each) and are listed in `escondidas`: that is expected. A trunk is not a cylinder: by default the foot flares at the ground and the stem thickens and thins; give it
 what the species has (`curva` for a young trunk, `raizes` and `nos` for an old one, bark with upright grain,
-`casca_sulcada` brown and `casca_cinzenta` warm grey (poplar, beech, ash: deep upright furrows with a light ridge), or `casca_anelada` with horizontal rings; `casca_clara` is smooth; for a grey plant, `copa` with `material: copa_cinzenta` and `miolo: cinza_fundo` (node by node; `cinza` is a neutral grey for any smooth part)
+`casca_sulcada` brown and `casca_cinzenta` warm grey (poplar, beech, ash: deep upright furrows with a light ridge), or `casca_anelada` with horizontal rings; `casca_clara` is smooth; `casca_alva` is smooth pale neutral bark and `casca_alva_anelada` white bark with dark level marks (birch): prefer these two over `casca_clara` and `casca_anelada`, which lean lilac; for a grey plant, `folha: cinzenta` in `planta`, or node by node `copa` with `material: copa_cinzenta` and `miolo: cinza_verde_fundo` (blades: `cinza_verde`, `cinza_verde_claro`, `cinza_verde_escuro`; `cinza` is a neutral grey for any smooth part)
 and, on a thin trunk, reads as a pipe). Small bushes and crowns (under ~1.5 m wide) need few large lobes (5 or 6 of
 0.45): with many small ones the relief disappears.
 

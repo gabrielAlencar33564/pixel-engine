@@ -22,7 +22,7 @@ from pixel_forge.contracts.carregar import validar
 from pixel_forge.contracts.composicao import Composicao
 from pixel_forge.design.asset import ir_da_composicao
 from pixel_forge.design.escala import PPM
-from pixel_forge.design.kit import pecas_ervas
+from pixel_forge.design.kit import pecas_copa, pecas_ervas
 from pixel_forge.design.kit.registro import PECAS
 from pixel_forge.design.vistas import AZIMUTE
 from pixel_forge.quality import flora
@@ -93,9 +93,11 @@ def test_controle_por_padrao_a_touceira_nasce_no_chao() -> None:
     assert _pes(["0", "0", "0"]) == {0.0}
 
 
-def _do_lado_de_la(vistas: tuple[str, ...]) -> tuple[int, int]:
+def _do_lado_de_la(vistas: tuple[str, ...], semente: int | None = None) -> tuple[int, int]:
     """Os pontos do salpico, e deles os que caem na metade de trás da moita (longe da câmera da vista S)."""
     dado = de_uma_peca("salpico", FLORES).model_dump(mode="json")
+    if semente is not None:
+        dado["semente"] = semente
     ir = ir_da_composicao(validar({**dado, "vistas": dict.fromkeys(vistas, {})}, Composicao, "teste"))
     pontos = [p.geometry.center_q8 for p in ir.parts if p.id.startswith("n_") and p.geometry.type == "ellipse"]
     return len(pontos), sum(1 for p in pontos if p[1] < -5 * 256)
@@ -107,8 +109,9 @@ def test_o_salpico_cai_do_lado_da_camera() -> None:
 
 
 def test_controle_na_volta_toda_ha_pontos_do_lado_de_la() -> None:
-    """Com as 4 vistas os pontos se espalham pela volta: cada vista mostra os dela."""
-    assert _do_lado_de_la(("S", "E", "N", "W"))[1] >= 2
+    """Com as 4 vistas os pontos se espalham pela volta: cada vista mostra os dela (em seis sementes: numa só,
+    a moita de lóbulos para a frente tem poucos pontos atrás)."""
+    assert sum(_do_lado_de_la(("S", "E", "N", "W"), semente)[1] for semente in range(6)) >= 6
 
 
 def _no_contorno(vistas: tuple[str, ...]) -> tuple[int, int]:
@@ -140,6 +143,7 @@ def test_o_salpico_cai_por_dentro_da_figura() -> None:
 def test_controle_o_ponto_na_face_cai_no_contorno(monkeypatch: pytest.MonkeyPatch) -> None:
     """Com o ponto na face do volume, por fora da folhagem (o jeito antigo), o da beira fica no contorno."""
     monkeypatch.setattr(pecas_ervas, "MERGULHO", 0.0)
+    monkeypatch.setattr(pecas_copa, "_de_frente", lambda _azimutes: [])  # e um ponto só por volume
     dentro, contorno = _no_contorno(("S",))
     assert contorno > dentro / 2
 
