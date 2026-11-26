@@ -11,6 +11,7 @@ import math
 from typing import Any
 
 from ...core.rng import Stream
+from ...views.camera import ELEVACAO_MDEG, PROFUNDIDADE_PERMILLE
 from ..construtor import Parte, bound_polygon, ellipse, q, qv
 from .peca import Apoio, Arg, Ctx, Peca
 
@@ -24,11 +25,14 @@ RAMINHO = 0.14  # o raminho na borda do lóbulo, em fração da copa
 VARIA = 2.5  # o tamanho do lóbulo varia ``irregular`` vezes isto
 RECUA = 1.2  # e o lóbulo recua da borda da copa até ``irregular`` vezes isto
 MAX_RECUO = 0.28  # mas nunca mais que isto: o lóbulo que recua demais abre a copa e mostra o miolo chapado
+# a cortina do chorão é de fios: ramos finos, afilados até a ponta, que chegam perto do chão (de 2 a 3 px e pouco
+# afilados, parando a 0,07 a 0,25 da altura de onde saíam, liam como barras de gelo)
 RAMOS_QUE_CAEM = 5  # por lóbulo
 ONDULA = 2.0  # a ponta do ramo sai do prumo até tantos raios dele, para um lado
-ACIMA_DO_CHAO = 0.18  # a ponta do ramo para a esta fração da altura de onde ele sai (de 0,4 a 1,4 vezes isto)
-RAMO_FINO = 0.045  # o raio do ramo que cai, em fração da meia largura da copa (1 px no mínimo)
-PONTA_DO_RAMO = 0.45  # o raio na ponta, em fração do raio no alto
+ACIMA_DO_CHAO = 0.06  # a ponta do ramo para a esta fração da altura de onde ele sai (de 0,4 a 1,4 vezes isto)
+RAMO_FINO = 0.035  # o raio do ramo que cai, em fração da meia largura da copa
+RAMO_MAIS_FINO = 0.7  # o menor raio do ramo no alto (px)
+PONTA_DO_RAMO = 0.3  # o raio na ponta, em fração do raio no alto
 RAIO_MINIMO = 32  # o menor raio do ramo na IR (q8): 1/8 px
 MIOLO = 0.5  # o miolo escuro, em fração da copa: fecha os vãos entre os lóbulos
 NO_CHAO = 1.5  # a copa cujo fundo chega a esta altura (px) é a moita: nasce do chão
@@ -102,9 +106,10 @@ def tufos(st: Stream, a: dict[str, Any]) -> list[tuple[Vec, Vec]]:
 
 
 def ramos(st: Stream, a: dict[str, Any], lobulos: list[tuple[Vec, Vec]]) -> list[tuple[Vec, Vec, float]]:
-    """Os ramos que caem (``pende``): cinco de cada lóbulo dos dois terços de baixo da copa, cada um de dentro do
-    lóbulo até ``pende`` meias alturas abaixo do meio da copa. O quanto desce é sorteado, e a barra da cortina é
-    desigual: nenhum ramo chega ao chão. Devolve o alto, a ponta (um pouco fora do prumo) e o raio de cada um."""
+    """Os ramos que caem (``pende``): ``RAMOS_QUE_CAEM`` de cada lóbulo dos dois terços de baixo da copa, cada um de
+    dentro do lóbulo até ``pende`` meias alturas abaixo do meio da copa. O quanto desce é sorteado, e a barra da
+    cortina é desigual: nenhum ramo chega ao chão. Devolve o alto, a ponta (um pouco fora do prumo) e o raio de
+    cada um."""
     meia_l, meia_a, cz = a["copa"]
     baixos = sorted(lobulos, key=lambda v: v[0][2])[:(2 * len(lobulos) + 2) // 3] if a["pende"] > 0 else []
     out = []
@@ -113,7 +118,7 @@ def ramos(st: Stream, a: dict[str, Any], lobulos: list[tuple[Vec, Vec]]) -> list
             px, py = x + 0.8 * rx * _sorte(st), y + 0.8 * ry * _sorte(st)
             desce = cz - meia_a * a["pende"] * (0.45 + 0.55 * abs(_sorte(st)))
             ponta = max(z * ACIMA_DO_CHAO * (0.4 + abs(_sorte(st))), desce)
-            raio = max(1.0, meia_l * RAMO_FINO * (0.7 + 0.6 * abs(_sorte(st))))
+            raio = max(RAMO_MAIS_FINO, meia_l * RAMO_FINO * (0.7 + 0.6 * abs(_sorte(st))))
             out.append(((px, py, z), (px * 1.03 + ONDULA * raio * _sorte(st), py * 1.03, ponta), raio))
     return out
 
@@ -124,11 +129,31 @@ def _na_massa(c: Ctx) -> tuple[str, ...]:
     return ("volume_sphere", f"massa_{c.grupo}", "borda_de_folha")
 
 
+def _de_frente(azimutes: list[int]) -> list[Vec]:
+    """As normais de face que a câmera de cada vista vê de frente: a direção em que a projeção achata um ponto (o chão
+    a cos 45° e a altura a 0,6, girada com a vista). O ponto na face de normal nela cai no meio da figura do volume,
+    longe do contorno. A face do alto (0, 0, 1) não entra: vista a 45°, o ponto que o ``salpico`` afunda nela fica
+    coberto pelo arco do volume (um terço deles sumia na moita)."""
+    chao, alto = math.cos(math.radians(ELEVACAO_MDEG / 1000)), PROFUNDIDADE_PERMILLE / 1000
+    tam = math.hypot(chao, alto)
+    return [(math.sin(math.radians(az / 1000)) * chao / tam, math.cos(math.radians(az / 1000)) * chao / tam,
+             alto / tam) for az in azimutes]
+
+
+def _na_face(centro: Vec, raios: Vec, normal: Vec) -> Vec:
+    """O ponto do elipsoide cuja normal é ``normal``."""
+    tam = math.sqrt(sum((r * n) ** 2 for r, n in zip(raios, normal, strict=True))) or 1.0
+    return (centro[0] + raios[0] ** 2 * normal[0] / tam, centro[1] + raios[1] ** 2 * normal[1] / tam,
+            centro[2] + raios[2] ** 2 * normal[2] / tam)
+
+
 def _volumes(c: Ctx, material: str, massas: list[tuple[Vec, Vec]], meio: Vec) -> list[Vec]:
     """Os volumes como partes do nó, no grupo de contorno dele (sem linha entre eles) e numa massa de luz só; devolve
-    a superfície: um ponto na face de cada volume, para fora do ``meio`` e para cima (a face que a câmera de cima
-    vê), se nenhum outro volume o cobre."""
+    a superfície: em cada volume, o ponto para fora do ``meio`` e para cima e o que cada vista da composição vê de
+    frente (``_de_frente``), os que nenhum outro volume cobre. Um ponto só por volume não bastava: a moita pequena
+    não tinha pontos de frente para todo o ``salpico``, e ele caía no contorno."""
     fora: list[Vec] = []
+    frentes = _de_frente(list(c.vistas.values()))
     for i, (centro, raios) in enumerate(massas):
         c.b.part(f"{c.pid}_{i:02d}", material, ellipse(qv(*centro), qv(*raios)),
                  Parte(group=c.grupo, tags=_na_massa(c)))
@@ -136,10 +161,11 @@ def _volumes(c: Ctx, material: str, massas: list[tuple[Vec, Vec]], meio: Vec) ->
         tam = math.hypot(*d) or 1.0
         d = [d[0] / tam, d[1] / tam, d[2] / tam + PARA_CIMA]
         tam = math.hypot(*d)
-        p = (centro[0] + d[0] / tam * raios[0], centro[1] + d[1] / tam * raios[1], centro[2] + d[2] / tam * raios[2])
-        if not any(j != i and math.hypot(*((p[k] - o[k]) / r[k] for k in range(3))) < 1
-                   for j, (o, r) in enumerate(massas)):
-            fora.append(p)
+        de_fora = (centro[0] + d[0] / tam * raios[0], centro[1] + d[1] / tam * raios[1],
+                   centro[2] + d[2] / tam * raios[2])
+        fora += [p for p in (de_fora, *(_na_face(centro, raios, n) for n in frentes))
+                 if not any(j != i and math.hypot(*((p[k] - o[k]) / r[k] for k in range(3))) < 1
+                            for j, (o, r) in enumerate(massas))]
     return fora
 
 
@@ -258,7 +284,8 @@ def _tronco_da_conifera(args: dict[str, Any]) -> Apoio:
 
 
 COPA = X("copa", "ponto", "a copa: meia largura, meia altura e a altura do centro")
-FOLHAGEM = X("material", "material", "a folhagem (copa_folhosa, copa_folha, copa_agulha)", "copa_folhosa")
+FOLHAGEM = X("material", "material", "a folhagem (copa_folhosa, copa_folha, copa_agulha, copa_cinzenta)",
+             "copa_folhosa")
 PECAS_COPA = [
     Peca("copa", "A copa da folhosa em massa: lóbulos de tamanhos desencontrados em espiral, por dentro do elipsoide "
          "da copa, com raminhos na borda; a luz é da massa inteira. O perfil faz a redonda, a gota e o guarda-sol; "
@@ -277,7 +304,8 @@ PECAS_COPA = [
              X("desvio", "faixa", "quanto a copa sai do eixo: para a direita da tela e para a frente (a copa de "
                "um lado só; a moita de duas massas, com dois nós no mesmo grupo)", ["0", "0"]),
              X("pontas", "ancora", "as pontas dos galhos onde sai um tufo a mais ('<nó>.pontas')", ""),
-             FOLHAGEM, X("miolo", "material", "o miolo escuro entre os lóbulos", "folhosa_funda")),
+             FOLHAGEM, X("miolo", "material", "o miolo escuro entre os lóbulos (folha_escura com a copa_folha, "
+                         "cinza_fundo com a copa_cinzenta)", "folhosa_funda")),
          _copa, (("redonda", {"copa": ["1.2m", "1m", "1.9m"]}),
                  ("gota", {"copa": ["85cm", "1.4m", "2.1m"], "tufos": "11", "tamanho": "0.34", "perfil": "0.9",
                            "material": "copa_folha", "miolo": "folha_escura"}),
@@ -285,8 +313,8 @@ PECAS_COPA = [
                  ("pendente", {"copa": ["1.3m", "70cm", "2.4m"], "perfil": "-0.6", "pende": "2.4",
                                "material": "copa_folha", "miolo": "folha_escura"}),
                  ("moita", {"copa": ["70cm", "45cm", "45cm"], "tufos": "6", "tamanho": "0.45"})),
-         TESTE, (_copa, _volumes, _na_massa, tufos, ramos, _lobulos, _raminhos, _sorte), vistas=QUATRO,
-         flora="folhagem", ancoras=("superficie",), apoio=_tronco_da_copa),
+         TESTE, (_copa, _volumes, _de_frente, _na_face, _na_massa, tufos, ramos, _lobulos, _raminhos, _sorte),
+         vistas=QUATRO, flora="folhagem", ancoras=("superficie",), apoio=_tronco_da_copa),
     Peca("copa_aberta", "A copa aberta: uma nuvem de folhas em cada ponta de galho, com os galhos e o chão à mostra "
          "entre elas (a árvore de galhos abertos, a de copa rala, a velha). De material de agulha, cada nuvem é um "
          "tufo chato de leques empilhados, de pontas finas (a conífera aberta). Pede as pontas de um nó de antes. "
@@ -303,9 +331,8 @@ PECAS_COPA = [
                    ("chatas", {"pontas": "galhos.pontas", "raio": "70cm", "achata": "0.35", "tufos": "5"}),
                    ("ralas", {"pontas": "galhos.pontas", "raio": "35cm", "tufos": "3", "material": "copa_folha"})),
          "tests/test_flora.py::test_a_copa_aberta_deixa_os_galhos_a_mostra",
-         (_aberta, _de_agulha, _saia, _volumes, _na_massa, tufos, _lobulos, _raminhos, _sorte), vistas=QUATRO,
-         flora="folhagem",
-         ancoras=("superficie",),
+         (_aberta, _de_agulha, _saia, _volumes, _de_frente, _na_face, _na_massa, tufos, _lobulos, _raminhos,
+          _sorte), vistas=QUATRO, flora="folhagem", ancoras=("superficie",),
          apoio=(("tronco", "tronco_em_pe", {"altura": "2.2m", "base": "26cm", "topo": "12cm",
                                             "casca": "casca_sulcada"}),
                 ("galhos", "galhos", {"base": "1.1m", "copa": ["1.3m", "70cm", "2.3m"], "n": "6", "alcance": "0.95",

@@ -162,6 +162,31 @@ def test_controle_sem_pende_nao_ha_ramo_caindo() -> None:
     assert ramos(Stream(1), COPA_DE_TESTE, tufos(Stream(1), COPA_DE_TESTE)[:7]) == []
 
 
+def _fios() -> tuple[float, float, float]:
+    """A cortina da copa pendente do kit (1,3 m de meia largura) com o ``pende`` que leva os ramos ao chão: a ponta
+    mais baixa (em fração da altura de onde o ramo sai) e o raio no alto e na ponta do ramo mais grosso (px)."""
+    a = {**COPA_DE_TESTE, "copa": (1.3 * PPM, 0.7 * PPM, 2.4 * PPM), "perfil": -0.6, "pende": 6.0}
+    cortina = ramos(Stream(1), a, tufos(Stream(1), a)[:7])
+    raio = max(r for _, _, r in cortina)
+    return min(ponta[2] / alto[2] for alto, ponta, _ in cortina), raio, raio * pecas_copa.PONTA_DO_RAMO
+
+
+def test_a_cortina_do_chorao_e_de_fios_que_chegam_perto_do_chao() -> None:
+    """Os ramos da cortina são finos, afilados até a ponta, e os mais longos param perto do chão (a menos de 0,05
+    da altura de onde saem): a cortina lê como fios, não como barras de gelo."""
+    ponta, alto, fim = _fios()
+    assert ponta <= 0.05 and alto <= 2.1 and fim <= 0.7
+
+
+def test_controle_a_cortina_de_barras_para_longe_do_chao(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: ramos de 2 a 3 px, pouco afilados, que paravam a 0,07 a 0,25 da altura de onde saíam."""
+    for nome, antes in (("ACIMA_DO_CHAO", 0.18), ("RAMO_FINO", 0.045), ("RAMO_MAIS_FINO", 1.0),
+                        ("PONTA_DO_RAMO", 0.45)):
+        monkeypatch.setattr(pecas_copa, nome, antes)
+    ponta, alto, fim = _fios()
+    assert ponta > 0.05 and alto > 2.1 and fim > 0.7
+
+
 def _duas_massas(grupos: tuple[str, str]) -> tuple[float, float]:
     """Dois nós de copa lado a lado (o ``desvio``): a luminância média do nó da esquerda e a do nó da direita."""
     nos = [{"id": f"copa_{lado}", "peca": "copa", "grupo": grupo,
@@ -706,3 +731,35 @@ def test_a_massa_larga_escurece_de_um_lado_ao_outro(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(tons, "LUZ_DA_MASSA", volume.SPH_LIGHT)
     luz_da_bola, sombra_da_bola = _duas_massas(("moita", "moita"))
     assert luz / sombra >= 1.2 and luz / sombra >= luz_da_bola / sombra_da_bola + 0.05
+
+
+def _frutos_de_frente() -> tuple[int, int, int]:
+    """As flores e os frutos do kit na moita, na composição de vista única (seis sementes): os pedidos, os que
+    aparecem por dentro da figura e os que tocam o contorno dela."""
+    pedidos = dentro = contorno = 0
+    for _, args in PECAS["salpico"].variacoes[:2]:
+        for semente in range(6):
+            dado = {**de_uma_peca("salpico", args).model_dump(mode="json"), "semente": semente}
+            q = quadro_de_repouso(ir_da_composicao(validar(dado, Composicao, "teste")),
+                                  estilo_render(estilo_base()), "S")
+            pts = [p for p in q.part_table if p.startswith("n_")]
+            pedidos += int(args["n"])
+            contorno += sum(1 for p in pts if q.na_silhueta.get(p, 0))
+            dentro += sum(1 for p in pts if q.visiveis.get(p, 0) and not q.na_silhueta.get(p, 0))
+    return pedidos, dentro, contorno
+
+
+def test_a_superficie_tem_o_ponto_de_frente_de_cada_vista() -> None:
+    """A âncora ``superficie`` deixa em cada volume, além do ponto de fora, o que cada vista da composição vê de
+    frente: a moita pequena tem pontos no meio da figura para todo o salpico (aparecem quase todos, e nenhum no
+    contorno)."""
+    pedidos, dentro, contorno = _frutos_de_frente()
+    assert dentro >= 0.82 * pedidos and contorno <= pedidos / 30
+
+
+def test_controle_um_ponto_so_por_volume_nao_basta_a_moita_pequena(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O jeito de antes: um ponto só por volume, para fora e para cima. Na moita pequena um terço do salpico não
+    aparece, e parte do que aparece cai no contorno."""
+    monkeypatch.setattr(pecas_copa, "_de_frente", lambda _azimutes: [])
+    pedidos, dentro, contorno = _frutos_de_frente()
+    assert dentro < 0.8 * pedidos and contorno > pedidos / 30
