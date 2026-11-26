@@ -103,7 +103,7 @@ class Planta(Strict):
     habito: Literal["decurrente", "excurrente", "aberto", "pendente", "guarda_sol", "seco", "moita", "touceira"]
     altura: Expr
     largura: Expr
-    folha: Literal["larga", "miuda", "agulha"] | None = None  # sem ela: larga; na touceira, a lâmina fina
+    folha: Literal["larga", "miuda", "agulha", "cinzenta"] | None = None  # sem ela: larga; na touceira, a lâmina fina
     idade: Literal["jovem", "adulta", "velha"] = "adulta"
     fuste: Expr | None = None
     esbeltez: Expr | None = None

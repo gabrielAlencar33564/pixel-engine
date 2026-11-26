@@ -63,7 +63,7 @@ HABITOS = {
 IDADES = {"jovem": (1.35, 0.12, 0.25, 0.2, 0.08, 0), "adulta": (1.0, 0.2, 0.0, 0.35, 0.12, 0),
           "velha": (0.75, 0.24, 0.1, 0.5, 0.18, 3)}
 FOLHAS = {"larga": ("copa_folhosa", "folhosa_funda"), "miuda": ("copa_folha", "folha_escura"),
-          "agulha": ("copa_agulha", "agulha_escura")}
+          "agulha": ("copa_agulha", "agulha_escura"), "cinzenta": ("copa_cinzenta", "cinza_verde_fundo")}
 LOBULO_PX = 11.0  # a largura de um lóbulo na tela: a copa tem tantos quantos cabem na largura dela (de 5 a 12)
 COBRE = 1.1  # o tamanho do lóbulo é isto sobre a raiz do número deles: juntos cobrem a copa, sem abrir o miolo
 ANDAR_M = 0.55  # a altura de um andar da conífera (mais juntos, um sombreia o outro e a árvore escurece toda)
@@ -98,7 +98,10 @@ ABRE_DA_TOUCEIRA = 0.43  # o alcance das pontas que leva a touceira até a largu
 # pé e reta; a largura que a abertura não dá vem do pé, mais largo
 LAMINA_EM_PE = (0.35, 0.08)
 FRONDE = (0.2, 0.5)
-LAMINA, LAMINA_ESCURA = ("capim", "capim_claro", "capim_escuro"), ("agulha", "agulha_clara", "agulha_escura")
+# a lâmina fina pela folha: o material, o do lado da luz e o do lado de lá (a miúda é a do capim)
+LAMINAS_DA_FOLHA = {"miuda": ("capim", "capim_claro", "capim_escuro"),
+                    "agulha": ("agulha", "agulha_clara", "agulha_escura"),
+                    "cinzenta": ("cinza_verde", "cinza_verde_claro", "cinza_verde_escuro")}
 LIMITES = {"fuste": (0.05, 0.8), "esbeltez": (4.0, 40.0), "vento": (-1.0, 1.0), "cortina": (0.0, 1.0)}
 
 
@@ -285,7 +288,7 @@ def _touceira(m: _Medidas) -> list[No]:
                     abre=f"{min(0.95, m.w / 2 / longa):.2f}", cai=f"{FRONDE[1]:g}",
                     largura=_px(max(3.0, longa * FRONDE[0])), pena=True, material="folha", claro="folha_clara",
                     escuro="folha_escura")]
-    comum, claro, escuro = LAMINA_ESCURA if m.folha == "agulha" else LAMINA
+    comum, claro, escuro = LAMINAS_DA_FOLHA[m.folha]
     alcance = ABRE_DA_TOUCEIRA * m.w
     abre = min(LAMINA_EM_PE[0], alcance / m.h)
     return [_no("folhas", "touceira", "folhas", altura=[_px(LAMINAS[1] * m.h), _px(m.h)],

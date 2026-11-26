@@ -481,6 +481,46 @@
     140,
     255
    ]
+  },
+  {
+   "index": 54,
+   "id": "cinza_verde_fundo",
+   "rgba": [
+    36,
+    44,
+    38,
+    255
+   ]
+  },
+  {
+   "index": 55,
+   "id": "cinza_verde_escuro",
+   "rgba": [
+    66,
+    78,
+    64,
+    255
+   ]
+  },
+  {
+   "index": 56,
+   "id": "cinza_verde",
+   "rgba": [
+    104,
+    120,
+    94,
+    255
+   ]
+  },
+  {
+   "index": 57,
+   "id": "cinza_verde_claro",
+   "rgba": [
+    156,
+    170,
+    136,
+    255
+   ]
   }
  ],
  "materials": [
@@ -1048,16 +1088,16 @@
    ],
    "outline_index": 1,
    "texture": {
-    "density_permille": 350,
-    "depth_permille": 330,
-    "jitter_permille": 100,
+    "density_permille": 750,
+    "depth_permille": 500,
+    "jitter_permille": 30,
     "kind": "dashes",
     "length_px": [
-     1,
-     2
+     3,
+     6
     ],
-    "lift_permille": 300,
-    "period_px": 2,
+    "lift_permille": 600,
+    "period_px": 3,
     "seed": 41
    }
   },
@@ -1152,10 +1192,10 @@
   {
    "id": "copa_cinzenta",
    "ramp": [
-    50,
-    51,
-    52,
-    53
+    54,
+    55,
+    56,
+    57
    ],
    "outline_index": 1,
    "texture": {
@@ -1170,6 +1210,71 @@
     "lift_permille": 300,
     "period_px": 2,
     "seed": 59
+   }
+  },
+  {
+   "id": "cinza_verde",
+   "ramp": [
+    55,
+    56,
+    57
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "cinza_verde_fundo",
+   "ramp": [
+    54,
+    54
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "cinza_verde_escuro",
+   "ramp": [
+    55,
+    55
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "cinza_verde_claro",
+   "ramp": [
+    57,
+    57
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "casca_alva",
+   "ramp": [
+    52,
+    53,
+    22
+   ],
+   "outline_index": 1
+  },
+  {
+   "id": "casca_alva_anelada",
+   "ramp": [
+    50,
+    53,
+    22
+   ],
+   "outline_index": 1,
+   "texture": {
+    "density_permille": 550,
+    "depth_permille": 600,
+    "grain": "across",
+    "jitter_permille": 0,
+    "kind": "dashes",
+    "length_px": [
+     2,
+     5
+    ],
+    "lift_permille": 0,
+    "period_px": 3,
+    "seed": 61
    }
   }
  ],

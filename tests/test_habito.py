@@ -139,6 +139,20 @@ def test_a_touceira_fina_e_a_de_folha_larga() -> None:
     assert larga["pena"] is True and _px(larga["largura"]) >= 3 and float(larga["abre"]) > 0.7  # a samambaia
 
 
+def test_a_folha_cinzenta_pinta_a_copa_e_a_lamina_de_cinza_verde() -> None:
+    """A folha cinzenta (a cor da folhagem: tests/test_estilo.py) vale em toda construção de folha: a copa em massa
+    e a moita com o miolo do fundo da rampa dela, a nuvem do aberto e a lâmina fina da touceira; e passa na crítica."""
+    copa = _args(_comp(habito="decurrente", folha="cinzenta"), "copa")
+    assert (copa["material"], copa["miolo"]) == ("copa_cinzenta", "cinza_verde_fundo")
+    moita = _comp("arbusto", habito="moita", altura="60cm", largura="90cm", folha="cinzenta")
+    assert _args(moita, "copa")["material"] == "copa_cinzenta"
+    assert _args(_comp(habito="aberto", folha="cinzenta"), "copa")["material"] == "copa_cinzenta"
+    lamina = _args(_comp("arbusto", habito="touceira", altura="50cm", largura="60cm", folha="cinzenta"), "folhas")
+    assert (lamina["material"], lamina["claro"], lamina["escuro"]) == ("cinza_verde", "cinza_verde_claro",
+                                                                       "cinza_verde_escuro")
+    assert not [a for a in flora.achados(critica.medir(moita)[0], False, {}) if a["gravidade"] == "defeito"]
+
+
 def _pes_do_capim() -> float:
     """O vão (px) entre o pé mais à esquerda e o mais à direita das lâminas de um capim derivado de 60 cm."""
     ir = ir_da_composicao(_comp("objeto", habito="touceira", altura="45cm", largura="60cm"))
