@@ -241,7 +241,7 @@ def test_o_claro_das_laminas_fica_do_lado_da_luz_em_toda_vista() -> None:
 
 def test_controle_com_o_lado_da_luz_do_mundo_o_claro_vira_nas_outras_vistas(monkeypatch: pytest.MonkeyPatch) -> None:
     """Com o lado da luz tirado do mundo (o da vista S), na vista N o claro cai todo do lado da sombra."""
-    monkeypatch.setattr(pecas_ervas, "_lado_da_luz", lambda az, _azimute: -math.sin(az))
+    monkeypatch.setattr(pecas_ervas, "_lado_da_luz", lambda az, _azimute, _de_cima=0.0: -math.sin(az))
     esquerda, direita = _claras_em_cada_vista()["N"]
     assert direita >= 3 * esquerda
 

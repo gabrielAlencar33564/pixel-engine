@@ -90,16 +90,19 @@ NUVEM = 0.15  # a meia largura da nuvem de folhas do hábito aberto, em larguras
 # um galho a mais, bifurcado, sai para o lado de lá, 40 % mais longe e mais baixo (a copa em bandeira)
 BANDEIRA = (0.5, 0.4)
 # a touceira: as lâminas finas pela largura na tela (de 7 a 18, uma a cada 1,6 px) e o comprimento da mais curta;
-# a folha larga em pena: a largura dela em comprimentos e o arco que a ponta cai
+# a folha larga em pena: a largura dela em comprimentos (a fronde do feto tem de 0,2 a 0,3; com 0,2 a de 60 cm
+# saía com 5 px, e o corpo dela não aparecia entre o contorno e a nervura) e o arco que a ponta cai
 LAMINAS = (1.6, 0.6)
 PE_DA_TOUCEIRA = 0.3  # o raio do pé das lâminas finas, em larguras da touceira: cada lâmina no seu pé
 ABRE_DA_TOUCEIRA = 0.43  # o alcance das pontas que leva a touceira até a largura pedida (o pé e a abertura o somam)
 # a lâmina fina abre no máximo isto e cai no máximo isto: a flor (o ``salpico`` nas pontas) pede a lâmina quase em
 # pé e reta; a largura que a abertura não dá vem do pé, mais largo
 LAMINA_EM_PE = (0.35, 0.08)
-FRONDE = (0.2, 0.5)
-# a lâmina fina pela folha: o material, o do lado da luz e o do lado de lá (a miúda é a do capim)
-LAMINAS_DA_FOLHA = {"miuda": ("capim", "capim_claro", "capim_escuro"),
+FRONDE = (0.25, 0.5)
+# a lâmina pela folha: o material, o do lado da luz e o do lado de lá (a miúda é a do capim; a larga, a fronde em
+# pena, tem o verde da copa de folha larga: com o da folha miúda ela saía verde-limão)
+LAMINAS_DA_FOLHA = {"larga": ("folhosa", "folhosa_clara", "folhosa_escura"),
+                    "miuda": ("capim", "capim_claro", "capim_escuro"),
                     "agulha": ("agulha", "agulha_clara", "agulha_escura"),
                     "cinzenta": ("cinza_verde", "cinza_verde_claro", "cinza_verde_escuro")}
 LIMITES = {"fuste": (0.05, 0.8), "esbeltez": (4.0, 40.0), "vento": (-1.0, 1.0), "cortina": (0.0, 1.0)}
@@ -281,14 +284,14 @@ def _touceira(m: _Medidas) -> list[No]:
     lâminas finas, cada uma no seu pé (espalhadas pela largura da touceira: o capim não nasce de um ponto só, e as
     lâminas ficam separadas), quase em pé e quase retas, de ponta para cima (a flor nas pontas se lê): na touceira
     baixa e larga, o pé leva as lâminas até a largura que a abertura não dá."""
+    comum, claro, escuro = LAMINAS_DA_FOLHA[m.folha]
     if m.folha == "larga":
         longa = math.hypot(m.h, m.w / 2)
         n = {"jovem": 7, "adulta": 9, "velha": 11}[m.planta.idade]
         return [_no("folhas", "touceira", "folhas", altura=[_px(0.8 * longa), _px(longa)], n=str(n),
                     abre=f"{min(0.95, m.w / 2 / longa):.2f}", cai=f"{FRONDE[1]:g}",
-                    largura=_px(max(3.0, longa * FRONDE[0])), pena=True, material="folha", claro="folha_clara",
-                    escuro="folha_escura")]
-    comum, claro, escuro = LAMINAS_DA_FOLHA[m.folha]
+                    largura=_px(max(3.0, longa * FRONDE[0])), pena=True, material=comum, claro=claro,
+                    escuro=escuro)]
     alcance = ABRE_DA_TOUCEIRA * m.w
     abre = min(LAMINA_EM_PE[0], alcance / m.h)
     return [_no("folhas", "touceira", "folhas", altura=[_px(LAMINAS[1] * m.h), _px(m.h)],

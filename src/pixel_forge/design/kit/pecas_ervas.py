@@ -15,7 +15,9 @@ from .peca import Arg, Ctx, Peca
 QUATRO = ("S", "E", "N", "W")
 TRECHOS = 5  # os trechos do arco da lâmina
 FIO = ("flat", "no_outline")  # a lâmina fina: chapada e sem contorno, mas lança a sombra dela no chão (não é detalhe)
-PENA = ("no_inner_outline", "borda_serrilhada")  # a folha em pena: o corpo roliço, de beira serrilhada
+# a folha em pena: chapada (o tom do lado da luz dela; com as faixas de luz e de sombra da peça lisa cada folha tinha
+# o risco claro dela, e a roseta não tinha lado claro), com o contorno de fora partido dente a dente
+PENA = ("flat", "no_inner_outline", "borda_serrilhada")
 # a folha larga lisa: chapada (um tom só, o do lado da luz dela), com o contorno de fora; com as faixas de luz e de
 # sombra da peça lisa ela lia como um tubo
 FOLHA_LISA = ("flat", "no_inner_outline")
@@ -25,8 +27,14 @@ ABRE_MENOS = 0.35  # a lâmina mais fechada abre 35 % do pedido (poucas: a maior
 ABRE_MENOS_A_LARGA = 0.75  # e a folha larga, 75 %: a roseta abre por igual
 TOM = 0.3  # a lâmina sai clara ou escura quando o tom dela (de −1 a 1) passa disto
 LADO_DA_LUZ = 0.45  # o tom é isto do lado para onde a lâmina abre (a esquerda da tela é a da luz) e o resto, sorteio
-# a largura da folha em cada ponto do arco (fração da largura): estreita no pé, larga antes do meio, ponta fina
+# e na folha em pena, o lado da luz pesa isto e vem de cima à esquerda da tela (a folha que abre para trás sobe na
+# tela): a roseta tem o lado claro e o escuro de uma massa (com o peso da lâmina e só a esquerda, o sorteio levava
+# fronde clara para o lado da sombra)
+LUZ_DA_PENA = (0.8, math.pi / 4)
+# a largura da folha em cada ponto do arco (fração da largura): estreita no pé, larga antes do meio, ponta fina; a
+# fronde em pena é larga do meio até perto da ponta (com a ponta fina, ela lia como um traço)
 LARGURA_NO_ARCO = (0.3, 0.6, 1.0, 0.9, 0.55, 0.15)
+LARGURA_DA_PENA = (0.25, 0.55, 0.9, 1.0, 0.8, 0.35)
 RAIO_MINIMO = 32  # o menor raio da folha na IR (q8): 1/8 px
 MIOLO_DA_ROSETA = 0.55  # o raio do miolo escuro no pé das folhas largas, em larguras da folha
 FRENTE_LIVRE = 0.3  # a roseta de folhas largas gira até 0,15 do vão entre as câmeras para cada lado do meio dele (e
@@ -71,14 +79,16 @@ def _arco(pe: Vec, az: float, comprimento: float, forma: tuple[float, float, int
 
 def _folha(c: Ctx, pid: str, materiais: tuple[str, str], arco: list[Vec], forma: tuple[float, bool]) -> None:
     """A folha larga: o corpo ao longo do arco (estreito no pé, largo antes do meio e de ponta fina) e a nervura
-    escura no eixo: cada folha se lê pela nervura dela. Em pena, o corpo é roliço e a beira sai serrilhada dente a
-    dente (a marca ``borda_serrilhada``, no render), no grupo de contorno do nó (sem linha entre as folhas); lisa, o
-    corpo é chapado e, se cabe o contorno, a nervura e o tom, tem o grupo de contorno dele: a linha entre ela e a de
-    trás separa as folhas (no grupo do nó, a roseta de poucas folhas largas lia como uma estrela só)."""
+    escura no eixo: cada folha se lê pela nervura dela. O corpo é chapado. Em pena, a fronde é larga até perto da
+    ponta e o contorno de fora sai partido dente a dente (a marca ``borda_serrilhada``, no render), no grupo de
+    contorno do nó (sem linha entre as folhas); lisa, se cabe o contorno, a nervura e o tom, ela tem o grupo de
+    contorno dela: a linha entre ela e a de trás separa as folhas (no grupo do nó, a roseta de poucas folhas largas
+    lia como uma estrela só)."""
     corpo, nervura = materiais
     largura, pena = forma
+    perfil = LARGURA_DA_PENA if pena else LARGURA_NO_ARCO
     geo = {"type": "tapered_polyline", "points_q8": [qv(*p) for p in arco],
-           "radii_q8": [max(RAIO_MINIMO, q(largura / 2 * k)) for k in LARGURA_NO_ARCO]}
+           "radii_q8": [max(RAIO_MINIMO, q(largura / 2 * k)) for k in perfil]}
     grupo, tags = c.grupo, tuple(PENA if pena else FOLHA_LISA)
     if not pena and largura >= COM_CONTORNO:
         grupo, tags = f"{c.grupo}_{pid}", tuple(t for t in FOLHA_LISA if t != "no_inner_outline")
@@ -101,10 +111,11 @@ def _lamina(c: Ctx, pid: str, material: str, arco: list[Vec]) -> None:
     c.b.part(pid, material, polyline([qv(*p) for p in arco], 1), Parte(group=c.grupo, tags=FIO))
 
 
-def _lado_da_luz(az: float, azimute_mdeg: int) -> float:
+def _lado_da_luz(az: float, azimute_mdeg: int, de_cima: float = 0.0) -> float:
     """De −1 a 1: quanto a lâmina que abre no azimute ``az`` (do mundo) vai para a esquerda da tela da vista (a luz
-    vem de cima à esquerda da tela em toda vista)."""
-    return -math.sin(az - math.radians(azimute_mdeg / 1000))
+    vem de cima à esquerda da tela em toda vista); com ``de_cima`` (rad), para a luz girada esse tanto para o alto da
+    tela (a lâmina que abre para trás sobe na tela)."""
+    return -math.sin(az - math.radians(azimute_mdeg / 1000) + de_cima)
 
 
 def _material(a: dict[str, Any], tom: float, pena: bool) -> str:
@@ -167,9 +178,10 @@ def _touceira(c: Ctx, a: dict[str, Any]) -> None:
         comprimento = a["altura"][0] + (a["altura"][1] - a["altura"][0]) * st.randint(0, 100) / 100
         abre = min(0.98, a["abre"] * (1 - fecha * (st.randint(0, 100) / 100) ** 2))
         arco = _arco(pe, az, comprimento, (abre, a["cai"], TRECHOS))
-        sorteio = (1 - LADO_DA_LUZ) * st.randint(-100, 100) / 100
+        peso, de_cima = (LUZ_DA_PENA if larga and a["pena"] else (LADO_DA_LUZ, 0.0))
+        sorteio = (1 - peso) * st.randint(-100, 100) / 100
         pid = f"{c.pid}_{i:02d}"
-        tons = {v: _material(a, LADO_DA_LUZ * _lado_da_luz(az, giro_da_vista) + sorteio, larga and a["pena"])
+        tons = {v: _material(a, peso * _lado_da_luz(az, giro_da_vista, de_cima) + sorteio, larga and a["pena"])
                 for v, giro_da_vista in c.vistas.items()}
         if larga and not a["pena"]:  # a folha lisa não repete o tom das vizinhas na volta (a última fecha com a 1ª)
             junto = vizinhas[-1:] + (vizinhas[:1] if i == n - 1 else [])
@@ -286,8 +298,9 @@ PECAS_ERVAS = [
                "pé; 0.9 = deitada)", "0.5"),
              X("cai", "escalar", "quanto a ponta cai da altura do arco (0 = reta; 1 = volta à altura do pé)", "0.3"),
              X("largura", "comprimento", "a largura da folha (0 = lâmina fina, de 1 px)", "0"),
-             X("pena", "bool", "a folha larga em pena (a samambaia, a palma): roliça e de beira serrilhada, em vez "
-               "de chapada e lisa (as duas com a nervura no tom escuro)", False),
+             X("pena", "bool", "a folha larga em pena (a samambaia, a palma): larga até perto da ponta, de beira "
+               "serrilhada e com a luz da roseta inteira, em vez de lisa (as duas chapadas, com a nervura no tom "
+               "escuro)", False),
              X("raio", "comprimento", "o raio do pé: as lâminas nascem espalhadas nele", "0"),
              X("pe", "ponto", "de onde nasce (o chão, ou o alto de um tronco)", ["0", "0", "0"]),
              X("material", "material", "a lâmina comum", "capim"),
@@ -297,8 +310,8 @@ PECAS_ERVAS = [
                      ("junco", {"altura": ["70cm", "1.2m"], "n": "9", "abre": "0.22", "cai": "0.05",
                                 "raio": "15cm"}),
                      ("samambaia", {"altura": ["50cm", "75cm"], "n": "8", "abre": "0.75", "cai": "0.45",
-                                    "largura": "22cm", "pena": True, "material": "folha", "claro": "folha_clara",
-                                    "escuro": "folha_escura"}),
+                                    "largura": "18cm", "pena": True, "material": "folhosa",
+                                    "claro": "folhosa_clara", "escuro": "folhosa_escura"}),
                      ("espada", {"altura": ["50cm", "80cm"], "n": "11", "abre": "0.6", "cai": "0",
                                  "largura": "10cm", "material": "agulha", "claro": "agulha_clara",
                                  "escuro": "agulha_escura"})),

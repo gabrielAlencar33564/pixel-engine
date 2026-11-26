@@ -1,5 +1,6 @@
 """Os contornos: o interno, no lado da peça de trás onde o grupo muda, e o externo, por dentro da silhueta (a figura
-não engorda) com o sel-out (o lado da luz no tom mais escuro do material) e a limpeza pixel-perfect dos cantos."""
+não engorda) com o sel-out (o lado da luz no tom mais escuro do material), a limpeza pixel-perfect dos cantos e, na
+folha em pena, a linha partida dente a dente."""
 
 from __future__ import annotations
 
@@ -8,9 +9,11 @@ import numpy.typing as npt
 
 from .estilo import EstiloRender
 from .grade import Mascara, pixel_perfect, shift
-from .montagem import Buf16, Camadas, Tabelas
+from .montagem import Buf16, Camadas, Tabelas, sorteadas
 
 QUATRO = ((1, 0), (-1, 0), (0, 1), (0, -1))
+BORDA_SERRILHADA = "borda_serrilhada"  # a marca da folha em pena: o contorno de fora sai partido, dente a dente
+SERRILHA_PARTE = 500  # os pixels desse contorno que voltam a ser vazio (‰)
 
 
 def contorno_interno(cam: Camadas, t: Tabelas, index: Buf16) -> Mascara:
@@ -84,4 +87,20 @@ def contorno_externo(est: EstiloRender, cam: Camadas, t: Tabelas, bufs: tuple[Bu
     cam.part = np.where(gone, 0, cam.part).astype(cam.part.dtype)
     ring &= ~drop
     inner &= ~drop
-    return ring
+    dentes = _serrilha(cam, ring)
+    alpha[dentes] = 0
+    cam.part = np.where(dentes, 0, cam.part).astype(cam.part.dtype)
+    return ring & ~dentes
+
+
+def _serrilha(cam: Camadas, ring: Mascara) -> Mascara:
+    """Os pixels do contorno de fora da peça ``borda_serrilhada`` que saem: a metade, sorteada pixel a pixel (contada
+    do canto da máscara dela), e a beira da folha aparece entre os que ficam, sem linha. A folha não perde o corpo:
+    recortada na máscara, ela perdia o pixel do dente, a linha entrava no lugar dele e a folha de 5 px virava um
+    traço de 1 px de cor cercado de contorno."""
+    dentes = np.zeros(ring.shape, dtype=bool)
+    for p in (p for p, c in cam.cmds.items() if BORDA_SERRILHADA in c.tags):
+        dela = ring & (cam.part == cam.num[p])
+        if dela.any():
+            dentes |= dela & sorteadas(cam.full[p], 1, SERRILHA_PARTE)
+    return dentes
