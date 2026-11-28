@@ -1,8 +1,7 @@
 # Estado da engine corrigida
 
 Entrada: `README.md`. Plano, decisões e regras: `docs/plano.md`, `decisoes.md`, `regras.md`. **N0 a N5 feitos.**
-Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine); os commits desde `20004c3` (2026-11-25) ainda
-não foram enviados. Oráculo: o clone local `pixel-engine`.
+Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. Oráculo: o clone local `pixel-engine`.
 
 ## O que a engine tem
 
