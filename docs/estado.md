@@ -1,7 +1,8 @@
 # Estado da engine corrigida
 
 Entrada: `README.md`. Plano, decisões e regras: `docs/plano.md`, `decisoes.md`, `regras.md`. **N0 a N5 feitos.**
-Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. Oráculo: o clone local `pixel-engine`.
+Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine); os commits desde `20004c3` (2026-11-25) ainda
+não foram enviados. Oráculo: o clone local `pixel-engine`.
 
 ## O que a engine tem
 
@@ -20,15 +21,16 @@ Remoto: `gabrielAlencar33564/pixel-engine`, só a `main` (esta engine), em dia. 
   deriva o tronco, os galhos e a copa; e a recusa `LIGACAO` do que fica no ar (o galho nasce do eixo do tronco).
   A ligação é da estrutura, conferida na geometria: o pixel não se junta, e as lâminas do capim ficam separadas.
   Na última prova de fora (dez plantas só pela skill, 2026-11-25) nove saíram pelos traços com uma prévia cada;
-  o revisor de fora passou cinco e devolveu cinco (a samambaia, o chorão, a oliveira, os dois arbustos).
+  o revisor de fora passou cinco e devolveu cinco (a samambaia, o chorão, a oliveira, os dois arbustos). Das
+  cinco só a samambaia foi mexida (`73f4488`), e o dono devolveu a cor dela (em "O que não veio ou não passou").
 
 ## Números contra a linha de base
 
 | Medida | `pixel-engine` | engine nova |
 |---|---|---|
-| Linhas em `src/` | 32 701 | 8 273 |
-| Arquivos rastreados | 9 672 | 152 |
-| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | ~38 s, 285 testes |
+| Linhas de Python em `src/` | 32 701 | 10 389 (8 273 antes da flora) |
+| Arquivos rastreados | 9 672 | 175 |
+| Suíte completa (`check.py`) | 5 min 13 s, 918 testes | 1 min 14 s a 1 min 35 s, 513 testes (2026-11-28) |
 | Carvalho: relógio do agente | ~9 min | 3 min 49 s |
 | Carvalho: máquina | ~2 min 57 s (prévia 5 s, novo 2 min 27 s, build 23 s, export 2 s) | 27 s em 11 chamadas |
 | Poço / camponesa: máquina | — | 17 s / 25 s, 11 chamadas cada |
@@ -121,10 +123,17 @@ Além delas: a saia mede a barra pelo quadril; a camada do nó separa os nós; o
   sombra da copa alta sai em manchas; a crítica não mede o brócolis (fica na pergunta de quem revisa) e compara só
   a silhueta. As plantas antigas do acervo não foram refeitas: as de `copa` dão outro desenho
   e as de `copa_conica` com `saia` não se leem mais (em `docs/decisoes.md`).
+- A samambaia (`73f4488`, 2026-11-26): a fronde ganhou o corpo, o contorno partido e o lado claro, mas foi ao verde
+  escuro da folhosa, e o dono a achou inferior na cor (prefere o tom claro de antes). Faltam a cor clara de volta,
+  os cortes em cada braço da folha (os folíolos, pedido dele) e a prancha numerada em `mudancas/` (as de comparação
+  estão em `pranchas/regressao_opus/`).
+- As outras quatro que o revisor de fora devolveu (o chorão, a oliveira, o arbusto de frutos, o arbusto claro) não
+  foram mexidas: o parecer é hipótese, e o desenho espera o dono ver a prancha e dizer se concorda com o defeito.
 
 ## Espera o dono
 
 A revisão artística dos builds a 0,6 e das mudanças intencionais (`pfe revisar <build> --veredito ...`), com a
 flora em volumes entre elas. Nenhuma
 arte foi aprovada pela engine nem por mim; os pacotes saem como prévia (`art_review: pending`). A camponesa do acervo
-(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 18 ela ainda não foi reconstruída.
+(`98f3c0ef2a49`) é a do humano antigo: com as mudanças 7 a 18 ela ainda não foi reconstruída. Da flora, espera o
+olho dele nas quatro plantas devolvidas, antes de qualquer correção.

@@ -730,6 +730,24 @@ revisarem o que entregam. Pranchas: `21`, `21b` e `21c`.
   e 4,3 m contra os 3,2 m da ficha (foi composta nó por nó). O arbusto de frutos: as bagas são retângulos
   chapados de 2 a 4 px, soltos. O arbusto claro: duas massas em linha com um vale (amendoim), não três corcovas.
   Nenhuma dessas a crítica da máquina acusou.
+- A samambaia depois da revisão (`73f4488`, 2026-11-26; um agente, a partir do parecer de fora): a fronde derivada
+  de 5 px perdia o corpo entre o contorno e a nervura (o recorte da beira na máscara tirava o pixel do dente e o
+  contorno entrava no lugar dele: 29 % da figura era contorno, e o corpo tinha 1,9 px). A `borda_serrilhada` passou
+  a partir o contorno de fora (metade dos pixels dele volta a ser vazio, contada do canto da máscara) e a máscara
+  não é mais recortada; a fronde em pena é chapada, larga até perto da ponta (`LARGURA_DA_PENA`) e tem 0,25 do
+  comprimento (era 0,2); o tom vem do lado da luz da tela erguido 45° para o alto, com peso 0,8 (`LUZ_DA_PENA`); a
+  fronde derivada e a samambaia do kit foram do verde `folha` ao `folhosa`, e a do kit a 18 cm (era 22). Nos portes
+  de 0,4 a 1 m, em quatro sementes: o contorno foi de 29 % a 11 % da figura, o corpo de 1,9 a 3,1 px, e o claro cai
+  100 % na metade de cima à esquerda em toda vista (era 80 %). Os testes, com os controles: `tests/test_fronde.py`.
+  Nas variações do kit só a samambaia muda; os exemplos não mudam.
+- O dono olhou (2026-11-26; as pranchas de comparação em `~/.pixel-forge/acervo/pranchas/regressao_opus/`): a
+  samambaia nova é inferior na cor (ele prefere o tom claro de antes; o verde escuro era pedido do parecer de fora),
+  e falta o que nenhum revisor pediu: os vários cortes em cada braço da folha (os folíolos). A queixa era só da cor,
+  e o commit não foi revertido. As outras plantas do acervo (os pinheiros, os ciprestes, os salgueiros, a erva)
+  saíram iguais. Fica aberto: a cor clara de volta (o teste `test_a_fronde_tem_o_verde_da_copa_de_folha_larga` e o
+  controle dele afirmam o verde escuro, e mudam junto), os folíolos e a prancha numerada do antes e do depois em
+  `mudancas/`. As outras quatro devolvidas (o chorão, a oliveira, os dois arbustos) não foram mexidas: o parecer de
+  fora é hipótese, e o desenho só muda depois de o dono ver a prancha e concordar com o defeito.
 - O que sobra: a casca clara e a anelada seguem lilases (as alvas são a escolha neutra); o traço da agulha é
   sempre deitado (a textura do volume não tem direção) e cruza a ponta caída do pinheiro; no chorão de 5 m os
   ramos têm 6 a 7 px no alto e a cortina é rala e reta; a nervura some na folha lisa escura; no capim pequeno
